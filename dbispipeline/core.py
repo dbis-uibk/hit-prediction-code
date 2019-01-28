@@ -1,21 +1,21 @@
 from sklearn.pipeline import Pipeline
 
 
-class core:
+class Core:
     def __init__(self, pipeline_config):
         self.setup(pipeline_config)
 
 
     def setup(self, pipeline_config):
-        self.dataloder = pipeline_config.dataloder()
+        self.dataloder = pipeline_config.dataloader
 
-        steps = pipeline_config.steps()
+        steps = pipeline_config.pipeline
         if steps is not None:
             self.pipeline = Pipeline(steps)
         else:
             self.pipeline = None
 
-        self.evaluation = pipeline_config.evaluator()
+        self.evaluation = pipeline_config.evaluator
 
 
     def run(self):

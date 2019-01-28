@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 
 import argparse
+import importlib
 import json
 from datetime import datetime
 import pandas as pd
-from sklearn.model_selection import GridSearchCV, KFold
+from dbispipeline.core import Core as Pipeline
 
 
 def setup_argument_parser():
@@ -26,7 +27,7 @@ def setup_argument_parser():
         type=str,
         help='path to config file',
         dest='config_file',
-        default="./config/config.json"
+        default="config.config"
     )
 
     return parser.parse_args()
@@ -34,6 +35,11 @@ def setup_argument_parser():
 
 def main():
     print("Hallo Hit Songs!")
+
+    cmd_args = setup_argument_parser()
+
+    pipeline_config = importlib.import_module(cmd_args.config_file, '.')
+    pipeline = Pipeline(pipeline_config)
 
 if __name__ == '__main__':
     main()

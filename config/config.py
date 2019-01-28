@@ -1,15 +1,29 @@
-from dbis-pipeline.config import DbisPipelineConfig
-
 from dataloaders.demo_data import Loader
+from dbispipeline.evaluator import GridEvaluator
 
-class Config(DbisPipelineConfig):
+from sklearn.svm import SVC
+from sklearn.preprocessing import StandardScaler
 
-    def dataloader(self):
-        return Loader()
 
-    def steps(self):
-        return None
+dataloader = Loader()
 
-    def evaluator(self):
-        return None
+pipeline = [
+    ('std', StandardScaler()),
+    ('classifier', SVC())
+]
+
+pipeline_params = {
+    'std__with_mean': [True, False],
+    'std__with_std': [True, False],
+    'classifier__C': [0.1, 1.0],
+    'svm__kernel': ['linear', 'rbf']
+}
+
+gridsearch = {
+    'scoring': 'accuracy',
+    'verbose': 1,
+    'n_jobs': 1
+}
+
+evaluator = GridEvaluator()
 
