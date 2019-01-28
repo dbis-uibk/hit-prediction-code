@@ -14,6 +14,7 @@ def main():
     repo = git.Repo(search_parent_directories=True)
     sha_commit_id = repo.head.object.hexsha
     print(sha_commit_id)
+    print(repo.remotes.origin.url)
     print(repo.is_dirty())
 
     pipeline = Pipeline()
