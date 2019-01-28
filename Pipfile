@@ -19,6 +19,7 @@ pandas = "*"
 gensim = "*"
 tensorflow = "*"
 sklearn = "*"
+gitpython = "*"
 
 [requires]
 python_version = "3.6"
