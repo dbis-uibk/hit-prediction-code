@@ -26,7 +26,7 @@ class Core:
             self.gridsearch = GridSearchCV(
                 self.pipeline,
                 pipeline_config.pipeline_params,
-                *pipeline_config.gridsearch
+                **pipeline_config.gridsearch
             )
 
         self.evaluation = pipeline_config.evaluator
@@ -45,7 +45,7 @@ class Core:
             X, y = self.dataloder.load_test()
             prediction = self.pipeline.predict(X)
 
-        self.result = self.evaluation.evaluate(X, y, prediction)
+        self.result = self.evaluation.evaluate(self.gridsearch, (X, y, prediction))
 
         if self.result is not None:
             self.store()
@@ -56,8 +56,7 @@ class Core:
 
 
     def store(self):
-        raise NotImplementedError()
-
+        print("Not storing the results.")
 
 def load_config(file_path):
     spec = importlib.util.spec_from_file_location('config', file_path)

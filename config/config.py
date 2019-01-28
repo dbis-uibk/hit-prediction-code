@@ -16,7 +16,7 @@ pipeline_params = {
     'std__with_mean': [True, False],
     'std__with_std': [True, False],
     'classifier__C': [0.1, 1.0],
-    'svm__kernel': ['linear', 'rbf']
+    'classifier__kernel': ['linear', 'rbf']
 }
 
 gridsearch = {

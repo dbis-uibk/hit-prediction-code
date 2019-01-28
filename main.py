@@ -11,6 +11,7 @@ def main():
     print("Hallo Hit Songs!")
 
     pipeline = Pipeline()
+    pipeline.run()
 
 if __name__ == '__main__':
     main()
