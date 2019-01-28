@@ -1,8 +1,15 @@
+import argparse
+import importlib.util
 from sklearn.pipeline import Pipeline
+from sklearn.model_selection import GridSearchCV
 
 
 class Core:
-    def __init__(self, pipeline_config):
+    def __init__(self, pipeline_config=None):
+        if not pipeline_config:
+            cmd_args = setup_argument_parser()
+            pipeline_config = load_config(cmd_args.config_file)
+
         self.setup(pipeline_config)
 
 
@@ -14,6 +21,13 @@ class Core:
             self.pipeline = Pipeline(steps)
         else:
             self.pipeline = None
+
+        if pipeline_config.gridsearch:
+            self.gridsearch = GridSearchCV(
+                self.pipeline,
+                pipeline_config.pipeline_params,
+                *pipeline_config.gridsearch
+            )
 
         self.evaluation = pipeline_config.evaluator
 
@@ -43,3 +57,37 @@ class Core:
 
     def store(self):
         raise NotImplementedError()
+
+
+def load_config(file_path):
+    spec = importlib.util.spec_from_file_location('config', file_path)
+    pipeline_config = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(pipeline_config)
+
+    return pipeline_config
+
+
+def setup_argument_parser():
+    """Configures the argument pareser."""
+
+    parser = argparse.ArgumentParser(
+        description='Exploring hit song predictions.')
+
+    parser.add_argument(
+        '-d, --dataset',
+        type=str,
+        help='name of the dataset',
+        dest='dataset',
+        required=True
+    )
+
+    parser.add_argument(
+        '-c, --config-file',
+        type=str,
+        help='path to config file',
+        dest='config_file',
+        default="config/config.py"
+    )
+
+    return parser.parse_args()
+
