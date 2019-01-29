@@ -1,6 +1,7 @@
 from sklearn.datasets import samples_generator
+from dataloaders.loader import Loader
 
-class Loader:
+class DemoLoader(Loader):
     def load_train(self):
         return samples_generator.make_classification(n_informative=5, n_redundant=0, random_state=42)
 

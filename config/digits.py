@@ -1,22 +1,17 @@
-from dataloaders.demo_data import DemoLoader
+from dataloaders.digits_loader import DigitsLoader
 from dbispipeline.evaluator import GridEvaluator
 
 from sklearn.svm import SVC
 from sklearn.preprocessing import StandardScaler
 
-
-dataloader = DemoLoader()
+dataloader= DigitsLoader()
 
 pipeline = [
-    ('std', StandardScaler()),
-    ('classifier', SVC())
+    ("classifier", SVC()),
 ]
 
 pipeline_params = {
-    'std__with_mean': [True, False],
-    'std__with_std': [True, False],
-    'classifier__C': [0.1, 1.0],
-    'classifier__kernel': ['linear', 'rbf']
+    "classifier__gamma": [0.0001, 0.001, 0.01]
 }
 
 gridsearch_params = {
@@ -26,4 +21,3 @@ gridsearch_params = {
 }
 
 evaluator = GridEvaluator()
-

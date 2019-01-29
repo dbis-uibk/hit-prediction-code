@@ -28,6 +28,8 @@ class Core:
                 pipeline_config.pipeline_params,
                 **pipeline_config.gridsearch_params
             )
+        else:
+            self.gridsearch = None
 
         self.evaluation = pipeline_config.evaluator
 
