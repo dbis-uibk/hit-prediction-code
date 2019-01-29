@@ -19,7 +19,7 @@ pipeline_params = {
     'classifier__kernel': ['linear', 'rbf']
 }
 
-gridsearch = {
+gridsearch_params = {
     'scoring': 'accuracy',
     'verbose': 1,
     'n_jobs': 1

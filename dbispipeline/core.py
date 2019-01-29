@@ -22,11 +22,11 @@ class Core:
         else:
             self.pipeline = None
 
-        if pipeline_config.gridsearch:
+        if pipeline_config.gridsearch_params:
             self.gridsearch = GridSearchCV(
                 self.pipeline,
                 pipeline_config.pipeline_params,
-                **pipeline_config.gridsearch
+                **pipeline_config.gridsearch_params
             )
 
         self.evaluation = pipeline_config.evaluator
@@ -59,9 +59,31 @@ class Core:
         print("Not storing the results.")
 
 def load_config(file_path):
+    """Loads the config moduel from the given python file and checks whether that module is a valid config module.
+        :file_path: The path to the config module.
+    """
     spec = importlib.util.spec_from_file_location('config', file_path)
     pipeline_config = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(pipeline_config)
+
+    missing_members = []
+    if "dataloader" not in dir(pipeline_config):
+        missing_members.append("dataloader")
+
+    if "pipeline" not in dir(pipeline_config):
+        missing_members.append("pipeline")
+
+    if "pipeline_params" not in dir(pipeline_config):
+        missing_members.append("pipeline_params")
+
+    if "gridsearch_params" not in dir(pipeline_config):
+        missing_members.append("gridsearch_params")
+
+    if "evaluator" not in dir(pipeline_config):
+        missing_members.append("evaluator")
+
+    if len(missing_members) > 0:
+        raise ValueError(f"Module {file_path} is not a valid config module. The following members are missing: {','.join(missing_members)}.")
 
     return pipeline_config
 
