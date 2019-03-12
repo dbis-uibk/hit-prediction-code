@@ -1,6 +1,7 @@
 from sklearn.datasets import load_digits
 from dataloaders.loader import Loader
 
+
 class DigitsLoader(Loader):
     def __init__(self):
         data = load_digits(return_X_y=True)
