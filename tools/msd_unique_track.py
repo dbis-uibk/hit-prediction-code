@@ -5,7 +5,8 @@ import pandas as pd
 
 
 def main():
-    match_msd_billboard()
+    # match_msd_billboard()
+    bb_track_duplicates()
 
 
 def match_msd_billboard():
@@ -15,11 +16,21 @@ def match_msd_billboard():
     combined = pd.merge(
         msd,
         billboard,
-        how='inner',
+        how='outer',
         left_on=['artist', 'title'],
         right_on=['artist', 'title'])
-    with open('msd_bb_matches.csv', 'w') as out_file:
+    with open('msd_bb_matches_outer.csv', 'w') as out_file:
         combined.to_csv(out_file)
+
+
+def bb_track_duplicates():
+    bb = read_billboard_tracks()
+    tracks = bb.groupby(['artist', 'title'])
+
+    for index, group in tracks:
+        group_cnt = group.count()['peak']
+        if group_cnt > 1:
+            print(index, group_cnt)
 
 
 def msd_track_duplicates():
