@@ -1,3 +1,6 @@
+import csv
+import sys
+
 import pandas as pd
 
 
@@ -5,7 +8,16 @@ def main():
     msd = read_msd_tracks()
     unique_file_count = len(set(msd['track_file']))
     unique_id_count = len(set(msd['track_id']))
-    print(unique_file_count, unique_id_count)
+    print(str(unique_file_count) + ',' + str(unique_id_count))
+
+    tracks = msd.groupby(['track_id'])
+
+    for index, group in tracks:
+        group_cnt = group.count()['track_file']
+        if group_cnt > 1:
+            for item in group['track_file']:
+                output_line = item + ',' + index
+                print(output_line)
 
 
 def read_msd_tracks():
