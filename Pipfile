@@ -31,6 +31,7 @@ tensorflow = "*"
 sklearn = "*"
 gitpython = "*"
 dbispileline = {git = "ssh://git@git.uibk.ac.at/dbis/software/dbispipeline.git"}
+tables = "*"
 
 [requires]
 python_version = "3.6"
