@@ -5,27 +5,43 @@ import pandas as pd
 
 
 def main():
+    msd_track_duplicates()
+
+
+def main1():
     msd = read_msd_unique_tracks()
     bb = read_billboard_tracks()
 
-    match_and_store_datasets(msd, bb, 'msd_bb_matches.h5')
-    match_and_store_datasets(msd, bb, 'msd_bb_matches_left.h5', how='left')
+    match_and_store_datasets(msd, bb, 'msd_bb_matches.csv')
+    match_and_store_datasets(msd, bb, 'msd_bb_matches_left.csv', how='left')
+
+    features = read_msd_feature_files()
+    msd_bb = join(msd, bb, on=['artist', 'title'])
+    msd_bb_features = join(msd_bb, features, on=['msd_id'])
+    msd_bb_features.to_csv('msd_bb_feature_matches.csv')
+
+    msd_bb = join(msd, bb, on=['artist', 'title'], how='left')
+    msd_bb_features = join(msd_bb, features, on=['msd_id'])
+    msd_bb_features.to_csv('msd_bb_feature_matches_left.csv')
 
     msd_year = read_msd_tracks_per_year()[['year', 'msd_id']]
     msd_per_year = join(msd, msd_year, on=['msd_id'], how='inner')
-    match_and_store_datasets(msd_per_year, bb, 'msd_per_year_bb_matches.h5')
+    match_and_store_datasets(msd_per_year, bb, 'msd_per_year_bb_matches.csv')
 
 
-def match_and_store_datasets(left, right, output_file, how='inner', key='data'):
+def match_and_store_datasets(left, right, output_file, how='inner', hdf=None, key='data'):
     combined = join(
         left,
         right,
         on=['artist', 'title'],
         how=how)
-    combined.to_hdf(output_file, key=key)
+    if hdf:
+        combined.to_hdf(output_file, key=key)
+    else:
+        combined.to_csv(output_file)
 
 
-def join(left, right, on, how):
+def join(left, right, on, how='inner'):
     return pd.merge(
         left,
         right,
@@ -50,14 +66,18 @@ def msd_track_duplicates():
     unique_id_count = len(set(msd['echo_nest_id']))
     print(str(unique_file_count) + ',' + str(unique_id_count))
 
-    tracks = msd.groupby(['echo_nest_id'])
+    tracks = msd.groupby(['artist', 'title'])
 
+    count = 0
     for index, group in tracks:
         group_cnt = group.count()['msd_id']
         if group_cnt > 1:
             for item in group['msd_id']:
                 output_line = item + ',' + index
                 print(output_line)
+            count += 1
+
+    print(len(tracks), count)
 
 
 def read_msd_tracks_per_year():
@@ -78,6 +98,15 @@ def read_msd_unique_tracks():
         sep='<SEP>',
         header=None,
         names=['msd_id', 'echo_nest_id', 'artist', 'title'])
+
+
+def read_msd_feature_files():
+    file_path = '/storage/nas3/datasets/music/millionsongdataset/msd_audio_features/file_ids.csv'  # noqa E501
+
+    return pd.read_csv(
+        file_path,
+        header=None,
+        names=['msd_id'])
 
 
 def read_billboard_tracks():
