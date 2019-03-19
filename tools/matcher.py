@@ -9,19 +9,26 @@ def main1():
 
 
 def main():
-    msd = read_msd_tracks_per_year()
-    echo = read_msd_unique_tracks()[['msd_id', 'echo_nest_id']]
-    bb = read_billboard_tracks()
+    msd = read_msd_unique_tracks()
+    year = read_msd_tracks_per_year()[['msd_id', 'year']]
+    billboard = read_billboard_tracks()
     features = read_msd_feature_files()
 
+    msd = join(msd, year, on=['msd_id'])
     msd = join(msd, features, on=['msd_id'])
-    msd = join(msd, echo, on=['msd_id'])
 
-    msd.drop_duplicates(subset=['artist', 'title'], keep=False, inplace=True)
-    msd.drop_duplicates(subset=['echo_nest_id'], keep=False, inplace=True)
+    msd_bb = join(msd, billboard, on=['artist', 'title'])
+    remove_duplicates(msd_bb)
+    msd_bb.to_csv('msd_bb_matches.csv')
 
-    match_and_store_datasets(msd, bb, 'msd_bb_matches.csv')
-    match_and_store_datasets(msd, bb, 'msd_bb_all.csv', how='left')
+    msd_bb = join(msd, billboard, on=['artist', 'title'], how='left')
+    remove_duplicates(msd_bb)
+    msd_bb.to_csv('msd_bb_all.csv')
+
+
+def remove_duplicates(data):
+    data.drop_duplicates(subset=['artist', 'title'], keep=False, inplace=True)
+    data.drop_duplicates(subset=['echo_nest_id'], keep=False, inplace=True)
 
 
 def match_and_store_datasets(left,
