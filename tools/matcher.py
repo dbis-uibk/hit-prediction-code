@@ -45,7 +45,6 @@ def work(msd):
     billboard = read_billboard_tracks()
     results = pd.DataFrame(
         columns=list(msd.columns) + ['max_sim', 'artist_sim', 'title_sim'])
-    count = 0
     for _, row_msd in msd.iterrows():
         entry = {
             **row_msd,
@@ -65,10 +64,6 @@ def work(msd):
                 entry['weeks'] = row_bb['weeks']
         entry = pd.Series(entry)
         results = results.append(entry, ignore_index=True)
-        count += 1
-
-        if count >= 5:
-            break
 
     return results
 
