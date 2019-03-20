@@ -1,5 +1,11 @@
 import csv
 import sys
+import multiprocessing as mp
+
+from fuzzywuzzy import fuzz
+from fuzzywuzzy import process
+
+import numpy as np
 
 import pandas as pd
 
@@ -17,13 +23,54 @@ def main():
     msd = join(msd, year, on=['msd_id'])
     msd = join(msd, features, on=['msd_id'])
 
-    msd_bb = join(msd, billboard, on=['artist', 'title'])
-    remove_duplicates(msd_bb)
-    msd_bb.to_csv('msd_bb_matches.csv')
+    matches = join(msd, billboard, on=['artist', 'title'])
+    matches.to_csv('msd_bb_matches.csv')
 
-    msd_bb = join(msd, billboard, on=['artist', 'title'], how='left')
-    remove_duplicates(msd_bb)
-    msd_bb.to_csv('msd_bb_all.csv')
+    results = join(msd, billboard, on=['artist', 'title'], how='left')
+    results.to_csv('msd_bb_all.csv')
+
+    df_split = np.array_split(results, mp.cpu_count() * 4)
+
+    with mp.Pool() as pool:
+        result_entries = pool.imap_unordered(work, df_split)
+        fuzzy_results = pd.DataFrame(
+            columns=list(msd.columns) + ['max_sim', 'artist_sim', 'title_sim'])
+        for result in result_entries:
+            fuzzy_results = fuzzy_results.append(
+                result, ignore_index=True, sort=False)
+        fuzzy_results.to_csv('msd_bb_fuzzy_matches.csv')
+
+
+def work(msd):
+    billboard = read_billboard_tracks()
+    results = pd.DataFrame(
+        columns=list(msd.columns) + ['max_sim', 'artist_sim', 'title_sim'])
+    count = 0
+    for _, row_msd in msd.iterrows():
+        entry = {
+            **row_msd,
+            'max_sim': 0,
+        }
+        for _, row_bb in billboard.iterrows():
+            artist_sim, title_sim = fuzz.ratio(
+                row_msd['artist'], row_bb['artist']), fuzz.ratio(
+                    row_msd['title'], row_bb['title'])
+            sim = fuzz.ratio(row_msd['artist'] + '|#|' + row_msd['title'],
+                             row_bb['artist'] + '|#|' + row_bb['title'])
+            if sim > entry['max_sim']:
+                entry['max_sim'] = sim
+                entry['artist_sim'] = artist_sim
+                entry['title_sim'] = title_sim
+                entry['peak'] = row_bb['peak']
+                entry['weeks'] = row_bb['weeks']
+        entry = pd.Series(entry)
+        results = results.append(entry, ignore_index=True)
+        count += 1
+
+        if count >= 5:
+            break
+
+    return results
 
 
 def remove_duplicates(data):

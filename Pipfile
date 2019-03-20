@@ -32,6 +32,7 @@ sklearn = "*"
 gitpython = "*"
 dbispileline = {git = "ssh://git@git.uibk.ac.at/dbis/software/dbispipeline.git"}
 tables = "*"
+fuzzywuzzy = {extras = ["speedup"],version = "*"}
 
 [requires]
 python_version = "3.6"
