@@ -29,6 +29,12 @@ def main2():
         subset=['artist', 'title'], keep=False)]
     duplicates.to_csv('msd_bb_matches_duplicates.csv')
 
+    results = join(msd, billboard, on=['artist', 'title'], how='left')
+
+    duplicates = results[results.duplicated(
+        subset=['artist', 'title'], keep=False)]
+    duplicates.to_csv('msd_bb_all_duplicates.csv')
+
 
 def main():
     msd = read_msd_unique_tracks()
