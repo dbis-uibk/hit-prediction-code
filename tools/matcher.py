@@ -14,6 +14,22 @@ def main1():
     msd_track_duplicates()
 
 
+def main2():
+    msd = read_msd_unique_tracks()
+    year = read_msd_tracks_per_year()[['msd_id', 'year']]
+    billboard = read_billboard_tracks()
+    features = read_msd_feature_files()
+
+    msd = join(msd, year, on=['msd_id'])
+    msd = join(msd, features, on=['msd_id'])
+
+    matches = join(msd, billboard, on=['artist', 'title'])
+
+    duplicates = matches[matches.duplicated(
+        subset=['artist', 'title'], keep=False)]
+    duplicates.to_csv('msd_bb_matches_duplicates.csv')
+
+
 def main():
     msd = read_msd_unique_tracks()
     year = read_msd_tracks_per_year()[['msd_id', 'year']]
