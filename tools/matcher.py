@@ -46,9 +46,11 @@ def main():
     msd = join(msd, features, on=['msd_id'])
 
     matches = join(msd, billboard, on=['artist', 'title'])
+    keep_first_duplicate(matches)
     matches.to_csv('msd_bb_matches.csv')
 
     results = join(msd, billboard, on=['artist', 'title'], how='left')
+    keep_first_duplicate(results)
     results.to_csv('msd_bb_all.csv')
 
     df_split = np.array_split(results, mp.cpu_count() * 4)
@@ -88,6 +90,11 @@ def work(msd):
         results = results.append(entry, ignore_index=True)
 
     return results
+
+
+def keep_first_duplicate(data):
+    data.drop_duplicates(
+        subset=['artist', 'title'], keep='first', inplace=True)
 
 
 def remove_duplicates(data):
