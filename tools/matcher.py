@@ -64,6 +64,12 @@ def main():
                 result, ignore_index=True, sort=False)
         fuzzy_results.to_csv('msd_bb_fuzzy_matches.csv')
 
+        fuzzy_results = fuzzy_results.loc[fuzzy_results['title_sim'] <= 40]
+        fuzzy_results = fuzzy_results[[
+            'msd_id', 'echo_nest_id', 'artist', 'title', 'year'
+        ]]
+        fuzzy_results.to_csv('msd_bb_non_matches.csv')
+
 
 def work(msd):
     billboard = read_billboard_tracks()
