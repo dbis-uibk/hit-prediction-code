@@ -84,7 +84,7 @@ def match():
 def combine_lowlevel_features():
     hits = set(read_hits()['msd_id'])
     non_hits = set(read_non_hits()['msd_id'])
-    msd_ids = hits + non_hits
+    msd_ids = hits | non_hits
     features = _combine_ll_features(msd_ids)
     features.to_hdf('msd_bb_ll_features.h5', 'll')
 
@@ -107,7 +107,7 @@ def _combine_ll_features(msd_ids):
 def combine_highlevel_features():
     hits = set(read_hits()['msd_id'])
     non_hits = set(read_non_hits()['msd_id'])
-    msd_ids = hits + non_hits
+    msd_ids = hits | non_hits
     features = _combine_hl_features(msd_ids)
     features.to_hdf('msd_bb_hl_features.h5', 'hl')
 
