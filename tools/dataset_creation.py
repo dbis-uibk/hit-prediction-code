@@ -13,9 +13,16 @@ import numpy as np
 import pandas as pd
 
 
+RESULT_PATH = '.'
+BB_PATH = '/storage/nas3/datasets/music/billboard'
+MSD_PATH = '/storage/nas3/datasets/music/millionsongdataset'
+
+
 @click.group()
-def cli():
-    pass
+@click.option('--path', default='.', help='The path where the results are stored.')
+def cli(path):
+    global RESULT_PATH
+    RESULT_PATH = path
 
 
 def main1():
@@ -35,13 +42,13 @@ def main2():
 
     duplicates = matches[matches.duplicated(
         subset=['artist', 'title'], keep=False)]
-    duplicates.to_csv('msd_bb_matches_duplicates.csv')
+    duplicates.to_csv(RESULT_PATH + '/msd_bb_matches_duplicates.csv')
 
     results = join(msd, billboard, on=['artist', 'title'], how='left')
 
     duplicates = results[results.duplicated(
         subset=['artist', 'title'], keep=False)]
-    duplicates.to_csv('msd_bb_all_duplicates.csv')
+    duplicates.to_csv(RESULT_PATH + '/msd_bb_all_duplicates.csv')
 
 
 @cli.command()
@@ -56,11 +63,11 @@ def match():
 
     matches = join(msd, billboard, on=['artist', 'title'])
     keep_first_duplicate(matches)
-    matches.to_csv('msd_bb_matches.csv')
+    matches.to_csv(RESULT_PATH + '/msd_bb_matches.csv')
 
     results = join(msd, billboard, on=['artist', 'title'], how='left')
     keep_first_duplicate(results)
-    results.to_csv('msd_bb_all.csv')
+    results.to_csv(RESULT_PATH + '/msd_bb_all.csv')
 
     df_split = np.array_split(results, mp.cpu_count() * 4)
 
@@ -71,13 +78,13 @@ def match():
         for result in result_entries:
             fuzzy_results = fuzzy_results.append(
                 result, ignore_index=True, sort=False)
-        fuzzy_results.to_csv('msd_bb_fuzzy_matches.csv')
+        fuzzy_results.to_csv(RESULT_PATH + '/msd_bb_fuzzy_matches.csv')
 
         fuzzy_results = fuzzy_results.loc[fuzzy_results['title_sim'] <= 40]
         fuzzy_results = fuzzy_results[[
             'msd_id', 'echo_nest_id', 'artist', 'title', 'year'
         ]]
-        fuzzy_results.to_csv('msd_bb_non_matches.csv')
+        fuzzy_results.to_csv(RESULT_PATH + '/msd_bb_non_matches.csv')
 
 
 @cli.command()
@@ -86,11 +93,11 @@ def combine_lowlevel_features():
     non_hits = set(read_non_hits()['msd_id'])
     msd_ids = hits | non_hits
     features = _combine_ll_features(msd_ids)
-    features.to_hdf('msd_bb_ll_features.h5', 'll')
+    features.to_hdf(RESULT_PATH + '/msd_bb_ll_features.h5', 'll')
 
 
 def _combine_ll_features(msd_ids):
-    features_path = '/storage/nas3/datasets/music/millionsongdataset/msd_audio_features'  # noqa E501
+    features_path = MSD_PATH + '/msd_audio_features'  # noqa E501
 
     ll_features = pd.DataFrame()
     for msd_id in msd_ids:
@@ -109,11 +116,11 @@ def combine_highlevel_features():
     non_hits = set(read_non_hits()['msd_id'])
     msd_ids = hits | non_hits
     features = _combine_hl_features(msd_ids)
-    features.to_hdf('msd_bb_hl_features.h5', 'hl')
+    features.to_hdf(RESULT_PATH + '/msd_bb_hl_features.h5', 'hl')
 
 
 def _combine_hl_features(msd_ids):
-    features_path = '/storage/nas3/datasets/music/millionsongdataset/msd_audio_features'  # noqa E501
+    features_path = MSD_PATH + '/msd_audio_features'  # noqa E501
 
     hl_features = pd.DataFrame()
     for msd_id in msd_ids:
@@ -229,7 +236,7 @@ def _load_feature(features_path, msd_id, file_suffix):
 
 
 def read_msd_tracks_per_year():
-    file_path = '/storage/nas3/datasets/music/millionsongdataset/additional_files/tracks_per_year.txt'  # noqa E501
+    file_path = MSD_PATH + '/additional_files/tracks_per_year.txt'
 
     return pd.read_csv(
         file_path,
@@ -239,7 +246,7 @@ def read_msd_tracks_per_year():
 
 
 def read_msd_unique_artists():
-    file_path = '/storage/nas3/datasets/music/millionsongdataset/additional_files/unique_tracks.txt'  # noqa E501
+    file_path = MSD_PATH + '/additional_files/unique_tracks.txt'
 
     return pd.read_csv(
         file_path,
@@ -249,7 +256,7 @@ def read_msd_unique_artists():
 
 
 def read_msd_unique_tracks():
-    file_path = '/storage/nas3/datasets/music/millionsongdataset/additional_files/unique_tracks.txt'  # noqa E501
+    file_path = MSD_PATH + '/additional_files/unique_tracks.txt'
 
     return pd.read_csv(
         file_path,
@@ -259,24 +266,24 @@ def read_msd_unique_tracks():
 
 
 def read_msd_feature_files():
-    file_path = '/storage/nas3/datasets/music/millionsongdataset/msd_audio_features/file_ids.csv'  # noqa E501
+    file_path = MSD_PATH + '/msd_audio_features/file_ids.csv'
 
     return pd.read_csv(file_path, header=None, names=['msd_id'])
 
 
 def read_billboard_tracks():
-    file_path = '/storage/nas3/datasets/music/billboard_mp3/billboard_1954-2018_summary.csv'  # noqa E501
+    file_path = BB_PATH + '_mp3/billboard_1954-2018_summary.csv'
 
     return pd.read_csv(file_path)
 
 
 def read_hits():
-    file_path = '/storage/nas3/datasets/music/billboard/msd_bb_matches.csv'
+    file_path = BB_PATH + '/msd_bb_matches.csv'
     return pd.read_csv(file_path)
 
 
 def read_non_hits():
-    file_path = '/storage/nas3/datasets/music/billboard/msd_bb_non_matches.csv'
+    file_path = BB_PATH + '/msd_bb_non_matches.csv'
     return pd.read_csv(file_path)
 
 
