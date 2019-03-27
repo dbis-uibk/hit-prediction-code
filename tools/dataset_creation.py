@@ -1,6 +1,9 @@
 import csv
+import json
 import sys
 import multiprocessing as mp
+
+import click
 
 from fuzzywuzzy import fuzz
 from fuzzywuzzy import process
@@ -8,6 +11,11 @@ from fuzzywuzzy import process
 import numpy as np
 
 import pandas as pd
+
+
+@click.group()
+def cli():
+    pass
 
 
 def main1():
@@ -36,7 +44,8 @@ def main2():
     duplicates.to_csv('msd_bb_all_duplicates.csv')
 
 
-def main():
+@cli.command()
+def match():
     msd = read_msd_unique_tracks()
     year = read_msd_tracks_per_year()[['msd_id', 'year']]
     billboard = read_billboard_tracks()
@@ -69,6 +78,56 @@ def main():
             'msd_id', 'echo_nest_id', 'artist', 'title', 'year'
         ]]
         fuzzy_results.to_csv('msd_bb_non_matches.csv')
+
+
+@cli.command()
+def combine_lowlevel_features():
+    hits = set(read_hits()['msd_id'])
+    hit_features = _combine_ll_features(hits)
+    hit_features.to_hdf('msd_bb_matches_ll_features.h5', 'hits')
+
+    non_hits = set(read_non_hits()['msd_id'])
+    non_hit_features = _combine_ll_features(non_hits)
+    non_hit_features.to_hdf('msd_bb_non_matches_ll_features.h5', 'non-hits')
+
+
+def _combine_ll_features(msd_ids):
+    features_path = '/storage/nas3/datasets/music/millionsongdataset/msd_audio_features'  # noqa E501
+
+    ll_features = pd.DataFrame()
+    for msd_id in msd_ids:
+        file_id = pd.DataFrame([msd_id], columns=['msd_id'])
+        feature = pd.io.json.json_normalize(
+            _get_lowlevel_feature(features_path, msd_id))
+        ll_features = ll_features.append(
+            file_id.join(feature), sort=False, ignore_index=True)
+
+    return ll_features
+
+
+@cli.command()
+def combine_highlevel_features():
+    hits = set(read_hits()['msd_id'])
+    hit_features = _combine_hl_features(hits)
+    hit_features.to_hdf('msd_bb_matches_hl_features.h5', 'hits')
+
+    non_hits = set(read_non_hits()['msd_id'])
+    non_hit_features = _combine_hl_features(non_hits)
+    non_hit_features.to_hdf('msd_bb_non_matches_hl_features.h5', 'non_hits')
+
+
+def _combine_hl_features(msd_ids):
+    features_path = '/storage/nas3/datasets/music/millionsongdataset/msd_audio_features'  # noqa E501
+
+    hl_features = pd.DataFrame()
+    for msd_id in msd_ids:
+        file_id = pd.DataFrame([msd_id], columns=['msd_id'])
+        feature = pd.io.json.json_normalize(
+            _get_highlevel_feature(features_path, msd_id))
+        hl_features = hl_features.append(
+            file_id.join(feature), sort=False, ignore_index=True)
+
+    return hl_features
 
 
 def work(msd):
@@ -155,6 +214,24 @@ def msd_track_duplicates():
     print(len(tracks), count)
 
 
+def _get_highlevel_feature(features_path, msd_id):
+    file_suffix = '.mp3.highlevel.json'
+    return _load_feature(features_path, msd_id, file_suffix)
+
+
+def _get_lowlevel_feature(features_path, msd_id):
+    file_suffix = '.mp3'
+    return _load_feature(features_path, msd_id, file_suffix)
+
+
+def _load_feature(features_path, msd_id, file_suffix):
+    file_prefix = '/features_tracks_' + msd_id[2].lower() + '/'
+    file_name = features_path + file_prefix + msd_id + file_suffix
+
+    with open(file_name) as features:
+        return json.load(features)
+
+
 def read_msd_tracks_per_year():
     file_path = '/storage/nas3/datasets/music/millionsongdataset/additional_files/tracks_per_year.txt'  # noqa E501
 
@@ -197,5 +274,15 @@ def read_billboard_tracks():
     return pd.read_csv(file_path)
 
 
+def read_hits():
+    file_path = '/storage/nas3/datasets/music/billboard/msd_bb_matches.csv'
+    return pd.read_csv(file_path)
+
+
+def read_non_hits():
+    file_path = '/storage/nas3/datasets/music/billboard/msd_bb_non_matches.csv'
+    return pd.read_csv(file_path)
+
+
 if __name__ == '__main__':
-    main()
+    cli()
