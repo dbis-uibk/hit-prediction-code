@@ -83,12 +83,10 @@ def match():
 @cli.command()
 def combine_lowlevel_features():
     hits = set(read_hits()['msd_id'])
-    hit_features = _combine_ll_features(hits)
-    hit_features.to_hdf('msd_bb_matches_ll_features.h5', 'hits')
-
     non_hits = set(read_non_hits()['msd_id'])
-    non_hit_features = _combine_ll_features(non_hits)
-    non_hit_features.to_hdf('msd_bb_non_matches_ll_features.h5', 'non-hits')
+    msd_ids = hits + non_hits
+    features = _combine_ll_features(msd_ids)
+    features.to_hdf('msd_bb_ll_features.h5', 'll')
 
 
 def _combine_ll_features(msd_ids):
@@ -108,12 +106,10 @@ def _combine_ll_features(msd_ids):
 @cli.command()
 def combine_highlevel_features():
     hits = set(read_hits()['msd_id'])
-    hit_features = _combine_hl_features(hits)
-    hit_features.to_hdf('msd_bb_matches_hl_features.h5', 'hits')
-
     non_hits = set(read_non_hits()['msd_id'])
-    non_hit_features = _combine_hl_features(non_hits)
-    non_hit_features.to_hdf('msd_bb_non_matches_hl_features.h5', 'non_hits')
+    msd_ids = hits + non_hits
+    features = _combine_hl_features(msd_ids)
+    features.to_hdf('msd_bb_hl_features.h5', 'hl')
 
 
 def _combine_hl_features(msd_ids):
