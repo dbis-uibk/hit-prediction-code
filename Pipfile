@@ -30,10 +30,10 @@ gensim = "*"
 tensorflow = "*"
 sklearn = "*"
 gitpython = "*"
-dbispileline = {git = "ssh://git@git.uibk.ac.at/dbis/software/dbispipeline.git"}
 tables = "*"
 fuzzywuzzy = {extras = ["speedup"],version = "*"}
 click = "*"
+dbispipeline = {git = "ssh://git@git.uibk.ac.at/dbis/software/dbispipeline"}
 
 [requires]
 python_version = "3.6"
