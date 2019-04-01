@@ -73,4 +73,4 @@ def _load_feature(features_path, msd_id, file_suffix):
 
 def _filter_hl_features(columns):
     regex = re.compile('highlevel\.\w+\.all\.\w+')
-    return filter(regex.search, non_label_columns)
+    return filter(regex.search, columns)
