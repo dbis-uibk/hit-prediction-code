@@ -13,12 +13,16 @@ class MsdBbLoader(Loader):
                  hits_file_path,
                  non_hits_file_path,
                  features_path,
-                 non_hits_per_hit=None):
+                 non_hits_per_hit=None,
+                 features=None,
+                 label=None):
         self._config = {
             'hits_file_path': hits_file_path,
             'non_hits_file_path': non_hits_file_path,
             'features_path': features_path,
             'non_hits_per_hit': non_hits_per_hit,
+            'features': features,
+            'label': label,
         }
 
         hits = pd.read_csv(hits_file_path)
@@ -27,17 +31,17 @@ class MsdBbLoader(Loader):
         if non_hits_per_hit:
             non_hits = non_hits.sample(n=len(hits) * non_hits_per_hit)
 
-        print(hits.shape, non_hits.shape)
-
         self.data = hits.append(non_hits, sort=False, ignore_index=True)
         ll_features = pd.read_hdf(features_path + '/msd_bb_ll_features.h5')
         self.data = self.data.merge(ll_features, on='msd_id')
         hl_features = pd.read_hdf(features_path + '/msd_bb_hl_features.h5')
         self.data = self.data.merge(hl_features, on='msd_id')
-        print(ll_features.shape, hl_features.shape)
+
+        self.data = self.data[self.data.columns.remove(label)]
+        self.labels =  self.data[label]
 
     def load(self):
-        return self.data
+        return self.data, self.labels
 
     def configuration(self):
         return self._config
