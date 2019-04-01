@@ -56,7 +56,7 @@ class MsdBbLoader(Loader):
             feature_data.append(data[_filter_features(data.columns,
                                                       regex_filter)])
 
-        self.data = np.array(feature_data)
+        self.data = feature_data
 
     def load(self):
         return self.data, self.labels
