@@ -38,8 +38,8 @@ class MsdBbLoader(Loader):
         hl_features = pd.read_hdf(features_path + '/msd_bb_hl_features.h5')
         self.data = self.data.merge(hl_features, on='msd_id')
 
-        self.data = self.data[_filter_hl_features(self.data.columns)]
         self.labels =  self.data[[label]]
+        self.data = self.data[_filter_hl_features(self.data.columns)]
 
     def load(self):
         return self.data, self.labels
@@ -66,7 +66,10 @@ def _load_feature(features_path, msd_id, file_suffix):
         return json.load(features)
 
 
-def _filter_hl_features(columns):
+def _filter_hl_features(columns, label):
     regex = re.compile('highlevel\.\w+\.all\.\w+')
 
-    return filter(regex.search, list(columns))
+    non_label_columns = list(columns)
+    non_label_columns.remove(label)
+
+    return filter(regex.search, non_label_columns)
