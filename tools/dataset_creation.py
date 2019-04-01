@@ -102,15 +102,18 @@ def _combine_features(combine_function):
     msd_ids = hits | non_hits
 
     all_features = pd.DataFrame()
-    chunk_size = len(msd_ids) / (4 * mp.cpu_count())
+
+    df_split = np.array_split(list(msd_ids), mp.cpu_count() * 4)
     with mp.Pool() as pool:
-        features = pool.imap_unordered(combine_function, msd_ids, chunk_size)
+        features = pool.imap_unordered(combine_function, df_split)
 
-    for feature in features:
-        all_features = all_features.append(
-            feature, sort=False, ignore_index=True)
+        for feature in features:
+            all_features = all_features.append(
+                feature, sort=False, ignore_index=True)
 
-    return all_features
+        return all_features
+
+    return None
 
 
 def _combine_ll_features(msd_ids):
