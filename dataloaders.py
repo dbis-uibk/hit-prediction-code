@@ -32,8 +32,8 @@ class MsdBbLoader(Loader):
         self.data = hits.append(non_hits, sort=False, ignore_index=True)
         ll_features = pd.read_hdf(features_path + '/msd_bb_ll_features.h5')
         self.data.merge(ll_features, on='msd_id')
-        hl_features = pd.read_hdf(features_path + '/msd_bb_hl_features.h5')
-        self.data.merge(hl_features, on='msd_id')
+        # hl_features = pd.read_hdf(features_path + '/msd_bb_hl_features.h5')
+        # self.data.merge(hl_features, on='msd_id')
 
 
     def load(self):
