@@ -39,6 +39,11 @@ class MsdBbLoader(Loader):
         self.data = self.data.merge(hl_features, on='msd_id')
 
         self.labels =  self.data[[label]]
+
+        non_label_columns = list(columns)
+        non_label_columns.remove(label)
+        self.data = self.data[non_label_columns]
+
         self.data = self.data[_filter_hl_features(self.data.columns)]
 
     def load(self):
@@ -66,10 +71,6 @@ def _load_feature(features_path, msd_id, file_suffix):
         return json.load(features)
 
 
-def _filter_hl_features(columns, label):
+def _filter_hl_features(columns):
     regex = re.compile('highlevel\.\w+\.all\.\w+')
-
-    non_label_columns = list(columns)
-    non_label_columns.remove(label)
-
     return filter(regex.search, non_label_columns)
