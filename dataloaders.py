@@ -4,6 +4,8 @@ import json
 
 from dbispipeline.base import Loader
 
+import numpy as np
+
 import pandas as pd
 
 
@@ -32,19 +34,29 @@ class MsdBbLoader(Loader):
         if non_hits_per_hit:
             non_hits = non_hits.sample(n=len(hits) * non_hits_per_hit)
 
-        self.data = hits.append(non_hits, sort=False, ignore_index=True)
+        data = hits.append(non_hits, sort=False, ignore_index=True)
         ll_features = pd.read_hdf(features_path + '/msd_bb_ll_features.h5')
-        self.data = self.data.merge(ll_features, on='msd_id')
+        data = data.merge(ll_features, on='msd_id')
         hl_features = pd.read_hdf(features_path + '/msd_bb_hl_features.h5')
-        self.data = self.data.merge(hl_features, on='msd_id')
+        data = data.merge(hl_features, on='msd_id')
 
-        self.labels = self.data[[label]]
+        self.labels = data[[label]].values()
 
-        non_label_columns = list(self.data.columns)
+        non_label_columns = list(data.columns)
         non_label_columns.remove(label)
-        self.data = self.data[non_label_columns]
+        data = data[non_label_columns]
 
-        self.data = self.data[_filter_hl_features(self.data.columns)]
+        feature_data = []
+        for feature in features:
+            if feature == 'hl':
+                regex_filter = r'highlevel\.\w+\.all\.\w+'
+            else:
+                regex_filter = feature
+
+            feature_data.append(data[_filter_features(data.columns,
+                                                      regex_filter)])
+
+        self.data = np.array(feature_data)
 
     def load(self):
         return self.data, self.labels
@@ -71,6 +83,6 @@ def _load_feature(features_path, msd_id, file_suffix):
         return json.load(features)
 
 
-def _filter_hl_features(columns):
-    regex = re.compile('highlevel\.\w+\.all\.\w+')
+def _filter_features(columns, regex_filter):
+    regex = re.compile(regex_filter)
     return filter(regex.search, columns)
