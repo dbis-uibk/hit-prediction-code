@@ -121,11 +121,14 @@ def _combine_ll_features(msd_ids):
 
     ll_features = pd.DataFrame()
     for msd_id in msd_ids:
-        file_id = pd.DataFrame([msd_id], columns=['msd_id'])
-        feature = pd.io.json.json_normalize(
-            _get_lowlevel_feature(features_path, msd_id))
-        ll_features = ll_features.append(
-            file_id.join(feature), sort=False, ignore_index=True)
+        try:
+            file_id = pd.DataFrame([msd_id], columns=['msd_id'])
+            feature = pd.io.json.json_normalize(
+                _get_lowlevel_feature(features_path, msd_id))
+            ll_features = ll_features.append(
+                file_id.join(feature), sort=False, ignore_index=True)
+        except FileNotFoundError as error:
+            print(error)
 
     return ll_features
 
@@ -135,11 +138,14 @@ def _combine_hl_features(msd_ids):
 
     hl_features = pd.DataFrame()
     for msd_id in msd_ids:
-        file_id = pd.DataFrame([msd_id], columns=['msd_id'])
-        feature = pd.io.json.json_normalize(
-            _get_highlevel_feature(features_path, msd_id))
-        hl_features = hl_features.append(
-            file_id.join(feature), sort=False, ignore_index=True)
+        try:
+            file_id = pd.DataFrame([msd_id], columns=['msd_id'])
+            feature = pd.io.json.json_normalize(
+                _get_highlevel_feature(features_path, msd_id))
+            hl_features = hl_features.append(
+                file_id.join(feature), sort=False, ignore_index=True)
+        except FileNotFoundError as error:
+            print(error)
 
     return hl_features
 
