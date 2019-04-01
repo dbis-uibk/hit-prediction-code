@@ -38,9 +38,9 @@ class MsdBbLoader(Loader):
         hl_features = pd.read_hdf(features_path + '/msd_bb_hl_features.h5')
         self.data = self.data.merge(hl_features, on='msd_id')
 
-        self.labels =  self.data[[label]]
+        self.labels = self.data[[label]]
 
-        non_label_columns = list(columns)
+        non_label_columns = list(self.data.columns)
         non_label_columns.remove(label)
         self.data = self.data[non_label_columns]
 
