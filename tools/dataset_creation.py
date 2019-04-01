@@ -1,17 +1,13 @@
-import csv
 import json
-import sys
 import multiprocessing as mp
 
 import click
 
 from fuzzywuzzy import fuzz
-from fuzzywuzzy import process
 
 import numpy as np
 
 import pandas as pd
-
 
 RESULT_PATH = '.'
 BB_PATH = '/storage/nas3/datasets/music/billboard'
@@ -19,7 +15,8 @@ MSD_PATH = '/storage/nas3/datasets/music/millionsongdataset'
 
 
 @click.group()
-@click.option('--path', default='.', help='The path where the results are stored.')
+@click.option(
+    '--path', default='.', help='The path where the results are stored.')
 def cli(path):
     global RESULT_PATH
     RESULT_PATH = path
@@ -72,7 +69,7 @@ def match():
     df_split = np.array_split(results, mp.cpu_count() * 4)
 
     with mp.Pool() as pool:
-        result_entries = pool.imap_unordered(work, df_split)
+        result_entries = pool.imap_unordered(_fuzzy_match, df_split)
         fuzzy_results = pd.DataFrame(
             columns=list(msd.columns) + ['max_sim', 'artist_sim', 'title_sim'])
         for result in result_entries:
@@ -89,11 +86,31 @@ def match():
 
 @cli.command()
 def combine_lowlevel_features():
+    features = _combine_features(_combine_ll_features)
+    features.to_hdf(RESULT_PATH + '/msd_bb_ll_features.h5', 'll')
+
+
+@cli.command()
+def combine_highlevel_features():
+    features = _combine_features(_combine_hl_features)
+    features.to_hdf(RESULT_PATH + '/msd_bb_hl_features.h5', 'hl')
+
+
+def _combine_features(combine_function):
     hits = set(read_hits()['msd_id'])
     non_hits = set(read_non_hits()['msd_id'])
     msd_ids = hits | non_hits
-    features = _combine_ll_features(msd_ids)
-    features.to_hdf(RESULT_PATH + '/msd_bb_ll_features.h5', 'll')
+
+    all_features = pd.DataFrame()
+    chunk_size = len(msd_ids) / (4 * mp.cpu_count())
+    with mp.Pool() as pool:
+        features = pool.imap_unordered(combine_function, msd_ids, chunk_size)
+
+    for feature in features:
+        all_features = all_features.append(
+            feature, sort=False, ignore_index=True)
+
+    return all_features
 
 
 def _combine_ll_features(msd_ids):
@@ -110,15 +127,6 @@ def _combine_ll_features(msd_ids):
     return ll_features
 
 
-@cli.command()
-def combine_highlevel_features():
-    hits = set(read_hits()['msd_id'])
-    non_hits = set(read_non_hits()['msd_id'])
-    msd_ids = hits | non_hits
-    features = _combine_hl_features(msd_ids)
-    features.to_hdf(RESULT_PATH + '/msd_bb_hl_features.h5', 'hl')
-
-
 def _combine_hl_features(msd_ids):
     features_path = MSD_PATH + '/msd_audio_features'  # noqa E501
 
@@ -133,7 +141,7 @@ def _combine_hl_features(msd_ids):
     return hl_features
 
 
-def work(msd):
+def _fuzzy_match(msd):
     billboard = read_billboard_tracks()
     results = pd.DataFrame(
         columns=list(msd.columns) + ['max_sim', 'artist_sim', 'title_sim'])
