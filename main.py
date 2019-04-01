@@ -12,7 +12,7 @@ def main():
         features_path=
         '/storage/nas3/datasets/music/billboard',
         non_hits_per_hit=1,
-        label = 'weeks',
+        label='weeks',
     )
 
     print(loader.load()[0].shape, loader.load()[1].shape)
