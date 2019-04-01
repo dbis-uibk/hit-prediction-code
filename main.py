@@ -16,6 +16,7 @@ def main():
 
     print(loader.load().shape)
     print(loader.configuration())
+    print(loader.load().columns)
 
 
 if __name__ == '__main__':
