@@ -3,23 +3,28 @@ from dbispipeline.evaluators import GridEvaluator
 
 from sklearn.model_selection import KFold
 from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import MinMaxScaler
 from sklearn.svm import SVR
 
 from dataloaders import MsdBbLoader
 
-
 cv = KFold(n_splits=5, shuffle=True, random_state=42)
 
 dataloader = MsdBbLoader(
-        hits_file_path='/storage/nas3/datasets/music/billboard/msd_bb_matches.csv',  # noqa E501
-        non_hits_file_path='/storage/nas3/datasets/music/billboard/msd_bb_non_matches.csv',  # noqa E501
-        features_path='/storage/nas3/datasets/music/billboard',
-        non_hits_per_hit=1,
-        features=['hl'],
-        label='weeks',
-    )
+    hits_file_path=
+    '/storage/nas3/datasets/music/billboard/msd_bb_matches.csv',
+    non_hits_file_path=
+    '/storage/nas3/datasets/music/billboard/msd_bb_non_matches.csv',
+    features_path='/storage/nas3/datasets/music/billboard',
+    non_hits_per_hit=1,
+    features=['hl'],
+    label='peak',
+    nan_value=101,
+    random_state=42,
+)
 
 pipeline = Pipeline([
+    ('scale', MinMaxScaler()),
     ('svm', SVR(gamma='scale')),
 ])
 

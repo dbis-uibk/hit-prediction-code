@@ -19,7 +19,8 @@ class MsdBbLoader(Loader):
                  non_hits_per_hit=None,
                  features=None,
                  label=None,
-                 nan_value=0):
+                 nan_value=0,
+                 random_state=None):
         self._config = {
             'hits_file_path': hits_file_path,
             'non_hits_file_path': non_hits_file_path,
@@ -33,7 +34,9 @@ class MsdBbLoader(Loader):
         non_hits = pd.read_csv(non_hits_file_path)
 
         if non_hits_per_hit:
-            non_hits = non_hits.sample(n=len(hits) * non_hits_per_hit)
+            num_of_samples = len(hits) * non_hits_per_hit
+            non_hits = non_hits.sample(
+                n=num_of_samples, random_state=random_state)
 
         data = hits.append(non_hits, sort=False, ignore_index=True)
         # ll_features = pd.read_hdf(features_path + '/msd_bb_ll_features.h5')
