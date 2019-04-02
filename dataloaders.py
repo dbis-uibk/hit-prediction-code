@@ -1,5 +1,4 @@
 """Dataloaders for the hit song prediction."""
-import re
 import json
 
 from dbispipeline.base import Loader
@@ -7,6 +6,8 @@ from dbispipeline.base import Loader
 import numpy as np
 
 import pandas as pd
+
+from common import feature_columns
 
 
 class MsdBbLoader(Loader):
@@ -52,19 +53,25 @@ class MsdBbLoader(Loader):
         non_label_columns.remove(label)
         data = data[non_label_columns]
 
-        feature_columns = []
+        feature_cols = []
+        self._features_list = []
         for feature in features:
-            if feature == 'hl':
-                regex_filter = r'highlevel\.\w+\.all\.\w+'
-            else:
-                regex_filter = feature
+            cols = feature_columns(data.columns, feature)
+            feature_cols += cols
+            self._features_list.append(cols)
 
-            feature_columns += _filter_features(data.columns, regex_filter)
-
-        self.data = data[feature_columns]
+        self.data = data[feature_cols]
+        self._features_index_list = []
+        for cols in self._features_list:
+            index = [self.data.columns.get_loc(c) for c in cols]
+            self._features_index_list.append(index)
 
     def load(self):
         return self.data, self.labels
+
+    @property
+    def feature_indices(self):
+        return self._features_index_list
 
     @property
     def configuration(self):
@@ -87,8 +94,3 @@ def _load_feature(features_path, msd_id, file_suffix):
 
     with open(file_name) as features:
         return json.load(features)
-
-
-def _filter_features(columns, regex_filter):
-    regex = re.compile(regex_filter)
-    return filter(regex.search, columns)
