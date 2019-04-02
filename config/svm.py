@@ -36,7 +36,14 @@ evaluator = GridEvaluator(
         'verbose': 3,
         'cv': cv,
         'refit': False,
-        'scoring': 'neg_mean_squared_error',
+        'scoring': [
+            'explained_variance',
+            'neg_mean_absolute_error',
+            'neg_mean_squared_error',
+            'neg_mean_squared_log_error',
+            'neg_median_absolute_error',
+            'r2',
+        ],
     },
 )
 
