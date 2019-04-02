@@ -18,7 +18,8 @@ class MsdBbLoader(Loader):
                  features_path,
                  non_hits_per_hit=None,
                  features=None,
-                 label=None):
+                 label=None,
+                 nan_value=0):
         self._config = {
             'hits_file_path': hits_file_path,
             'non_hits_file_path': non_hits_file_path,
@@ -41,6 +42,8 @@ class MsdBbLoader(Loader):
         data = data.merge(hl_features, on='msd_id')
 
         self.labels = data[[label]]
+        nan_values = np.isnan(self.labels)
+        self.labels[nan_values] = nan_value
 
         non_label_columns = list(data.columns)
         non_label_columns.remove(label)
@@ -53,13 +56,16 @@ class MsdBbLoader(Loader):
             else:
                 regex_filter = feature
 
-            feature_data.append(data[_filter_features(data.columns,
-                                                      regex_filter)])
+            filtered_data = data[_filter_features(data.columns, regex_filter)]
+            nan_values = np.isnan(filtered_data)
+            filtered_data[nan_values] = nan_value
+            feature_data.append(filtered_data)
 
         self.data = feature_data
+        print(self.data[0].shape, self.labels.shape)
 
     def load(self):
-        return self.data, self.labels
+        return self.data[0], self.labels
 
     def configuration(self):
         return self._config

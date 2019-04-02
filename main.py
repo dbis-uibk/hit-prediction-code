@@ -15,7 +15,7 @@ def main():
         label='weeks',
     )
 
-    print(loader.load()[0].shape, loader.load()[1].shape)
+    print(loader.load()[0][0].shape, loader.load()[1].shape)
     print(loader.configuration())
     print(loader.load()[0][0].columns)
 
