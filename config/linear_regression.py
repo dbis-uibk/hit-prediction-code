@@ -16,7 +16,7 @@ dataloader = MsdBbLoader(
     non_hits_file_path=
     '/storage/nas3/datasets/music/billboard/msd_bb_non_matches.csv',
     features_path='/storage/nas3/datasets/music/billboard',
-    non_hits_per_hit=10,
+    non_hits_per_hit=1,
     features=['hl'],
     label='peak',
     nan_value=101,
