@@ -17,7 +17,7 @@ dataloader = MsdBbLoader(
     )
 
 pipeline = Pipeline([
-    ('logres', LogisticRegression()),
+    ('logres', LogisticRegression(multi_class='auto', solver='lbfgs')),
 ])
 
 evaluator = GridEvaluator(

@@ -67,6 +67,7 @@ class MsdBbLoader(Loader):
     def load(self):
         return self.data[0], self.labels
 
+    @property
     def configuration(self):
         return self._config
 
