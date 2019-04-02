@@ -1,7 +1,7 @@
 import dbispipeline.result_handlers as result_handlers
 from dbispipeline.evaluators import GridEvaluator
 
-from sklearn.linear_model import LogisticRegression
+from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import KFold
 from sklearn.pipeline import Pipeline
 
@@ -20,13 +20,11 @@ dataloader = MsdBbLoader(
     )
 
 pipeline = Pipeline([
-    ('logres', LogisticRegression(multi_class='auto', solver='lbfgs')),
+    ('linreg', LinearRegression()),
 ])
 
 evaluator = GridEvaluator(
-    parameters={
-        'logres__C': [1.0],
-    },
+    parameters={},
     grid_parameters={
         'verbose': 3,
         'cv': cv,
