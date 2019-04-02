@@ -52,20 +52,16 @@ class MsdBbLoader(Loader):
         non_label_columns.remove(label)
         data = data[non_label_columns]
 
-        if len(features) > 1:
-            raise NotImplementedError("Only one set of features allowed")
-
-        feature_data = []
+        feature_columns = []
         for feature in features:
             if feature == 'hl':
                 regex_filter = r'highlevel\.\w+\.all\.\w+'
             else:
                 regex_filter = feature
 
-            filtered_data = data[_filter_features(data.columns, regex_filter)]
-            feature_data.append(filtered_data)
+            feature_columns += _filter_features(data.columns, regex_filter)
 
-        self.data = feature_data[0]
+        self.data = data[feature_columns]
 
     def load(self):
         return self.data, self.labels
