@@ -57,8 +57,6 @@ class MsdBbLoader(Loader):
                 regex_filter = feature
 
             filtered_data = data[_filter_features(data.columns, regex_filter)]
-            nan_values = np.isnan(filtered_data)
-            filtered_data[nan_values] = nan_value
             feature_data.append(filtered_data)
 
         self.data = feature_data
