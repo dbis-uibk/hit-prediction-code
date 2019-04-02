@@ -52,6 +52,9 @@ class MsdBbLoader(Loader):
         non_label_columns.remove(label)
         data = data[non_label_columns]
 
+        if len(features) > 1:
+            raise NotImplementedError("Only one set of features allowed")
+
         feature_data = []
         for feature in features:
             if feature == 'hl':
@@ -62,11 +65,10 @@ class MsdBbLoader(Loader):
             filtered_data = data[_filter_features(data.columns, regex_filter)]
             feature_data.append(filtered_data)
 
-        self.data = feature_data
-        print(self.data[0].shape, self.labels.shape)
+        self.data = feature_data[0]
 
     def load(self):
-        return self.data[0], self.labels
+        return self.data, self.labels
 
     @property
     def configuration(self):
