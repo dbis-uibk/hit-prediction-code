@@ -2,10 +2,13 @@ import dbispipeline.result_handlers as result_handlers
 from dbispipeline.evaluators import GridEvaluator
 
 from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import KFold
 from sklearn.pipeline import Pipeline
 
 from dataloaders import MsdBbLoader
 
+
+cv = KFold(n_splits=5, shuffle=True, random_state=42)
 
 dataloader = MsdBbLoader(
         hits_file_path='/storage/nas3/datasets/music/billboard/msd_bb_matches.csv',  # noqa E501
