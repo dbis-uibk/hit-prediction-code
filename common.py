@@ -23,6 +23,10 @@ def feature_columns(columns, feature_select):
         regex_filter = hl_rhythm_regex()
     elif feature == 'hl_tonal':
         regex_filter = hl_tonal_regex()
+    elif feature == 'll_beats_loudness':
+        regex_filter = ll_beats_loudness_regex()
+    elif feature == 'll_bpm_histogram':
+        regex_filter = ll_bpm_histogram_regex()
     else:
         regex_filter = feature
 
@@ -72,3 +76,12 @@ def hl_rhythm_regex():
 
 def hl_tonal_regex():
     return r'tonal\.(chords_changes_rate|chords_number_rate|tuning_frequency)'
+
+
+def ll_beats_loudness_regex():
+    return r'rhythm.beats_loudness\.\w+$'
+
+
+def ll_bpm_histogram_regex():
+    # FIXME: selechts multiple values but only some are meaningfull
+    return r'rhythm\.bpm_histogram_\w+\.\w+'

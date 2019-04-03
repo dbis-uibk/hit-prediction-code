@@ -23,6 +23,7 @@ dataloader = MsdBbLoader(
         ('year', 'wide'),
         ('hl_rhythm', 'wide'),
         ('hl_tonal', 'wide'),
+        ('ll_beats_loudness', 'deep'),
     ],
     label='peak',
     nan_value=150,
