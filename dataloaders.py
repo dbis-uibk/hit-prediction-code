@@ -56,15 +56,17 @@ class MsdBbLoader(Loader):
         feature_cols = []
         self._features_list = []
         for feature in features:
-            cols = feature_columns(data.columns, feature)
+            cols, part = feature_columns(data.columns, feature)
             feature_cols += cols
-            self._features_list.append(cols)
+            self._features_list.append((cols, part))
 
         self.data = data[feature_cols]
         self._features_index_list = []
-        for cols in self._features_list:
+        for cols, part in self._features_list:
             index = [self.data.columns.get_loc(c) for c in cols]
-            self._features_index_list.append(index)
+            self._features_index_list.append((index, part))
+
+        self._config['features_list'] = self._features_list
 
     def load(self):
         return self.data, self.labels

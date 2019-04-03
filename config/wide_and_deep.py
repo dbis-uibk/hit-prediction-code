@@ -12,13 +12,12 @@ from models.wide_and_deep import WideAndDeep
 cv = KFold(n_splits=5, shuffle=True, random_state=42)
 
 dataloader = MsdBbLoader(
-    hits_file_path=
-    '/storage/nas3/datasets/music/billboard/msd_bb_matches.csv',
+    hits_file_path='/storage/nas3/datasets/music/billboard/msd_bb_matches.csv',
     non_hits_file_path=
     '/storage/nas3/datasets/music/billboard/msd_bb_non_matches.csv',
     features_path='/storage/nas3/datasets/music/billboard',
     non_hits_per_hit=1,
-    features=['hl', 'year'],
+    features=[('hl', 'wide'), ('year', 'wide')],
     label='peak',
     nan_value=101,
     random_state=42,
@@ -31,11 +30,15 @@ pipeline = Pipeline([
 
 evaluator = GridEvaluator(
     parameters={
+        'wide_and_deep__epochs': [10, 100, 500],
     },
     grid_parameters={
-        'verbose': 3,
-        'cv': cv,
-        'refit': False,
+        'verbose':
+        3,
+        'cv':
+        cv,
+        'refit':
+        False,
         'scoring': [
             'explained_variance',
             'neg_mean_absolute_error',

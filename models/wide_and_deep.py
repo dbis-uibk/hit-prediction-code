@@ -8,10 +8,39 @@ import numpy as np
 
 
 class WideAndDeep(BaseEstimator, RegressorMixin):
-    def __init__(self, features=None, **kwargs):
+    def __init__(self,
+                 loss='mse',
+                 optimizer='adam',
+                 metrics=['mae'],
+                 deep_activation='sigmoid',
+                 dense_activation='relu',
+                 output_activation=None,
+                 epochs=1,
+                 batch_size=None,
+                 features=None,
+                 **kwargs):
         self.input_list = []
+        self.loss = loss
+        self.optimizer = optimizer
+        self.metrics = metrics
+        self.deep_activation = deep_activation
+        self.dense_activation = dense_activation
+        self.output_activation = output_activation
+        self.epochs = epochs
+        self.batch_size = batch_size
         self.features = features
-        self._config = kwargs
+        self._config = {
+            'loss': loss,
+            'optimizer': optimizer,
+            'metrics': metrics,
+            'deep_activation': deep_activation,
+            'dense_activation': dense_activation,
+            'output_activation': output_activation,
+            'epochs': epochs,
+            'batch_size': batch_size,
+            'features': features,
+            **kwargs,
+        }
         self._model = None
 
     @property
@@ -20,30 +49,47 @@ class WideAndDeep(BaseEstimator, RegressorMixin):
 
     def _build_model(self):
         input_list = []
+        input_type_list = []
         concat_list = []
-        for split in self.features:
-            input_list.append(Input(shape=(len(split),)))
+        for i, feature in enumerate(self.features):
+            split, part = feature
+            if part is None:
+                part = 'deep'
+            name = str(part) + '-input-' + str(i)
+            input_list.append(Input(shape=(len(split), ), name=name))
+            input_type_list.append(part)
 
-        for entry in input_list:
-            activation = 'sigmoid'
-            concat_list.append(Dense(1, activation=activation)(entry))
+        for i, input_entry in enumerate(zip(input_list, input_type_list)):
+            entry, part = input_entry
+            if part == 'wide':
+                concat_list.append(entry)
+            else:
+                name = 'fab-' + str(i)
+                concat_list.append(
+                    Dense(1, activation=self.deep_activation,
+                          name=name)(entry))
 
-        concat_tensor = Concatenate(axis=-1)(concat_list)
+        concat_tensor = Concatenate(
+            axis=-1, name='concat_wide_and_deep')(concat_list)
 
-        activation = 'relu'
-        dense_layer = Dense(256, activation=activation)(concat_tensor)
-        dense_layer = Dense(256, activation=activation)(dense_layer)
-        output = Dense(1,activation='sigmoid')(dense_layer)
+        dense_layer = Dense(
+            256, activation=self.dense_activation,
+            name='dense-1')(concat_tensor)
+        dense_layer = Dense(
+            256, activation=self.dense_activation, name='dense-2')(dense_layer)
+        output = Dense(
+            1, activation=self.output_activation, name='output')(dense_layer)
 
         model = Model(inputs=input_list, outputs=output)
-        model.compile(loss='mse', optimizer='adam', metrics=['mae'])
+        model.compile(
+            loss=self.loss, optimizer=self.optimizer, metrics=self.metrics)
 
         return model
 
     def _split_features(self, x):
         features = []
-        for index in self.features:
-            feature = x[...,index]
+        for index, _ in self.features:
+            feature = x[..., index]
             features.append(feature)
         return features
 
@@ -53,7 +99,9 @@ class WideAndDeep(BaseEstimator, RegressorMixin):
 
         features = self._split_features(x)
         self._model = self._build_model()
-        self._model.fit(features, y)
+        self._model.summary()
+        self._model.fit(
+            x=features, y=y, batch_size=self.batch_size, epochs=self.epochs)
 
     def predict(self, x):
         features = self._split_features(x)
