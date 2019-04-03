@@ -19,6 +19,10 @@ def feature_columns(columns, feature_select):
         regex_filter = ismir04_rhythm_regex()
     elif feature == 'moods_mirex':
         regex_filter = moods_mirex_regex()
+    elif feature == 'hl_rhythm':
+        regex_filter = hl_rhythm_regex()
+    elif feature == 'hl_tonal':
+        regex_filter = hl_tonal_regex()
     else:
         regex_filter = feature
 
@@ -60,3 +64,11 @@ def danceability_regex():
 
 def tonal_atonal_regex():
     return r'highlevel\.tonal_atonal\.all\.\w+'
+
+
+def hl_rhythm_regex():
+    return r'rhythm\.(bpm|beats_count|onset_rate|danceability)'
+
+
+def hl_tonal_regex():
+    return r'tonal\.(chords_changes_rate|chords_number_rate|tuning_frequency)'

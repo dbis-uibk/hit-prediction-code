@@ -40,8 +40,8 @@ class MsdBbLoader(Loader):
                 n=num_of_samples, random_state=random_state)
 
         data = hits.append(non_hits, sort=False, ignore_index=True)
-        # ll_features = pd.read_hdf(features_path + '/msd_bb_ll_features.h5')
-        # data = data.merge(ll_features, on='msd_id')
+        ll_features = pd.read_hdf(features_path + '/msd_bb_ll_features.h5')
+        data = data.merge(ll_features, on='msd_id')
         hl_features = pd.read_hdf(features_path + '/msd_bb_hl_features.h5')
         data = data.merge(hl_features, on='msd_id')
 

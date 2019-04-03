@@ -21,6 +21,7 @@ dataloader = MsdBbLoader(
         ('mood', 'wide'),
         ('voice', 'wide'),
         ('year', 'wide'),
+        ('hl_acoustic', 'wide'),
     ],
     label='peak',
     nan_value=150,

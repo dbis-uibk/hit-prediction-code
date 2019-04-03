@@ -22,6 +22,8 @@ dataloader = MsdBbLoader(
         ('mood', 'wide'),
         ('voice', 'wide'),
         ('year', 'wide'),
+        ('hl_rhythm', 'wide'),
+        ('hl_tonal', 'wide'),
     ],
     label='peak',
     nan_value=150,
@@ -35,7 +37,7 @@ pipeline = Pipeline([
 
 evaluator = GridEvaluator(
     parameters={
-        'wide_and_deep__epochs': [10],
+        'wide_and_deep__epochs': [10, 50, 100, 200],
     },
     grid_parameters={
         'verbose':
