@@ -11,8 +11,7 @@ from dataloaders import MsdBbLoader
 cv = KFold(n_splits=5, shuffle=True, random_state=42)
 
 dataloader = MsdBbLoader(
-    hits_file_path=
-    '/storage/nas3/datasets/music/billboard/msd_bb_matches.csv',
+    hits_file_path='/storage/nas3/datasets/music/billboard/msd_bb_matches.csv',
     non_hits_file_path=
     '/storage/nas3/datasets/music/billboard/msd_bb_non_matches.csv',
     features_path='/storage/nas3/datasets/music/billboard',
@@ -33,9 +32,12 @@ evaluator = GridEvaluator(
         'logreg__C': [1.0],
     },
     grid_parameters={
-        'verbose': 3,
-        'cv': cv,
-        'refit': False,
+        'verbose':
+        3,
+        'cv':
+        cv,
+        'refit':
+        False,
         'scoring': [
             'explained_variance',
             'neg_mean_absolute_error',
