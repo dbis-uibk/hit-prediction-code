@@ -17,8 +17,12 @@ dataloader = MsdBbLoader(
     '/storage/nas3/datasets/music/billboard/msd_bb_non_matches.csv',
     features_path='/storage/nas3/datasets/music/billboard',
     non_hits_per_hit=1,
-    features=[('genre', 'wide'), ('mood', 'wide'), ('voice', 'wide'),
-              ('year', 'wide')],
+    features=[
+        ('genre', 'wide'),
+        ('mood', 'wide'),
+        ('voice', 'wide'),
+        ('year', 'wide'),
+    ],
     label='peak',
     nan_value=150,
     random_state=42,
@@ -31,7 +35,7 @@ pipeline = Pipeline([
 
 evaluator = GridEvaluator(
     parameters={
-        'wide_and_deep__epochs': [10, 100, 500],
+        'wide_and_deep__epochs': [10],
     },
     grid_parameters={
         'verbose':

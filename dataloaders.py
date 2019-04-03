@@ -67,6 +67,7 @@ class MsdBbLoader(Loader):
             self._features_index_list.append((index, part))
 
         self._config['features_list'] = self._features_list
+        print(self._features_list)
 
     def load(self):
         return self.data, self.labels

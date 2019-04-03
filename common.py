@@ -15,6 +15,10 @@ def feature_columns(columns, feature_select):
         regex_filter = mood_regex()
     elif feature == 'voice':
         regex_filter = voice_regex()
+    elif feature == 'ismir04_rhythm':
+        regex_filter = ismir04_rhythm_regex()
+    elif feature == 'moods_mirex':
+        regex_filter = moods_mirex_regex()
     else:
         regex_filter = feature
 
@@ -40,3 +44,19 @@ def mood_regex():
 
 def voice_regex():
     return r'(highlevel\.voice_instrumental\.all\.\w+|highlevel\.gender\.all\.\w+)'
+
+
+def ismir04_rhythm_regex():
+    return r'highlevel\.ismir04_rhythm\.all\.\w+'
+
+
+def moods_mirex_regex():
+    return r'highlevel\.moods_mirex\.all\.\w+'
+
+
+def danceability_regex():
+    return r'highlevel\.danceability\.all\.danceable'
+
+
+def tonal_atonal_regex():
+    return r'highlevel\.tonal_atonal\.all\.\w+'
