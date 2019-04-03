@@ -20,7 +20,7 @@ dataloader = MsdBbLoader(
     features=[('genre', 'wide'), ('mood', 'wide'), ('voice', 'wide'),
               ('year', 'wide')],
     label='peak',
-    nan_value=101,
+    nan_value=150,
     random_state=42,
 )
 
