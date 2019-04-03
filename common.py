@@ -67,7 +67,7 @@ def tonal_atonal_regex():
 
 
 def hl_rhythm_regex():
-    return r'rhythm\.(bpm|beats_count|onset_rate|danceability)'
+    return r'rhythm\.(bpm|beats_count|onset_rate|danceability)$'
 
 
 def hl_tonal_regex():
