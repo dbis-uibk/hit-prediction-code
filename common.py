@@ -136,7 +136,6 @@ def lowlevel_list():
         (r'lowlevel\.spectral_flux\.\w+', 'deep'),
         (r'lowlevel\.spectral_(kurtosis|skewness|spread)\.\w+', 'deep'),
         (r'lowlevel\.spectral_rms\.\w+', 'deep'),
-        (r'lowlevel\.spectral_rms\.\w+', 'deep'),
         (r'lowlevel\.spectral_rolloff\.\w+', 'deep'),
         (r'lowlevel\.spectral_strongpeak\.\w+', 'deep'),
         (r'lowlevel\.zerocrossingrate\.\w+', 'deep'),
