@@ -75,7 +75,11 @@ def hl_rhythm_regex():
 
 
 def hl_tonal_regex():
-    return r'tonal\.(chords_changes_rate|chords_number_rate|tuning_frequency)'
+    return r'tonal\.(chords_changes_rate|chords_number_rate|tuning_frequency|key_strength|tuning_diatonic_strength|tuning_equal_tempered_deviation|tuning_nontempered_energy_ratio)'
+
+
+def ll_tonal_regex():
+    return r'tonal\.(chords_strength|hpcp_entropy)\.\w+'
 
 
 def ll_beats_loudness_regex():
@@ -85,6 +89,13 @@ def ll_beats_loudness_regex():
 def ll_bpm_histogram_regex():
     # FIXME: selechts multiple values but only some are meaningfull
     return r'rhythm\.bpm_histogram_\w+\.\w+'
+
+
+def ll_rhythm_list():
+    return [
+        (ll_beats_loudness_regex(), 'deep'),
+        (ll_bpm_histogram_regex(), 'deep'),
+    ]
 
 
 def yang_list():
