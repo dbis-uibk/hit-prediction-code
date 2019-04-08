@@ -5,6 +5,8 @@ from sklearn.model_selection import KFold
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import MinMaxScaler
 
+import common
+
 from dataloaders import MsdBbLoader
 
 from models.wide_and_deep import WideAndDeep
@@ -25,6 +27,7 @@ dataloader = MsdBbLoader(
         ('hl_rhythm', 'wide'),
         ('hl_tonal', 'wide'),
         ('ll_beats_loudness', 'deep'),
+        *common.yang_list(),
     ],
     label='peak',
     nan_value=150,

@@ -6,6 +6,8 @@ from sklearn.model_selection import KFold
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import MinMaxScaler
 
+import common
+
 from dataloaders import MsdBbLoader
 
 cv = KFold(n_splits=5, shuffle=True, random_state=42)
@@ -24,6 +26,7 @@ dataloader = MsdBbLoader(
         ('hl_rhythm', 'wide'),
         ('hl_tonal', 'wide'),
         ('ll_beats_loudness', 'deep'),
+        *common.yang_list(),
     ],
     label='peak',
     nan_value=150,

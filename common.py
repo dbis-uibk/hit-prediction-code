@@ -85,3 +85,18 @@ def ll_beats_loudness_regex():
 def ll_bpm_histogram_regex():
     # FIXME: selechts multiple values but only some are meaningfull
     return r'rhythm\.bpm_histogram_\w+\.\w+'
+
+
+def yang_list():
+    return [
+        (r'lowlevel\.dissonance\.\w+', 'deep'),
+        (r'lowlevel\.spectral_centroid\.\w+', 'deep'),
+        (r'lowlevel\.average_loudness', 'wide'),
+        (r'lowlevel\.spectral_rolloff\.\w+', 'deep'),
+        (r'lowlevel\.spectral_kurtosis\.\w+', 'deep'),
+        (r'lowlevel\.barkbands_skewness\.\w+', 'deep'),
+        (r'lowlevel\.barkbands_spread\.\w+', 'deep'),
+        (r'lowlevel\.spectral_flux\.\w+', 'deep'),
+        (r'lowlevel\.barkbands_flatness_db\.\w+', 'deep'),
+        (r'lowlevel\.spectral_energyband_low\.\w+', 'deep'),
+    ]
