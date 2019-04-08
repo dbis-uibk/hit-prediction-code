@@ -1,7 +1,6 @@
 import dbispipeline.result_handlers as result_handlers
 from dbispipeline.evaluators import GridEvaluator
 
-from sklearn.model_selection import KFold
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import MinMaxScaler
 
@@ -9,11 +8,9 @@ import common
 
 from dataloaders import MsdBbLoader
 
-from evaluations import metrics
+import evaluations
 
 from models.wide_and_deep import WideAndDeep
-
-cv = KFold(n_splits=5, shuffle=True, random_state=42)
 
 dataloader = MsdBbLoader(
     hits_file_path='/storage/nas3/datasets/music/billboard/msd_bb_matches.csv',
@@ -22,15 +19,8 @@ dataloader = MsdBbLoader(
     features_path='/storage/nas3/datasets/music/billboard',
     non_hits_per_hit=1,
     features=[
-        ('genre', 'wide'),
-        ('mood', 'wide'),
-        ('voice', 'wide'),
-        ('year', 'wide'),
-        ('hl_rhythm', 'wide'),
-        ('hl_tonal', 'wide'),
-        (common.ll_tonal_regex(), 'wide'),
-        *common.ll_rhythm_list(),
-        *common.lowlevel_list(),
+        *common.hl_list(),
+        *common.ll_list(),
     ],
     label='peak',
     nan_value=150,
@@ -46,16 +36,7 @@ evaluator = GridEvaluator(
     parameters={
         'wide_and_deep__epochs': [10, 50, 100, 200],
     },
-    grid_parameters={
-        'verbose':
-        3,
-        'cv':
-        cv,
-        'refit':
-        False,
-        'scoring': metrics.scoring(),
-        'return_train_score': True,
-    },
+    grid_parameters=evaluations.grid_parameters(),
 )
 
 result_handlers = [

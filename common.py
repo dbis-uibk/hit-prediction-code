@@ -91,10 +91,46 @@ def ll_bpm_histogram_regex():
     return r'rhythm\.bpm_histogram_\w+\.\w+'
 
 
-def ll_rhythm_list():
+def mood_list():
     return [
+        ('mood', 'wide'),
+        ('moods_mirex', 'wide'),
+    ]
+
+
+def genre_list():
+    return [
+        ('genre', 'wide'),
+    ]
+
+
+def voice_list():
+    return [
+        ('voice', 'wide'),
+    ]
+
+
+def hl_list():
+    return [
+        *mood_list(),
+        *genre_list(),
+        *voice_list(),
+        ('year', 'wide'),
+    ]
+
+
+def rhythm_list():
+    return [
+        (hl_rhythm_regex(), 'deep'),
         (ll_beats_loudness_regex(), 'deep'),
         (ll_bpm_histogram_regex(), 'deep'),
+    ]
+
+
+def chords_list():
+    return [
+        (hl_tonal_regex(), 'deep'),
+        (ll_tonal_regex(), 'deep'),
     ]
 
 
@@ -102,7 +138,7 @@ def yang_list():
     return [
         (r'lowlevel\.dissonance\.\w+', 'deep'),
         (r'lowlevel\.spectral_centroid\.\w+', 'deep'),
-        (r'lowlevel\.average_loudness', 'wide'),
+        (r'lowlevel\.average_loudness', 'deep'),
         (r'lowlevel\.spectral_rolloff\.\w+', 'deep'),
         (r'lowlevel\.spectral_kurtosis\.\w+', 'deep'),
         (r'lowlevel\.barkbands_skewness\.\w+', 'deep'),
@@ -115,11 +151,11 @@ def yang_list():
 
 def lowlevel_list():
     return [
-        (r'lowlevel\.average_loudness', 'wide'),
+        (r'lowlevel\.average_loudness', 'deep'),
         (r'lowlevel\.dissonance\.\w+', 'deep'),
         (r'lowlevel\.barkbands_(crest|kurtosis|skewness|spread)\.\w+', 'deep'),
         (r'lowlevel\.barkbands_flatness_db\.\w+', 'deep'),
-        (r'lowlevel\.dynamic_complexity', 'wide'),
+        (r'lowlevel\.dynamic_complexity', 'deep'),
         (r'lowlevel\.erbbands_(crest|kurtosis|skewness|spread)\.\w+', 'deep'),
         (r'lowlevel\.erbbands_flatness_db\.\w+', 'deep'),
         (r'lowlevel\.hfc\.\w+', 'deep'),
@@ -131,7 +167,8 @@ def lowlevel_list():
         (r'lowlevel\.spectral_complexity\.\w+', 'deep'),
         (r'lowlevel\.spectral_decrease\.\w+', 'deep'),
         (r'lowlevel\.spectral_energy\.\w+', 'deep'),
-        (r'lowlevel\.spectral_energyband_(high|middle_high|middle_low|low)\.\w+', 'deep'),
+        (r'lowlevel\.spectral_energyband_(high|middle_high|middle_low|low)\.\w+',
+         'deep'),
         (r'lowlevel\.spectral_entropy\.\w+', 'deep'),
         (r'lowlevel\.spectral_flux\.\w+', 'deep'),
         (r'lowlevel\.spectral_(kurtosis|skewness|spread)\.\w+', 'deep'),
@@ -139,4 +176,20 @@ def lowlevel_list():
         (r'lowlevel\.spectral_rolloff\.\w+', 'deep'),
         (r'lowlevel\.spectral_strongpeak\.\w+', 'deep'),
         (r'lowlevel\.zerocrossingrate\.\w+', 'deep'),
+    ]
+
+
+def ll_filterd_list():
+    return [
+        *yang_list(),
+        *chords_list(),
+        *rhythm_list(),
+    ]
+
+
+def ll_list():
+    return [
+        *lowlevel_list(),
+        *chords_list(),
+        *rhythm_list(),
     ]

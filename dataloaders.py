@@ -70,7 +70,7 @@ class MsdBbLoader(Loader):
         print(self._features_list)
 
     def load(self):
-        return self.data, self.labels
+        return self.data.values, self.labels
 
     @property
     def feature_indices(self):
