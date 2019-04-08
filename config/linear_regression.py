@@ -10,6 +10,9 @@ import common
 
 from dataloaders import MsdBbLoader
 
+from evaluations import metrics
+
+
 cv = KFold(n_splits=5, shuffle=True, random_state=42)
 
 dataloader = MsdBbLoader(
@@ -48,13 +51,8 @@ evaluator = GridEvaluator(
         cv,
         'refit':
         False,
-        'scoring': [
-            'explained_variance',
-            'neg_mean_absolute_error',
-            'neg_mean_squared_error',
-            'neg_median_absolute_error',
-            'r2',
-        ],
+        'scoring': metrics.scoring(),
+        'return_train_score': True,
     },
 )
 

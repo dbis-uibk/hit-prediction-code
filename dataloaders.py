@@ -45,7 +45,7 @@ class MsdBbLoader(Loader):
         hl_features = pd.read_hdf(features_path + '/msd_bb_hl_features.h5')
         data = data.merge(hl_features, on='msd_id')
 
-        self.labels = data[[label]]
+        self.labels = np.ravel(data[[label]])
         nan_values = np.isnan(self.labels)
         self.labels[nan_values] = nan_value
 
