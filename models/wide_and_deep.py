@@ -73,11 +73,11 @@ class WideAndDeep(BaseEstimator, RegressorMixin):
             axis=-1, name='concat_wide_and_deep')(concat_list)
 
         dense_layer = Dense(
-            concat_tensor.output_shape[-1],
+            len(input_list),
             activation=self.dense_activation,
             name='dense-1')(concat_tensor)
         dense_layer = Dense(
-            concat_tensor.output_shape[-1],
+            len(input_list),
             activation=self.dense_activation,
             name='dense-2')(dense_layer)
         output = Dense(
