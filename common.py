@@ -83,7 +83,7 @@ def ll_tonal_regex():
 
 
 def ll_beats_loudness_regex():
-    return r'rhythm.beats_loudness\.\w+$'
+    return r'rhythm\.beats_loudness\.\w+$'
 
 
 def ll_bpm_histogram_regex():
