@@ -44,6 +44,7 @@ class MsdBbLoader(Loader):
         data = data.merge(ll_features, on='msd_id')
         hl_features = pd.read_hdf(features_path + '/msd_bb_hl_features.h5')
         data = data.merge(hl_features, on='msd_id')
+        data = data.replace(to_replace=key_mapping())
 
         self.labels = np.ravel(data[[label]])
         nan_values = np.isnan(self.labels)
@@ -97,3 +98,56 @@ def _load_feature(features_path, msd_id, file_suffix):
 
     with open(file_name) as features:
         return json.load(features)
+
+
+def key_mapping():
+    return {
+        'tonal.chords_key': {
+            'C': 1,
+            'Em': 2,
+            'G': 3,
+            'Bm': 4,
+            'D': 5,
+            'F#m': 6,
+            'A': 7,
+            'C#m': 8,
+            'E': 9,
+            'G#m': 10,
+            'B': 11,
+            'D#m': 12,
+            'F#': 13,
+            'A#m': 14,
+            'C#': 15,
+            'Fm': 16,
+            'G#': 17,
+            'Cm': 18,
+            'D#': 19,
+            'Gm': 20,
+            'A#': 21,
+            'Dm': 22,
+            'F': 23,
+            'Am': 24,
+        },
+        'tonal.chords_scale': {
+            'minor': 0,
+            'major': 1,
+        },
+        'tonal.key_key': {
+            'A': 1,
+            'A#': 2,
+            'B': 3,
+            'C': 4,
+            'C#': 5,
+            'D': 6,
+            'D#': 7,
+            'E': 8,
+            'F': 9,
+            'F#': 10,
+            'G': 11,
+            'G#': 12,
+        },
+        'tonal.key_scale': {
+            'minor': 0,
+            'major': 1,
+        },
+    }
