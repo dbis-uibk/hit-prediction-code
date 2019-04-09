@@ -35,6 +35,7 @@ pipeline = Pipeline([
 evaluator = GridEvaluator(
     parameters={
         'wide_and_deep__epochs': [10, 50, 100, 200],
+        'wide_and_deep__batch_normalization': [True],
     },
     grid_parameters=evaluations.grid_parameters(),
 )
