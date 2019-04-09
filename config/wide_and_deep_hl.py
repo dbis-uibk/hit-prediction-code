@@ -20,7 +20,6 @@ dataloader = MsdBbLoader(
     non_hits_per_hit=1,
     features=[
         *common.hl_list(),
-        *common.ll_list(),
     ],
     label='peak',
     nan_value=150,
@@ -35,8 +34,8 @@ pipeline = Pipeline([
 evaluator = GridEvaluator(
     parameters={
         'wide_and_deep__epochs': [10, 50, 100, 200],
-        'wide_and_deep__batch_normalization': [True],
-        'wide_and_deep__dropout_rate': [0.5],
+        'wide_and_deep__batch_normalization': [False, True],
+        'wide_and_deep__dropout_rate': [None, 0.25, 0.5],
     },
     grid_parameters=evaluations.grid_parameters(),
 )
