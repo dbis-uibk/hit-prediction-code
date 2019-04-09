@@ -131,8 +131,8 @@ def chords_list():
     return [
         (hl_tonal_regex(), 'deep'),
         (ll_tonal_regex(), 'deep'),
-        (r'tonal\.chords_(key|scale)', 'deep'),
-        (r'tonal\.key_(key|scale)', 'deep'),
+        (r'tonal\.chords_(key|scale).*', 'deep'),
+        (r'tonal\.key_(key|scale).*', 'deep'),
     ]
 
 
@@ -195,7 +195,6 @@ def ll_list():
         *chords_list(),
         *rhythm_list(),
     ]
-
 
 
 def all_list():
