@@ -108,7 +108,9 @@ class WideAndDeep(BaseEstimator, RegressorMixin):
             if self.batch_normalization:
                 dense_layer = BatchNormalization(
                     name='bn-' + str(i))(dense_layer)
-                dense_layer = Activation(self.dense_activation)(dense_layer)
+                dense_layer = Activation(
+                    self.dense_activation,
+                    name='activation-' + str(i))(dense_layer)
             if self.dropout_rate:
                 dense_layer = Dropout(
                     self.dropout_rate, name='dropout-' + str(i))(dense_layer)
