@@ -3,6 +3,7 @@ from dbispipeline.evaluators import GridEvaluator
 
 from sklearn.linear_model import LinearRegression
 from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import MinMaxScaler
 
 import common
 
@@ -17,7 +18,6 @@ dataloader = MsdBbLoader(
     features_path='/storage/nas3/datasets/music/billboard',
     non_hits_per_hit=1,
     features=[
-        *common.hl_list(),
         *common.ll_list(),
     ],
     label='peak',
@@ -26,6 +26,7 @@ dataloader = MsdBbLoader(
 )
 
 pipeline = Pipeline([
+    ('scale', MinMaxScaler()),
     ('linreg', LinearRegression()),
 ])
 

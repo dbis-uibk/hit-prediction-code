@@ -195,3 +195,18 @@ def ll_list():
         *chords_list(),
         *rhythm_list(),
     ]
+
+
+
+def all_list():
+    return [
+        *hl_list(),
+        *ll_list(),
+    ]
+
+
+def all_filtered_list():
+    return [
+        *hl_list(),
+        *ll_filterd_list(),
+    ]

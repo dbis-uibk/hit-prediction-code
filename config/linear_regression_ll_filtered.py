@@ -18,8 +18,7 @@ dataloader = MsdBbLoader(
     features_path='/storage/nas3/datasets/music/billboard',
     non_hits_per_hit=1,
     features=[
-        *common.hl_list(),
-        *common.ll_list(),
+        *common.ll_filterd_list(),
     ],
     label='peak',
     nan_value=150,

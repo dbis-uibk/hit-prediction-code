@@ -1,15 +1,15 @@
 import dbispipeline.result_handlers as result_handlers
 from dbispipeline.evaluators import GridEvaluator
 
+from sklearn.linear_model import LinearRegression
 from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import MinMaxScaler
 
 import common
 
 from dataloaders import MsdBbLoader
 
 import evaluations
-
-from models.wide_and_deep import WideAndDeep
 
 dataloader = MsdBbLoader(
     hits_file_path='/storage/nas3/datasets/music/billboard/msd_bb_matches.csv',
@@ -19,7 +19,6 @@ dataloader = MsdBbLoader(
     non_hits_per_hit=1,
     features=[
         *common.hl_list(),
-        *common.ll_list(),
     ],
     label='peak',
     nan_value=150,
@@ -27,13 +26,12 @@ dataloader = MsdBbLoader(
 )
 
 pipeline = Pipeline([
-    ('wide_and_deep', WideAndDeep(features=dataloader.feature_indices)),
+    ('scale', MinMaxScaler()),
+    ('linreg', LinearRegression()),
 ])
 
 evaluator = GridEvaluator(
-    parameters={
-        'wide_and_deep__epochs': [10, 50, 100, 200],
-    },
+    parameters={},
     grid_parameters=evaluations.grid_parameters(),
 )
 
