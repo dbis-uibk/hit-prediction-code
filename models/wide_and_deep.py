@@ -98,12 +98,13 @@ class WideAndDeep(BaseEstimator, RegressorMixin):
         else:
             dense_output_size = len(input_list)
 
+        dense_layer = concat_tensor
         for i in range(1, self.num_dense_layer + 1):
             dense_layer = Dense(
                 dense_output_size,
                 activation=activation,
                 name='dense-' + str(i),
-                use_bias=use_bias)(concat_tensor)
+                use_bias=use_bias)(dense_layer)
             if self.batch_normalization:
                 dense_layer = BatchNormalization(
                     name='bn-' + str(i))(dense_layer)
