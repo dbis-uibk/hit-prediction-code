@@ -1,4 +1,4 @@
-from keras.layers import Concatenate, Dense, Input
+from keras.layers import Activation, BatchNormalization, Concatenate, Dense, Input
 from keras.models import Model
 
 from sklearn.base import BaseEstimator, RegressorMixin
@@ -18,6 +18,7 @@ class WideAndDeep(BaseEstimator, RegressorMixin):
                  epochs=1,
                  batch_size=None,
                  features=None,
+                 batch_normalization=False,
                  **kwargs):
         self.input_list = []
         self.loss = loss
@@ -29,6 +30,7 @@ class WideAndDeep(BaseEstimator, RegressorMixin):
         self.epochs = epochs
         self.batch_size = batch_size
         self.features = features
+        self.batch_normalization = batch_normalization
         self._config = {
             'loss': loss,
             'optimizer': optimizer,
@@ -39,6 +41,7 @@ class WideAndDeep(BaseEstimator, RegressorMixin):
             'epochs': epochs,
             'batch_size': batch_size,
             'features': features,
+            'batch_normalization': batch_normalization,
             **kwargs,
         }
         self._model = None
@@ -72,16 +75,31 @@ class WideAndDeep(BaseEstimator, RegressorMixin):
         concat_tensor = Concatenate(
             axis=-1, name='concat_wide_and_deep')(concat_list)
 
+        if self.batch_normalization:
+            use_bias = False
+            activation = None
+        else:
+            use_bias = True
+            activation = self.dense_activation
+
         dense_layer = Dense(
             len(input_list),
-            activation=self.dense_activation,
-            name='dense-1')(concat_tensor)
+            activation=activation,
+            name='dense-1', use_bias=use_bias)(concat_tensor)
+        if self.batch_normalization:
+            dense_layer = BatchNormalization(name='bn-1')(dense_layer)
+            dense_layer = Activation(self.dense_activation)(dense_layer)
+
         dense_layer = Dense(
             len(input_list),
-            activation=self.dense_activation,
-            name='dense-2')(dense_layer)
+            activation=activation,
+            name='dense-2', use_bias=use_bias)(dense_layer)
+        if self.batch_normalization:
+            dense_layer = BatchNormalization(name='bn-2')(dense_layer)
+            dense_layer = Activation(self.dense_activation)(dense_layer)
+
         output = Dense(
-            1, activation=self.output_activation, name='output')(dense_layer)
+            1, activation=self.output_activation, name='output', use_bias=use_bias)(dense_layer)
 
         model = Model(inputs=input_list, outputs=output)
         model.compile(
