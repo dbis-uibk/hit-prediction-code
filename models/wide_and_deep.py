@@ -22,6 +22,8 @@ class WideAndDeep(BaseEstimator, RegressorMixin):
                  features=None,
                  batch_normalization=False,
                  dropout_rate=None,
+                 dense_output_size=None,
+                 num_dense_layer=2,
                  **kwargs):
         self.input_list = []
         self.loss = loss
@@ -35,6 +37,8 @@ class WideAndDeep(BaseEstimator, RegressorMixin):
         self.features = features
         self.batch_normalization = batch_normalization
         self.dropout_rate = dropout_rate
+        self.dense_output_size = dense_output_size
+        self.num_dense_layer = num_dense_layer
         self._config = {
             'loss': loss,
             'optimizer': optimizer,
@@ -47,6 +51,8 @@ class WideAndDeep(BaseEstimator, RegressorMixin):
             'features': features,
             'batch_normalization': batch_normalization,
             'dropout_rate': dropout_rate,
+            'dense_output_size': dense_output_size,
+            'num_dense_layer': num_dense_layer,
             **kwargs,
         }
         self._model = None
@@ -87,29 +93,24 @@ class WideAndDeep(BaseEstimator, RegressorMixin):
             use_bias = True
             activation = self.dense_activation
 
-        dense_layer = Dense(
-            len(input_list),
-            activation=activation,
-            name='dense-1',
-            use_bias=use_bias)(concat_tensor)
-        if self.batch_normalization:
-            dense_layer = BatchNormalization(name='bn-1')(dense_layer)
-            dense_layer = Activation(self.dense_activation)(dense_layer)
-        if self.dropout_rate:
-            dense_layer = Dropout(
-                self.dropout_rate, name='dropout-1')(dense_layer)
+        if self.dense_output_size:
+            dense_output_size = self.dense_output_size
+        else:
+            dense_output_size = len(input_list)
 
-        dense_layer = Dense(
-            len(input_list),
-            activation=activation,
-            name='dense-2',
-            use_bias=use_bias)(dense_layer)
-        if self.batch_normalization:
-            dense_layer = BatchNormalization(name='bn-2')(dense_layer)
-            dense_layer = Activation(self.dense_activation)(dense_layer)
-        if self.dropout_rate:
-            dense_layer = Dropout(
-                self.dropout_rate, name='dropout-2')(dense_layer)
+        for i in range(1, self.num_dense_layer + 1):
+            dense_layer = Dense(
+                dense_output_size,
+                activation=activation,
+                name='dense-' + str(i),
+                use_bias=use_bias)(concat_tensor)
+            if self.batch_normalization:
+                dense_layer = BatchNormalization(
+                    name='bn-' + str(i))(dense_layer)
+                dense_layer = Activation(self.dense_activation)(dense_layer)
+            if self.dropout_rate:
+                dense_layer = Dropout(
+                    self.dropout_rate, name='dropout-' + str(i))(dense_layer)
 
         output = Dense(
             1,
