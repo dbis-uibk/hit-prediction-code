@@ -119,6 +119,76 @@ def hl_list():
     ]
 
 
+def all_ll_genre_list():
+    return [
+        *ll_list(),
+        *genre_list(),
+    ]
+
+
+def all_ll_mood_list():
+    return [
+        *ll_list(),
+        *mood_list(),
+    ]
+
+
+def all_ll_voice_list():
+    return [
+        *ll_list(),
+        *voice_list(),
+    ]
+
+
+def all_ll_year_list():
+    return [
+        *ll_list(),
+        ('year', 'wide'),
+    ]
+
+
+def all_ll_year_genre_list():
+    return [
+        *all_ll_genre_list(),
+        ('year', 'wide'),
+    ]
+
+
+def all_ll_year_mood_list():
+    return [
+        *all_ll_mood_list(),
+        ('year', 'wide'),
+    ]
+
+
+def all_ll_year_voice_list():
+    return [
+        *all_ll_voice_list(),
+        ('year', 'wide'),
+    ]
+
+
+def all_ll_year_genre_mood_list():
+    return [
+        *all_ll_year_genre_list(),
+        *mood_list(),
+    ]
+
+
+def all_ll_year_genre_voice_list():
+    return [
+        *all_ll_year_genre_list(),
+        *voice_list(),
+    ]
+
+
+def all_ll_year_mood_voice_list():
+    return [
+        *all_ll_year_mood_list(),
+        *voice_list(),
+    ]
+
+
 def rhythm_list():
     return [
         (hl_rhythm_regex(), 'deep'),
