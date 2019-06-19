@@ -104,7 +104,7 @@ def key_mapping(df):
     # https://stackoverflow.com/questions/37292872/how-can-i-one-hot-encode-in-python
     string_columns = [
         'tonal.chords_key', 'tonal.chords_scale', 'tonal.key_scale',
-        'tonal.key_key'
+        'tonal.key_key', 'artist'
     ]
     for c in string_columns:
         if c in list(df):

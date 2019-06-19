@@ -1,7 +1,7 @@
-from keras.layers import (Activation, BatchNormalization, Concatenate, Dense,
-                          Dropout, Input)
+from tensorflow.keras.layers import (Activation, BatchNormalization,
+                                     Concatenate, Dense, Dropout, Input)
 
-from keras.models import Model
+from tensorflow.keras.models import Model
 
 from sklearn.base import BaseEstimator, RegressorMixin
 
