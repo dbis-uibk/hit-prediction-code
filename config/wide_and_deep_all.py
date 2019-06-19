@@ -20,7 +20,7 @@ dataloader = MsdBbLoader(
     non_hits_per_hit=1,
     features=[
         *common.all_list(),
-        ('artist', 'wide'),
+        ('artist', 'deep'),
     ],
     label='peak',
     nan_value=150,
