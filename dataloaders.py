@@ -112,7 +112,8 @@ def key_mapping(df):
                 values = df[c]
                 counts = pd.value_counts(values)
                 mask = values.isin(counts[counts > 1].index)
-                dummies = pd.get_dummies(values[mask], prefix=c, drop_first=False)
+                values[~mask] = 'one-hit-wonder'
+                dummies = pd.get_dummies(values, prefix=c, drop_first=False)
             else:
                 dummies = pd.get_dummies(df[c], prefix=c, drop_first=False)
 
