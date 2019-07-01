@@ -22,13 +22,11 @@ bandit = "*"
 
 [packages]
 matplotlib = "*"
-pymongo = "*"
 scikit-learn = "*"
 pandas = "*"
 gensim = "*"
-tensorflow = "==1.13.1"
+tensorflow = "==1.14.0"
 sklearn = "*"
-gitpython = "*"
 tables = "*"
 fuzzywuzzy = {extras = ["speedup"],version = "*"}
 click = "*"
