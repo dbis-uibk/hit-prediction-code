@@ -108,6 +108,14 @@ def key_mapping(df):
     ]
     for c in string_columns:
         if c in list(df):
-            dummies = pd.get_dummies(df[c], prefix=c, drop_first=False)
+            if c == 'artist':
+                values = df[c]
+                counts = pd.value_counts(values)
+                mask = values.isin(counts[counts > 1].index)
+                values[~mask] = 'one-hit-wonder'
+                dummies = pd.get_dummies(values, prefix=c, drop_first=False)
+            else:
+                dummies = pd.get_dummies(df[c], prefix=c, drop_first=False)
+
             df = pd.concat([df.drop(c, axis=1), dummies], axis=1)
     return df
