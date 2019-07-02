@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 import pandas as pd
 
-from SPARQLWrapper import SPARQLWrapper, JSON
+from SPARQLWrapper import SPARQLExceptions, SPARQLWrapper, JSON 
 
 from dataset_creation import read_msd_unique_artists, read_hits, read_non_hits, join
 
@@ -61,7 +61,10 @@ def dbpedia():
     for artist in artists['artist']:
         entry = {}
         entry['artist'] = artist
-        result = get_artist_from_dbpedia(entry['artist'])
+        try:
+            result = get_artist_from_dbpedia(entry['artist'])
+        except SPARQLExceptions.QueryBadFormed:
+            continue
 
         if result:
             print(result)
