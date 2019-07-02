@@ -28,12 +28,12 @@ dataloader = MsdBbLoader(
 
 pipeline = Pipeline([
     ('scale', MinMaxScaler()),
-    ('svm', LinearSVR()),
+    ('model', LinearSVR()),
 ])
 
 evaluator = GridEvaluator(
     parameters={
-        'svm__C': [1.0],
+        'model__C': [1.0],
     },
     grid_parameters=evaluations.grid_parameters(),
 )
