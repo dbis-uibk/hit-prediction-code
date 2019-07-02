@@ -56,7 +56,7 @@ def artist_preprocess(name):
 def dbpedia():
     mapping = []
 
-    artists = read_hits().drop_duplicates(subset=['artist']).head(3)
+    artists = read_hits().drop_duplicates(subset=['artist'])
 
     for artist in artists['artist']:
         entry = {}
