@@ -29,14 +29,14 @@ dataloader = MsdBbLoader(
 
 pipeline = Pipeline([
     ('scale', MinMaxScaler()),
-    ('wide_and_deep', WideAndDeep(features=dataloader.feature_indices)),
+    ('model', WideAndDeep(features=dataloader.feature_indices)),
 ])
 
 evaluator = GridEvaluator(
     parameters={
-        'wide_and_deep__batch_normalization': [False],
-        'wide_and_deep__dropout_rate': [0.25],
-        'wide_and_deep__epochs': [10, 20, 50, 100, 150, 200],
+        'model__batch_normalization': [False],
+        'model__dropout_rate': [0.25],
+        'model__epochs': [250, 300, 400, 500],
     },
     grid_parameters=evaluations.grid_parameters(),
 )
