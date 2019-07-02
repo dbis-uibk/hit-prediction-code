@@ -6,8 +6,7 @@ import matplotlib.pyplot as plt
 
 import pandas as pd
 
-import requests
-from qwikidata.sparql import return_sparql_query_results
+from SPARQLWrapper import SPARQLWrapper, JSON
 
 from dataset_creation import read_msd_unique_artists, read_hits, read_non_hits, join
 
@@ -54,23 +53,77 @@ def artist_preprocess(name):
 
 
 @cli.command()
-def wikidata():
-    query_string = """
-    SELECT $WDid
-    WHERE {
-        ?WDid (wdt:P279)* wd:Q4022
-    }
-    """
-    query_string = """
-    SELECT $WDid
-    WHERE {
-      wd:Q4022 (wdt:P279)* ?WDid
-    }
-    """
-    url = 'http://query.wikidata.org/bigdata/namespace/wdq/sparql'
-    results = requests.get(url, params={'query': query_string, 'format': 'json',})
+def dbpedia():
+    mapping = []
 
-    print(results.text)
+    artists = read_hits().drop_duplicates(subset=['artist']).head(3)
+
+    for artist in artists['artist']:
+        entry = {}
+        entry['artist'] = artist
+        result = get_artist_from_dbpedia(entry['artist'])
+
+        if result:
+            print(result)
+
+            entry['artist_dbpedia_uri'] = result['item']['value']
+            entry['artist_wikidata_uri'] = result['same']['value']
+            mapping.append(entry)
+
+    pd.DataFrame(mapping).to_csv(RESULT_PATH + '/artist_dbpedia_wikidata.csv')
+
+
+def get_artist_from_dbpedia(artist):
+    sparql = SPARQLWrapper("http://dbpedia.org/sparql")
+    sparql.setQuery("""
+        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+        PREFIX purl: <http://purl.org/linguistics/gold/>
+        SELECT DISTINCT ?item ?same
+        WHERE
+        {
+            { ?item purl:hypernym dbr:Singer . }
+            UNION
+            { ?item purl:hypernym dbr:Band . }
+            ?item rdfs:label ?label .
+            FILTER (lang(?label) = 'en')
+            FILTER (str(?label) = '""" + artist + """')
+            ?item owl:sameAs ?same .
+            FILTER (regex(?same, 'wikidata.org'))
+        } LIMIT 2
+    """)
+    sparql.setReturnFormat(JSON)
+    results = sparql.query()
+
+    print(results.info())
+    results = results.convert()["results"]["bindings"]
+    print(len(results))
+
+    if len(results) == 1:
+        return results[0]
+    else:
+        return None
+
+
+@cli.command()
+def wikidata():
+    pass
+    # sparql = SPARQLWrapper("https://query.wikidata.org/sparql")
+    # sparql.setQuery("""
+    # SELECT ?item ?itemLabel
+    # WHERE
+    # {
+        # ?item wdt:P31 wd:Q146 .
+        # SERVICE wikibase:label { bd:serviceParam wikibase:language "en" }
+    # }
+    # """)
+    # sparql.setReturnFormat(JSON)
+    # results = sparql.query()
+    # print(results.info())
+
+    # results = results.convert()
+
+    # results_df = pd.io.json.json_normalize(results['results']['bindings'])
+    # results_df[['item.value', 'itemLabel.value']].head()
 
 
 if __name__ == '__main__':
