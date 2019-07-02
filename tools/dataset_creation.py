@@ -263,7 +263,7 @@ def read_msd_tracks_per_year():
 
 
 def read_msd_unique_artists():
-    file_path = MSD_PATH + '/additional_files/unique_tracks.txt'
+    file_path = MSD_PATH + '/additional_files/unique_artists.txt'
 
     return pd.read_csv(
         file_path,

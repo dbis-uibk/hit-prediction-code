@@ -31,6 +31,7 @@ tables = "*"
 fuzzywuzzy = {extras = ["speedup"],version = "*"}
 click = "*"
 dbispipeline = {git = "ssh://git@git.uibk.ac.at/dbis/software/dbispipeline"}
+qwikidata = "*"
 
 [requires]
 python_version = "3.6"
