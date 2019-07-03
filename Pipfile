@@ -32,6 +32,7 @@ fuzzywuzzy = {extras = ["speedup"],version = "*"}
 click = "*"
 dbispipeline = {git = "ssh://git@git.uibk.ac.at/dbis/software/dbispipeline"}
 sparqlwrapper = "*"
+qwikidata = "*"
 
 [requires]
 python_version = "3.6"

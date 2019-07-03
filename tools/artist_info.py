@@ -6,6 +6,10 @@ import pandas as pd
 
 from SPARQLWrapper import SPARQLExceptions, SPARQLWrapper, JSON
 
+from qwikidata.entity import WikidataItem, WikidataProperty
+from qwikidata.linked_data_interface import get_entity_dict_from_api
+from qwikidata.json_dump import WikidataJsonDump
+
 from dataset_creation import join, read_hits, read_msd_unique_artists, read_non_hits
 
 RESULT_PATH = '.'
@@ -21,16 +25,18 @@ def cli(path):
 
 @cli.command()
 def artists():
-    hits = read_non_hits()
+    hits = read_hits()
+    hit_artists = pd.read_csv('/storage/nas3/datasets/wikipedia/wikidata/artist_dbpedia_wikidata_hits.csv') 
     artist_id = read_msd_unique_artists()
     artist_id = artist_id.dropna(subset=['mb_artist_id'])
-    # artists = hits['artist'].map(artist_preprocess).reset_index(name='artist')
-    # hits = pd.concat([hits.drop('artist', axis=1), artists], axis=1)
     num_of_hits = len(hits)
 
-    hits = join(hits, artist_id, on=['artist'])
-    print(hits['mb_artist_id'])
-    print(num_of_hits, len(hits))
+    hits_mbid = join(hits, artist_id, on=['artist'])
+    hits_wd = join(hits, hit_artists, on=['artist'])
+    hit_artists = join(hit_artists, artist_id, on=['artist'])
+    hits = join(hits, hit_artists, on=['artist'])
+
+    print(num_of_hits, len(hits_mbid), len(hits_wd), len(hits))
 
     hits = hits.groupby([
         'artist',
@@ -108,25 +114,14 @@ def get_artist_from_dbpedia(artist):
 
 @cli.command()
 def wikidata():
-    pass
-    # sparql = SPARQLWrapper("https://query.wikidata.org/sparql")
-    # sparql.setQuery("""
-    # SELECT ?item ?itemLabel
-    # WHERE
-    # {
-    # ?item wdt:P31 wd:Q146 .
-    # SERVICE wikibase:label { bd:serviceParam wikibase:language "en" }
-    # }
-    # """)
-    # sparql.setReturnFormat(JSON)
-    # results = sparql.query()
-    # print(results.info())
+    data = {}
+    hit_artists = pd.read_csv('/storage/nas3/datasets/wikipedia/wikidata/artist_dbpedia_wikidata_hits.csv')
 
-    # results = results.convert()
+    for artist in hit_artists['artist_wikidata_uri']:
+        artist_data = get_entity_dict_from_api(artist.rsplit('/', 1)[-1])
+        data[artist] = artist_data
 
-    # results_df = pd.io.json.json_normalize(results['results']['bindings'])
-    # results_df[['item.value', 'itemLabel.value']].head()
-
+    pd.DataFrame(data).to_json(RESULT_PATH + 'artist_hits_data.json')
 
 if __name__ == '__main__':
     cli()
