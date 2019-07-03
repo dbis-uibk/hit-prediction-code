@@ -1,15 +1,12 @@
 import click
-import platform
-import re
 
 import matplotlib.pyplot as plt
 
 import pandas as pd
 
-from SPARQLWrapper import SPARQLExceptions, SPARQLWrapper, JSON 
+from SPARQLWrapper import SPARQLExceptions, SPARQLWrapper, JSON
 
-from dataset_creation import read_msd_unique_artists, read_hits, read_non_hits, join
-
+from dataset_creation import join, read_hits, read_msd_unique_artists, read_non_hits
 
 RESULT_PATH = '.'
 
@@ -24,7 +21,7 @@ def cli(path):
 
 @cli.command()
 def artists():
-    hits = read_hits()
+    hits = read_non_hits()
     artist_id = read_msd_unique_artists()
     artist_id = artist_id.dropna(subset=['mb_artist_id'])
     # artists = hits['artist'].map(artist_preprocess).reset_index(name='artist')
@@ -35,7 +32,9 @@ def artists():
     print(hits['mb_artist_id'])
     print(num_of_hits, len(hits))
 
-    hits = hits.groupby(['artist']).size().sort_values(ascending=False).reset_index(name='counts')
+    hits = hits.groupby([
+        'artist',
+    ]).size().sort_values(ascending=False).reset_index(name='counts')
 
     hits = hits[hits['artist'].str.contains('[0-9]', regex=True)]
 
@@ -56,7 +55,7 @@ def artist_preprocess(name):
 def dbpedia():
     mapping = []
 
-    artists = read_hits().drop_duplicates(subset=['artist'])
+    artists = read_non_hits().drop_duplicates(subset=['artist'])
 
     for artist in artists['artist']:
         entry = {}
@@ -115,8 +114,8 @@ def wikidata():
     # SELECT ?item ?itemLabel
     # WHERE
     # {
-        # ?item wdt:P31 wd:Q146 .
-        # SERVICE wikibase:label { bd:serviceParam wikibase:language "en" }
+    # ?item wdt:P31 wd:Q146 .
+    # SERVICE wikibase:label { bd:serviceParam wikibase:language "en" }
     # }
     # """)
     # sparql.setReturnFormat(JSON)
