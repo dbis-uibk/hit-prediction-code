@@ -16,6 +16,8 @@ from dataset_creation import join, read_hits, read_msd_unique_artists, read_non_
 
 RESULT_PATH = '.'
 
+WIKIDATA_PATH = '/storage/nas3/datasets/wikipedia/wikidata'
+
 
 @click.group()
 @click.option(
@@ -27,31 +29,15 @@ def cli(path):
 
 @cli.command()
 def artists():
-    hits = read_hits()
-    hit_artists = pd.read_csv(
-        '/storage/nas3/datasets/wikipedia/wikidata/artist_dbpedia_wikidata_hits.csv'
+    songs = read_songs()
+    artists = pd.read_csv(
+        WIKIDATA_PATH + '/artist_dbpedia_wikidata.csv',
     )
-    artist_id = read_msd_unique_artists()
-    artist_id = artist_id.dropna(subset=['mb_artist_id'])
-    # num_of_hits = len(hits)
 
-    # hits_mbid = join(hits, artist_id, on=['artist'])
-    # hits_wd = join(hits, hit_artists, on=['artist'])
-    # hit_artists = join(hit_artists, artist_id, on=['artist'])
-    # hits = join(hits, hit_artists, on=['artist'])
+    song_artists = set(songs['artist'])
+    no_info = song_artists - set(artists['artist'])
 
-    # print(num_of_hits, len(hits_mbid), len(hits_wd), len(hits))
-
-    hits = hits.groupby([
-        'artist',
-    ]).size().sort_values(ascending=False).reset_index(name='counts')
-
-    no_info = set(hits['artist']) - set(hit_artists['artist'])
-
-    print(len(no_info), no_info)
-    # print(hits)
-    # hits.plot()
-    # plt.show()
+    print(no_info, len(song_artists), len(no_info))
 
 
 def artist_preprocess(name):
@@ -62,17 +48,24 @@ def artist_preprocess(name):
     return name
 
 
+def read_songs():
+    songs = read_hits()
+    songs = songs.append(read_non_hits(), sort=False)
+    songs.drop_duplicates(subset=['artist'], inplace=True)
+
+    return songs
+
+
 @cli.command()
 def dbpedia():
     dest_file = RESULT_PATH + '/artist_dbpedia_wikidata.csv'
     mapping = []
 
-    artists = read_hits()
-    artists = artists.append(read_non_hits(), sort=False)
-    artists.drop_duplicates(subset=['artist'], inplace=True)
+    songs = read_songs()
+    artists = songs['artist']
 
     num_of_artists = len(artists)
-    for i, artist in enumerate(artists['artist'], 1):
+    for i, artist in enumerate(artists, 1):
         entry = {}
         entry['artist'] = artist
         try:
@@ -132,11 +125,11 @@ def get_artist_from_dbpedia(artist):
 @cli.command()
 def wikidata():
     data = {}
-    non_hit_artists = pd.read_csv(
-        '/storage/nas3/datasets/wikipedia/wikidata/artist_dbpedia_wikidata_non_hits.csv'
+    artists = pd.read_csv(
+        WIKIDATA_PATH + '/artist_dbpedia_wikidata.csv',
     )
 
-    for artist in non_hit_artists['artist_wikidata_uri']:
+    for artist in artists['artist_wikidata_uri']:
         artist_data = get_entity_dict_from_api(artist.rsplit('/', 1)[-1])
         data[artist] = artist_data
 
