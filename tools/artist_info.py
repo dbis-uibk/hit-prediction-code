@@ -63,7 +63,8 @@ def dbpedia():
 
     artists = read_non_hits().drop_duplicates(subset=['artist'])
 
-    for artist in artists['artist']:
+    num_of_artists = len(artists)
+    for i, artist in enumerate(artists['artist'], 1):
         entry = {}
         entry['artist'] = artist
         try:
@@ -77,6 +78,10 @@ def dbpedia():
             entry['artist_dbpedia_uri'] = result['item']['value']
             entry['artist_wikidata_uri'] = result['same']['value']
             mapping.append(entry)
+        print('Track:', i, '/', num_of_artists)
+
+        if i % 100 == 0:
+            pd.DataFrame(mapping).to_csv(RESULT_PATH + '/artist_dbpedia_wikidata.csv')
 
     pd.DataFrame(mapping).to_csv(RESULT_PATH + '/artist_dbpedia_wikidata.csv')
 
