@@ -115,13 +115,14 @@ def get_artist_from_dbpedia(artist):
 @cli.command()
 def wikidata():
     data = {}
-    hit_artists = pd.read_csv('/storage/nas3/datasets/wikipedia/wikidata/artist_dbpedia_wikidata_hits.csv')
+    non_hit_artists = pd.read_csv('/storage/nas3/datasets/wikipedia/wikidata/artist_dbpedia_wikidata_non_hits.csv')
 
-    for artist in hit_artists['artist_wikidata_uri']:
+    for artist in non_hit_artists['artist_wikidata_uri']:
         artist_data = get_entity_dict_from_api(artist.rsplit('/', 1)[-1])
         data[artist] = artist_data
 
-    pd.DataFrame(data).to_json(RESULT_PATH + 'artist_hits_data.json')
+    pd.DataFrame(data).to_json(RESULT_PATH + '/artist_non_hits_data.json')
+
 
 if __name__ == '__main__':
     cli()
