@@ -33,7 +33,7 @@ pipeline = Pipeline([
 
 evaluator = GridEvaluator(
     parameters={
-        'model__n_estimators': [100, 500],
+        'model__n_estimators': [100, 200, 300, 400, 500, 600, 700],
     },
     grid_parameters=evaluations.grid_parameters(),
 )
