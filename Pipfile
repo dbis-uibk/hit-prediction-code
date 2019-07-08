@@ -33,6 +33,7 @@ click = "*"
 dbispipeline = {git = "ssh://git@git.uibk.ac.at/dbis/software/dbispipeline"}
 sparqlwrapper = "*"
 qwikidata = "*"
+billboard-py = "*"
 
 [requires]
 python_version = "3.6"

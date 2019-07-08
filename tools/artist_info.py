@@ -36,7 +36,7 @@ def artists(hits, non_hits):
     elif non_hits:
         songs = read_non_hits()
     else:
-       songs = read_songs()
+        songs = read_songs()
 
     all_artists = set(songs['artist'])
     mapped_artists = set(read_artist_dbpedia_wikidata()['artist'])
