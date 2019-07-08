@@ -28,7 +28,7 @@ dataloader = MsdBbLoader(
 
 pipeline = Pipeline([
     ('scale', MinMaxScaler()),
-    ('model', GradientBoostingRegressor),
+    ('model', GradientBoostingRegressor()),
 ])
 
 evaluator = GridEvaluator(
