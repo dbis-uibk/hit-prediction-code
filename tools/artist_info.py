@@ -28,13 +28,21 @@ def cli(path):
 
 
 @cli.command()
-def artists():
-    songs = read_songs()
+@click.option('--hits', default=False, is_flag=True, help='Only hits.')
+@click.option('--non-hits', default=False, is_flag=True, help='Only non-hits.')
+def artists(hits, non_hits):
+    if hits:
+        songs = read_hits()
+    elif non_hits:
+        songs = read_non_hits()
+    else:
+       songs = read_songs()
 
-    song_artists = set(songs['artist'])
-    no_info = missing_artists()
+    all_artists = set(songs['artist'])
+    mapped_artists = set(read_artist_dbpedia_wikidata()['artist'])
+    no_info = all_artists - mapped_artists
 
-    print(no_info, len(song_artists), len(no_info))
+    print(no_info, len(all_artists), len(mapped_artists), len(no_info))
 
 
 def artist_preprocess(name):
@@ -69,7 +77,7 @@ def missing_artists():
     '--get-all',
     default=False,
     is_flag=True,
-    help='Loads all artists by default only missing artists are loaded')
+    help='Loads all artists by default only missing artists are loaded.')
 def dbpedia(get_all):
     dest_file = RESULT_PATH + '/artist_dbpedia_wikidata.csv'
     mapping = []
