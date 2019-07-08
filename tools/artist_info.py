@@ -104,8 +104,6 @@ def dbpedia(get_all):
             df.to_csv(dest_file)
             mapping = []
 
-        print(df)
-
     df.append(mapping, ignore_index=True).to_csv(dest_file)
 
 
