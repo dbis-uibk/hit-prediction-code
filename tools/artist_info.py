@@ -30,12 +30,9 @@ def cli(path):
 @cli.command()
 def artists():
     songs = read_songs()
-    artists = pd.read_csv(
-        WIKIDATA_PATH + '/artist_dbpedia_wikidata.csv',
-    )
 
     song_artists = set(songs['artist'])
-    no_info = song_artists - set(artists['artist'])
+    no_info = missing_artists()
 
     print(no_info, len(song_artists), len(no_info))
 
@@ -56,13 +53,33 @@ def read_songs():
     return songs
 
 
+def read_artist_dbpedia_wikidata():
+    return pd.read_csv(WIKIDATA_PATH + '/artist_dbpedia_wikidata.csv')
+
+
+def missing_artists():
+    all_artists = set(read_songs()['artist'])
+    mapped_artists = set(read_artist_dbpedia_wikidata()['artist'])
+
+    return all_artists - mapped_artists
+
+
 @cli.command()
-def dbpedia():
+@click.option(
+    '--get-all',
+    default=False,
+    is_flag=True,
+    help='Loads all artists by default only missing artists are loaded')
+def dbpedia(get_all):
     dest_file = RESULT_PATH + '/artist_dbpedia_wikidata.csv'
     mapping = []
 
-    songs = read_songs()
-    artists = songs['artist']
+    if get_all:
+        artists = read_songs()['artist']
+        df = pd.DataFrame()
+    else:
+        artists = missing_artists()
+        df = pd.read_csv(dest_file, index_col=0)
 
     num_of_artists = len(artists)
     for i, artist in enumerate(artists, 1):
@@ -82,15 +99,19 @@ def dbpedia():
         print('Track:', i, '/', num_of_artists, '    found:', bool(result),
               '    ', artist)
 
-        if i % 100 == 0:
-            pd.DataFrame(mapping).to_csv(dest_file)
+        if i % 100 == 0 and len(mapping):
+            df = df.append(mapping, ignore_index=True)
+            df.to_csv(dest_file)
+            mapping = []
 
-    pd.DataFrame(mapping).to_csv(dest_file)
+        print(df)
+
+    df.append(mapping, ignore_index=True).to_csv(dest_file)
 
 
 def get_artist_from_dbpedia(artist):
     # artist = parse.quote(artist, safe=' ')
-    print(artist)
+    # print(artist)
 
     sparql = SPARQLWrapper("http://dbpedia.org/sparql")
     sparql.setQuery("""
@@ -125,9 +146,7 @@ def get_artist_from_dbpedia(artist):
 @cli.command()
 def wikidata():
     data = {}
-    artists = pd.read_csv(
-        WIKIDATA_PATH + '/artist_dbpedia_wikidata.csv',
-    )
+    artists = pd.read_csv(WIKIDATA_PATH + '/artist_dbpedia_wikidata.csv')
 
     for artist in artists['artist_wikidata_uri']:
         artist_data = get_entity_dict_from_api(artist.rsplit('/', 1)[-1])
