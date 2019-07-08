@@ -120,6 +120,7 @@ def get_artist_from_dbpedia(artist):
     # print(artist)
 
     sparql = SPARQLWrapper("http://dbpedia.org/sparql")
+    sparql.setTimeout(300)
     sparql.setQuery("""
         PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
         SELECT DISTINCT ?item ?same
