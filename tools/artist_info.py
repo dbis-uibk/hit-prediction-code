@@ -11,7 +11,7 @@ from socket import timeout
 from SPARQLWrapper import SPARQLExceptions, SPARQLWrapper, JSON
 
 from qwikidata.entity import WikidataItem, WikidataProperty
-from qwikidata.linked_data_interface import get_entity_dict_from_api
+from qwikidata.linked_data_interface import get_entity_dict_from_api, LdiResponseNotOk, InvalidEntityId
 from qwikidata.json_dump import WikidataJsonDump
 
 from dataset_creation import join, read_hits, read_msd_unique_artists, read_non_hits
@@ -200,13 +200,16 @@ def wikidata(get_all):
             df = pd.DataFrame()
 
     for i, artist in enumerate(artist_uris, 1):
-        data.append({
-            'artist_wikidata_uri':
-            artist,
-            'data':
-            get_entity_dict_from_api(artist.rsplit('/', 1)[-1]),
-        })
-        print('Artist', i, '/', len(artist_uris), artist)
+        try:
+            data.append({
+                'artist_wikidata_uri':
+                artist,
+                'data':
+                get_entity_dict_from_api(artist.rsplit('/', 1)[-1]),
+            })
+            print('Artist', i, '/', len(artist_uris), artist)
+        except (LdiResponseNotOk, InvalidEntityId) as ex:
+            print(ex)
 
         if i % 100 == 0 and len(data):
             df = df.append(data, ignore_index=True)
