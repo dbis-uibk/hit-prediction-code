@@ -105,7 +105,7 @@ def dbpedia(get_all):
             entry['artist'] = artist
             try:
                 result, _ = get_artist_from_dbpedia(entry['artist'])
-            except SPARQLExceptions.QueryBadFormed as ex:
+            except SPARQLExceptions.SPARQLWrapperException as ex:
                 print(ex)
                 failed.append({'artist': artist, 'exception': str(ex)})
                 continue
