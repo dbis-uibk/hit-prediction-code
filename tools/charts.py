@@ -16,7 +16,8 @@ def cli(path):
 
 
 @cli.command()
-@click.option('--name', default='hot-100', help='Name of the billboard charts.')
+@click.option(
+    '--name', default='hot-100', help='Name of the billboard charts.')
 def billboard_charts(name):
     charts = billboard.ChartData(name)
     end_date = charts.date

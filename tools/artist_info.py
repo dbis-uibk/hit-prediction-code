@@ -175,15 +175,45 @@ def get_artist_from_dbpedia(artist):
 
 
 @cli.command()
-def wikidata():
-    data = {}
-    artists = pd.read_csv(WIKIDATA_PATH + '/artist_dbpedia_wikidata.csv')
+@click.option(
+    '--get-all',
+    default=False,
+    is_flag=True,
+    help='Loads all artists by default only missing artists are loaded.')
+def wikidata(get_all):
+    dest_file = RESULT_PATH + '/artist_non_hits_data.json'
+    dest_file_param = {
+        'orient': 'records',
+        'lines': True,
+    }
+    artist_uris = pd.read_csv(
+        WIKIDATA_PATH + '/artist_dbpedia_wikidata.csv')['artist_wikidata_uri']
 
-    for artist in artists['artist_wikidata_uri']:
-        artist_data = get_entity_dict_from_api(artist.rsplit('/', 1)[-1])
-        data[artist] = artist_data
+    data = []
+    if get_all:
+        df = pd.DataFrame()
+    else:
+        try:
+            df = pd.read_json(dest_file, **dest_file_param)
+            artist_uris = set(artist_uris) - set(df['artist_wikidata_uri'])
+        except ValueError:
+            df = pd.DataFrame()
 
-    pd.DataFrame(data).to_json(RESULT_PATH + '/artist_non_hits_data.json')
+    for i, artist in enumerate(artist_uris, 1):
+        data.append({
+            'artist_wikidata_uri':
+            artist,
+            'data':
+            get_entity_dict_from_api(artist.rsplit('/', 1)[-1]),
+        })
+        print('Artist', i, '/', len(artist_uris), artist)
+
+        if i % 100 == 0 and len(data):
+            df = df.append(data, ignore_index=True)
+            df.to_json(dest_file, **dest_file_param)
+            data = []
+
+    df.append(data, ignore_index=True, **dest_file_param).to_json(dest_file)
 
 
 if __name__ == '__main__':
