@@ -16,16 +16,8 @@ def cli(path):
 
 
 @cli.command()
-def billboard_100():
-    load_billboard_charts('hot-100')
-
-
-@cli.command()
-def billboard_200():
-    load_billboard_charts('billboard-200')
-
-
-def load_billboard_charts(name):
+@click.option('--name', default='hot-100', help='Name of the billboard charts.')
+def billboard_charts(name):
     charts = billboard.ChartData(name)
     end_date = charts.date
     known_songs = set()
