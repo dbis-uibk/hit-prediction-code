@@ -152,7 +152,7 @@ def get_artist_from_dbpedia(artist):
             { ?item rdf:type yago:Group100031264 . }
             ?item rdfs:label ?label .
             FILTER (lang(?label) = 'en')
-            FILTER (str(?label) = "%s")
+            FILTER (regex(str(?label), "%s", "i"))
             ?item owl:sameAs ?same .
             FILTER (regex(?same, 'wikidata.org'))
         } LIMIT 2
