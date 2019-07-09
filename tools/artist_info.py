@@ -81,6 +81,7 @@ def missing_artists():
 def dbpedia(get_all):
     dest_file = RESULT_PATH + '/artist_dbpedia_wikidata.csv'
     mapping = []
+    failed = []
 
     if get_all:
         artists = read_songs()['artist']
@@ -104,6 +105,7 @@ def dbpedia(get_all):
                 result, _ = get_artist_from_dbpedia(entry['artist'])
             except SPARQLExceptions.QueryBadFormed as ex:
                 print(ex)
+                failed.append({'artist': artist, 'exception': str(ex)})
                 continue
 
             if result:
@@ -120,6 +122,7 @@ def dbpedia(get_all):
             mapping = []
 
     df.append(mapping, ignore_index=True).to_csv(dest_file)
+    pd.DataFrame(failed).to_csv('failed_requests.csv')
 
 
 def get_artist_from_dbpedia(artist):
