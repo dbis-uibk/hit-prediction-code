@@ -96,6 +96,7 @@ def dbpedia(get_all):
 
         for string in ['ft.', 'feat.', 'featuring']:
             if string in artist.lower():
+                print('Track:', i, '/', num_of_artists, '    skipped')
                 skip = True
 
         if not skip:
