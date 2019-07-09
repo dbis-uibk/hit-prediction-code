@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 
 import pandas as pd
 
+from socket import timeout
+
 from SPARQLWrapper import SPARQLExceptions, SPARQLWrapper, JSON
 
 from qwikidata.entity import WikidataItem, WikidataProperty
@@ -48,7 +50,6 @@ def artists(hits, non_hits):
 def artist_preprocess(name):
     name = str(name)
     name = name.lower()
-    # name = re.sub(r'[^a-zA-Z ]', '', name)
 
     return name
 
@@ -159,10 +160,13 @@ def get_artist_from_dbpedia(artist):
         } LIMIT 2
     """ % artist)
     sparql.setReturnFormat(JSON)
-    results = sparql.query()
-    info = results.info()
-
-    results = results.convert()["results"]["bindings"]
+    try:
+        results = sparql.query()
+        info = results.info()
+        results = results.convert()["results"]["bindings"]
+    except timeout as ex:
+        info = ex
+        results = []
 
     if len(results) == 1:
         return results[0], info
