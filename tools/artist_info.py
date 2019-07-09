@@ -219,5 +219,25 @@ def wikidata(get_all):
     df.append(data, ignore_index=True, **dest_file_param).to_json(dest_file)
 
 
+@cli.command()
+def wikidata_info():
+    dest_file = RESULT_PATH + '/artist_non_hits_data.json'
+    dest_file_param = {
+        'orient': 'records',
+        'lines': True,
+    }
+
+    df = pd.read_json(dest_file, **dest_file_param)
+
+    for _, entry in df.iterrows():
+        item = WikidataItem(entry['data'])
+        claim = item.get_truthy_claim_groups()
+        try:
+            music_brainz = claim['P434'][0]
+            result = music_brainz.mainsnak.datavalue.value
+            print(entry['artist_wikidata_uri'], result)
+        except KeyError:
+            continue
+
 if __name__ == '__main__':
     cli()
