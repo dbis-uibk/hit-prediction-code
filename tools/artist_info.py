@@ -91,21 +91,28 @@ def dbpedia(get_all):
 
     num_of_artists = len(artists)
     for i, artist in enumerate(artists, 1):
-        entry = {}
-        entry['artist'] = artist
-        try:
-            result, _ = get_artist_from_dbpedia(entry['artist'])
-        except SPARQLExceptions.QueryBadFormed as ex:
-            print(ex)
-            continue
+        skip = False
 
-        if result:
-            entry['artist_dbpedia_uri'] = result['item']['value']
-            entry['artist_wikidata_uri'] = result['same']['value']
-            mapping.append(entry)
+        for string in ['ft.', 'feat.', 'featuring']:
+            if string in artist.lower():
+                skip = True
 
-        print('Track:', i, '/', num_of_artists, '    found:', bool(result),
-              '    ', artist)
+        if not skip:
+            entry = {}
+            entry['artist'] = artist
+            try:
+                result, _ = get_artist_from_dbpedia(entry['artist'])
+            except SPARQLExceptions.QueryBadFormed as ex:
+                print(ex)
+                continue
+
+            if result:
+                entry['artist_dbpedia_uri'] = result['item']['value']
+                entry['artist_wikidata_uri'] = result['same']['value']
+                mapping.append(entry)
+
+            print('Track:', i, '/', num_of_artists, '    found:', bool(result),
+                  '    ', artist)
 
         if i % 100 == 0 and len(mapping):
             df = df.append(mapping, ignore_index=True)
@@ -116,9 +123,6 @@ def dbpedia(get_all):
 
 
 def get_artist_from_dbpedia(artist):
-    # artist = parse.quote(artist, safe=' ')
-    # print(artist)
-
     sparql = SPARQLWrapper("http://dbpedia.org/sparql")
     sparql.setTimeout(300)
     sparql.setQuery("""
@@ -131,6 +135,18 @@ def get_artist_from_dbpedia(artist):
             { ?item rdf:type dbo:MusicalArtist . }
             UNION
             { ?item rdf:type dbo:Band . }
+            UNION
+            { ?item rdf:type yago:Singer110599806 .}
+            UNION
+            { ?item rdf:type yago:Musician110340312 .}
+            UNION
+            { ?item rdf:type yago:Musician110339966 .}
+            UNION
+            { ?item rdf:type yago:Artist109812338 .}
+            UNION
+            { ?item rdf:type yago:MusicalOrganization108246613 . }
+            UNION
+            { ?item rdf:type yago:Group100031264 . }
             ?item rdfs:label ?label .
             FILTER (lang(?label) = 'en')
             FILTER (str(?label) = "%s")
