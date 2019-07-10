@@ -49,8 +49,11 @@ def musicbrainz():
         for recording in results['recording-list']:
             if recording['ext:score'] == '100' and recording['artist-credit']:
                 for artist in recording['artist-credit']:
-                    if arid == artist['artist']['id']:
-                        recordings.append(recording)
+                    try:
+                        if arid == artist['artist']['id']:
+                            recordings.append(recording)
+                    except Exception as ex:
+                        print(ex)
 
         found = False
         if len(recordings) == 1:
@@ -62,7 +65,8 @@ def musicbrainz():
                 'musicbrainz_recording_id': recordings[0]['id'],
             })
 
-        print(i, '/', len(charts), 'found:', found, arid, title)
+        print(i, '/', len(charts), 'found:', found, len(recordings), arid,
+              title)
 
     pd.DataFrame(
         data, ignore_index=True).to_csv(RESULT_PATH +
