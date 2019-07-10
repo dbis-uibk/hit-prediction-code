@@ -22,9 +22,17 @@ def musicbrainz():
         'arid': '0b30341b-b59d-4979-8130-b66c0e475321',
         'release': 'Old Town Road',
     }
-    musicbrainzngs.set_useragent('musicbrainz crawler', '1.0')
-    print(musicbrainzngs.search_recordings(**fields))
+    
+    recordings = []
 
+    musicbrainzngs.set_useragent('musicbrainz crawler', '1.0')
+    results = musicbrainzngs.search_recordings(**fields)
+
+    for recording in results['recording-list']:
+        if recording['ext:score'] == '100':
+            recordings.append(recording)
+
+    print(recordings)
 
 if __name__ == '__main__':
     cli()
