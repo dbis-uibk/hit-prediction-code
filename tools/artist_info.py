@@ -164,7 +164,7 @@ def get_artist_from_dbpedia(artist):
         results = sparql.query()
         info = results.info()
         results = results.convert()["results"]["bindings"]
-    except timeout as ex:
+    except Exception as ex:
         info = ex
         results = []
 
