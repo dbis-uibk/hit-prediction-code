@@ -216,7 +216,7 @@ def wikidata(get_all):
             df.to_json(dest_file, **dest_file_param)
             data = []
 
-    df.append(data, ignore_index=True, **dest_file_param).to_json(dest_file)
+    df.append(data).to_json(dest_file, ignore_index=True, **dest_file_param)
 
 
 @cli.command()
