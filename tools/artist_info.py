@@ -238,12 +238,12 @@ def wikidata_info():
             result = music_brainz.mainsnak.datavalue.value
             results.append({
                 'artist_wikidata_uri': entry['artist_wikidata_uri'],
-                'mbarid': result,
+                'musicbrainz_artist_id': result,
             })
         except KeyError:
             continue
 
-    print(len(results))
+    pd.DataFrame(results).to_csv(RESULT_PATH + '/artist_musicbrainz_id.csv')
 
 
 if __name__ == '__main__':
