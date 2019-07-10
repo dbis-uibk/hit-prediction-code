@@ -228,6 +228,7 @@ def wikidata_info():
     }
 
     df = pd.read_json(dest_file, **dest_file_param)
+    results = []
 
     for _, entry in df.iterrows():
         item = WikidataItem(entry['data'])
@@ -235,9 +236,15 @@ def wikidata_info():
         try:
             music_brainz = claim['P434'][0]
             result = music_brainz.mainsnak.datavalue.value
-            print(entry['artist_wikidata_uri'], result)
+            results.append({
+                'artist_wikidata_uri': entry['artist_wikidata_uri'],
+                'mbarid': result,
+            })
         except KeyError:
             continue
+
+    print(len(results))
+
 
 if __name__ == '__main__':
     cli()
