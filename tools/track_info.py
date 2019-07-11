@@ -27,6 +27,9 @@ def musicbrainz():
     WIKIDATA_PATH = '/storage/nas3/datasets/wikipedia/wikidata/'
 
     data = []
+    num_of_match = 0
+    num_of_miss = 0
+    num_of_multi = 0
 
     charts = read_hits()
     artists = pd.read_csv(WIKIDATA_PATH + '/artist_dbpedia_wikidata.csv')
@@ -57,6 +60,7 @@ def musicbrainz():
 
         found = False
         if len(recordings) == 1:
+            num_of_match += 1
             found = True
             data.append({
                 'title': title,
@@ -64,13 +68,16 @@ def musicbrainz():
                 'musicbrainz_artist_id': arid,
                 'musicbrainz_recording_id': recordings[0]['id'],
             })
+        elif len(recordings) < 1:
+            num_of_miss += 1
+        else:
+            num_of_multi += 1
 
-        print(i, '/', len(charts), 'found:', found, len(recordings), arid,
+        print(i + 1, '/', len(charts), 'found:', found, len(recordings), arid,
               title)
 
-    pd.DataFrame(
-        data, ignore_index=True).to_csv(RESULT_PATH +
-                                        '/msd_bb_matches_recording_id.csv')
+    print('Match', num_of_match, 'Multi', num_of_multi, 'Miss', num_of_miss)
+    pd.DataFrame(data).to_csv(RESULT_PATH + '/msd_bb_matches_recording_id.csv')
 
 
 if __name__ == '__main__':
