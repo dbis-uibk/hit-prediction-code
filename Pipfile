@@ -35,6 +35,7 @@ sparqlwrapper = "*"
 qwikidata = "*"
 billboard-py = "*"
 musicbrainzngs = "*"
+requests = "*"
 
 [requires]
 python_version = "3.6"

@@ -2,6 +2,8 @@ import json
 
 import click
 
+import requests
+
 import pandas as pd
 
 import musicbrainzngs
@@ -78,6 +80,59 @@ def musicbrainz():
 
     print('Match', num_of_match, 'Multi', num_of_multi, 'Miss', num_of_miss)
     pd.DataFrame(data).to_csv(RESULT_PATH + '/msd_bb_matches_recording_id.csv')
+
+
+@cli.command()
+@click.option(
+    '--recording-file',
+    default='msd_bb_matches_recording_id.csv',
+    help='File containing the recordings.')
+def acousticbrainz(recording_file):
+    # recordings = pd.read_csv(recording_file)
+    # TODO: split into chunks of 25
+    recordings = [
+        {'musicbrainz_recording_id': '8ac7f923-8418-4766-b3d7-406adb8aada1'},
+        {'musicbrainz_recording_id': 'c7e5ae79-b20b-46ab-89b4-63612ac3206f'},
+    ]
+
+    recordings = pd.DataFrame(recordings)
+
+    recording_id = recordings['musicbrainz_recording_id']
+    hl = acousticbrainz_get_highlevel(recording_id)
+    ll = acousticbrainz_get_lowlevel(recording_id)
+
+    for key, value in hl.items():
+        output_file = RESULT_PATH + '/' + key + '.highlevel.json'
+        write_json_file(output_file, value)
+
+    for key, value in ll.items():
+        output_file = RESULT_PATH + '/' + key + '.lowlevel.json'
+        write_json_file(output_file, value)
+
+
+def acousticbrainz_get_highlevel(recording_ids):
+    return acousticbrainz_get('high-level', recording_ids)
+
+
+def acousticbrainz_get_lowlevel(recording_ids):
+    return acousticbrainz_get('low-level', recording_ids)
+
+
+def acousticbrainz_get(feature_type, recording_ids):
+    BASE_URL = 'https://acousticbrainz.org/api/v1'
+
+    url = BASE_URL + '/' + feature_type
+
+    payload = {'recording_ids': ';'.join(recording_ids)}
+    headers = {'content-type': 'application/json'}
+
+    result = requests.get(url, params=payload, headers=headers)
+
+    return result.json()
+
+def write_json_file(file_name, data):
+    with open(file_name, 'w') as outfile:
+        json.dump(data, outfile)
 
 
 if __name__ == '__main__':
