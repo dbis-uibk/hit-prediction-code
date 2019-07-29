@@ -24,7 +24,12 @@ def cli(path):
 
 
 @cli.command()
-def musicbrainz():
+@click.option(
+    '--dups',
+    default=False,
+    is_flag=True,
+    help='Store duplicates in the resulting file.')
+def musicbrainz(dups):
     musicbrainzngs.set_useragent('musicbrainz crawler', '1.0')
     WIKIDATA_PATH = '/storage/nas3/datasets/wikipedia/wikidata/'
 
@@ -61,19 +66,26 @@ def musicbrainz():
                         print(ex)
 
         found = False
-        if len(recordings) == 1:
-            num_of_match += 1
-            found = True
-            data.append({
-                'title': title,
-                'artist': song['artist'],
-                'musicbrainz_artist_id': arid,
-                'musicbrainz_recording_id': recordings[0]['id'],
-            })
-        elif len(recordings) < 1:
-            num_of_miss += 1
+        if dups:
+            if len(recordings) > 1:
+                found = True
         else:
-            num_of_multi += 1
+            if len(recordings) == 1:
+                found = True
+            elif len(recordings) >= 1:
+                num_of_multi += 1
+
+        if found:
+            num_of_match += 1
+            for recording in recordings:
+                data.append({
+                    'title': title,
+                    'artist': song['artist'],
+                    'musicbrainz_artist_id': arid,
+                    'musicbrainz_recording_id': recording['id'],
+                })
+        else:
+            num_of_miss += 1
 
         print(i + 1, '/', len(charts), 'found:', found, len(recordings), arid,
               title)
