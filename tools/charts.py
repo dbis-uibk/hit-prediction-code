@@ -8,16 +8,18 @@ RESULT_PATH = '.'
 
 
 @click.group()
-@click.option(
-    '--path', default='.', help='The path where the results are stored.')
+@click.option('--path',
+              default='.',
+              help='The path where the results are stored.')
 def cli(path):
     global RESULT_PATH
     RESULT_PATH = path
 
 
 @cli.command()
-@click.option(
-    '--name', default='hot-100', help='Name of the billboard charts.')
+@click.option('--name',
+              default='hot-100',
+              help='Name of the billboard charts.')
 def billboard_charts(name):
     charts = billboard.ChartData(name)
     end_date = charts.date
