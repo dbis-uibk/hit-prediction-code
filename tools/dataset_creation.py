@@ -9,14 +9,15 @@ import numpy as np
 
 import pandas as pd
 
-RESULT_PATH = '.'
+RESULT_PATH = 'data/processed'
 BB_PATH = '/storage/nas3/datasets/music/billboard'
 MSD_PATH = '/storage/nas3/datasets/music/millionsongdataset'
 
 
 @click.group()
-@click.option(
-    '--path', default='.', help='The path where the results are stored.')
+@click.option('--path',
+              default='.',
+              help='The path where the results are stored.')
 def cli(path):
     global RESULT_PATH
     RESULT_PATH = path
@@ -37,14 +38,14 @@ def main2():
 
     matches = join(msd, billboard, on=['artist', 'title'])
 
-    duplicates = matches[matches.duplicated(
-        subset=['artist', 'title'], keep=False)]
+    duplicates = matches[matches.duplicated(subset=['artist', 'title'],
+                                            keep=False)]
     duplicates.to_csv(RESULT_PATH + '/msd_bb_matches_duplicates.csv')
 
     results = join(msd, billboard, on=['artist', 'title'], how='left')
 
-    duplicates = results[results.duplicated(
-        subset=['artist', 'title'], keep=False)]
+    duplicates = results[results.duplicated(subset=['artist', 'title'],
+                                            keep=False)]
     duplicates.to_csv(RESULT_PATH + '/msd_bb_all_duplicates.csv')
 
 
@@ -70,11 +71,12 @@ def match():
 
     with mp.Pool() as pool:
         result_entries = pool.imap_unordered(_fuzzy_match, df_split)
-        fuzzy_results = pd.DataFrame(
-            columns=list(msd.columns) + ['max_sim', 'artist_sim', 'title_sim'])
+        fuzzy_results = pd.DataFrame(columns=list(msd.columns) +
+                                     ['max_sim', 'artist_sim', 'title_sim'])
         for result in result_entries:
-            fuzzy_results = fuzzy_results.append(
-                result, ignore_index=True, sort=False)
+            fuzzy_results = fuzzy_results.append(result,
+                                                 ignore_index=True,
+                                                 sort=False)
         fuzzy_results.to_csv(RESULT_PATH + '/msd_bb_fuzzy_matches.csv')
 
         fuzzy_results = fuzzy_results.loc[fuzzy_results['title_sim'] <= 40]
@@ -84,85 +86,20 @@ def match():
         fuzzy_results.to_csv(RESULT_PATH + '/msd_bb_non_matches.csv')
 
 
-@cli.command()
-def combine_lowlevel_features():
-    features = _combine_features(_combine_ll_features)
-    features.to_hdf(RESULT_PATH + '/msd_bb_ll_features.h5', 'll')
-
-
-@cli.command()
-def combine_highlevel_features():
-    features = _combine_features(_combine_hl_features)
-    features.to_hdf(RESULT_PATH + '/msd_bb_hl_features.h5', 'hl')
-
-
-def _combine_features(combine_function):
-    hits = set(read_hits()['msd_id'])
-    non_hits = set(read_non_hits()['msd_id'])
-    msd_ids = hits | non_hits
-
-    all_features = pd.DataFrame()
-
-    df_split = np.array_split(list(msd_ids), mp.cpu_count() * 4)
-    with mp.Pool() as pool:
-        features = pool.imap_unordered(combine_function, df_split)
-
-        for feature in features:
-            all_features = all_features.append(
-                feature, sort=False, ignore_index=True)
-
-        return all_features
-
-    return None
-
-
-def _combine_ll_features(msd_ids):
-    features_path = MSD_PATH + '/msd_audio_features'  # noqa E501
-
-    ll_features = pd.DataFrame()
-    for msd_id in msd_ids:
-        try:
-            file_id = pd.DataFrame([msd_id], columns=['msd_id'])
-            feature = pd.io.json.json_normalize(
-                _get_lowlevel_feature(features_path, msd_id))
-            ll_features = ll_features.append(
-                file_id.join(feature), sort=False, ignore_index=True)
-        except FileNotFoundError as error:
-            print(error)
-
-    return ll_features
-
-
-def _combine_hl_features(msd_ids):
-    features_path = MSD_PATH + '/msd_audio_features'  # noqa E501
-
-    hl_features = pd.DataFrame()
-    for msd_id in msd_ids:
-        try:
-            file_id = pd.DataFrame([msd_id], columns=['msd_id'])
-            feature = pd.io.json.json_normalize(
-                _get_highlevel_feature(features_path, msd_id))
-            hl_features = hl_features.append(
-                file_id.join(feature), sort=False, ignore_index=True)
-        except FileNotFoundError as error:
-            print(error)
-
-    return hl_features
-
-
 def _fuzzy_match(msd):
     billboard = read_billboard_tracks()
-    results = pd.DataFrame(
-        columns=list(msd.columns) + ['max_sim', 'artist_sim', 'title_sim'])
+    results = pd.DataFrame(columns=list(msd.columns) +
+                           ['max_sim', 'artist_sim', 'title_sim'])
     for _, row_msd in msd.iterrows():
         entry = {
             **row_msd,
             'max_sim': 0,
         }
         for _, row_bb in billboard.iterrows():
-            artist_sim, title_sim = fuzz.ratio(
-                row_msd['artist'], row_bb['artist']), fuzz.ratio(
-                    row_msd['title'], row_bb['title'])
+            artist_sim, title_sim = fuzz.ratio(row_msd['artist'],
+                                               row_bb['artist']), fuzz.ratio(
+                                                   row_msd['title'],
+                                                   row_bb['title'])
             sim = fuzz.ratio(row_msd['artist'] + '|#|' + row_msd['title'],
                              row_bb['artist'] + '|#|' + row_bb['title'])
             if sim > entry['max_sim']:
@@ -178,8 +115,9 @@ def _fuzzy_match(msd):
 
 
 def keep_first_duplicate(data):
-    data.drop_duplicates(
-        subset=['artist', 'title'], keep='first', inplace=True)
+    data.drop_duplicates(subset=['artist', 'title'],
+                         keep='first',
+                         inplace=True)
 
 
 def remove_duplicates(data):
@@ -234,52 +172,31 @@ def msd_track_duplicates():
     print(len(tracks), count)
 
 
-def _get_highlevel_feature(features_path, msd_id):
-    file_suffix = '.mp3.highlevel.json'
-    return _load_feature(features_path, msd_id, file_suffix)
-
-
-def _get_lowlevel_feature(features_path, msd_id):
-    file_suffix = '.mp3'
-    return _load_feature(features_path, msd_id, file_suffix)
-
-
-def _load_feature(features_path, msd_id, file_suffix):
-    file_prefix = '/features_tracks_' + msd_id[2].lower() + '/'
-    file_name = features_path + file_prefix + msd_id + file_suffix
-
-    with open(file_name) as features:
-        return json.load(features)
-
-
 def read_msd_tracks_per_year():
     file_path = MSD_PATH + '/additional_files/tracks_per_year.txt'
 
-    return pd.read_csv(
-        file_path,
-        sep='<SEP>',
-        header=None,
-        names=['year', 'msd_id', 'artist', 'title'])
+    return pd.read_csv(file_path,
+                       sep='<SEP>',
+                       header=None,
+                       names=['year', 'msd_id', 'artist', 'title'])
 
 
 def read_msd_unique_artists():
     file_path = MSD_PATH + '/additional_files/unique_artists.txt'
 
-    return pd.read_csv(
-        file_path,
-        sep='<SEP>',
-        header=None,
-        names=['artist_id', 'mb_artist_id', 'msd_id', 'artist'])
+    return pd.read_csv(file_path,
+                       sep='<SEP>',
+                       header=None,
+                       names=['artist_id', 'mb_artist_id', 'msd_id', 'artist'])
 
 
 def read_msd_unique_tracks():
     file_path = MSD_PATH + '/additional_files/unique_tracks.txt'
 
-    return pd.read_csv(
-        file_path,
-        sep='<SEP>',
-        header=None,
-        names=['msd_id', 'echo_nest_id', 'artist', 'title'])
+    return pd.read_csv(file_path,
+                       sep='<SEP>',
+                       header=None,
+                       names=['msd_id', 'echo_nest_id', 'artist', 'title'])
 
 
 def read_msd_feature_files():
@@ -291,16 +208,6 @@ def read_msd_feature_files():
 def read_billboard_tracks():
     file_path = BB_PATH + '_mp3/billboard_1954-2018_summary.csv'
 
-    return pd.read_csv(file_path)
-
-
-def read_hits():
-    file_path = BB_PATH + '/msd_bb_matches.csv'
-    return pd.read_csv(file_path)
-
-
-def read_non_hits():
-    file_path = BB_PATH + '/msd_bb_non_matches.csv'
     return pd.read_csv(file_path)
 
 

@@ -22,8 +22,9 @@ WIKIDATA_PATH = '/storage/nas3/datasets/wikipedia/wikidata'
 
 
 @click.group()
-@click.option(
-    '--path', default='.', help='The path where the results are stored.')
+@click.option('--path',
+              default='.',
+              help='The path where the results are stored.')
 def cli(path):
     global RESULT_PATH
     RESULT_PATH = path
@@ -202,10 +203,8 @@ def wikidata(get_all):
     for i, artist in enumerate(artist_uris, 1):
         try:
             data.append({
-                'artist_wikidata_uri':
-                artist,
-                'data':
-                get_entity_dict_from_api(artist.rsplit('/', 1)[-1]),
+                'artist_wikidata_uri': artist,
+                'data': get_entity_dict_from_api(artist.rsplit('/', 1)[-1]),
             })
             print('Artist', i, '/', len(artist_uris), artist)
         except (LdiResponseNotOk, InvalidEntityId) as ex:

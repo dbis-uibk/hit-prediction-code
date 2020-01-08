@@ -16,19 +16,19 @@ WIKIDATA_PATH = '/storage/nas3/datasets/wikipedia/wikidata'
 
 
 @click.group()
-@click.option(
-    '--path', default='.', help='The path where the results are stored.')
+@click.option('--path',
+              default='.',
+              help='The path where the results are stored.')
 def cli(path):
     global RESULT_PATH
     RESULT_PATH = path
 
 
 @cli.command()
-@click.option(
-    '--dups',
-    default=False,
-    is_flag=True,
-    help='Store duplicates in the resulting file.')
+@click.option('--dups',
+              default=False,
+              is_flag=True,
+              help='Store duplicates in the resulting file.')
 def musicbrainz(dups):
     musicbrainzngs.set_useragent('musicbrainz crawler', '1.0')
     WIKIDATA_PATH = '/storage/nas3/datasets/wikipedia/wikidata/'
@@ -40,13 +40,11 @@ def musicbrainz(dups):
 
     charts = read_hits()
     artists = pd.read_csv(WIKIDATA_PATH + '/artist_dbpedia_wikidata.csv')
-    artists = join(
-        artists,
-        pd.read_csv(RESULT_PATH + '/artist_musicbrainz_id.csv'),
-        on=['artist_wikidata_uri'])
-    charts = join(
-        charts, artists,
-        on=['artist'])[['title', 'artist', 'musicbrainz_artist_id']]
+    artists = join(artists,
+                   pd.read_csv(RESULT_PATH + '/artist_musicbrainz_id.csv'),
+                   on=['artist_wikidata_uri'])
+    charts = join(charts, artists,
+                  on=['artist'])[['title', 'artist', 'musicbrainz_artist_id']]
 
     for i, song in charts.iterrows():
         title = song['title']
@@ -95,16 +93,19 @@ def musicbrainz(dups):
 
 
 @cli.command()
-@click.option(
-    '--recording-file',
-    default='msd_bb_matches_recording_id.csv',
-    help='File containing the recordings.')
+@click.option('--recording-file',
+              default='msd_bb_matches_recording_id.csv',
+              help='File containing the recordings.')
 def acousticbrainz(recording_file):
     # recordings = pd.read_csv(recording_file)
     # TODO: split into chunks of 25
     recordings = [
-        {'musicbrainz_recording_id': '8ac7f923-8418-4766-b3d7-406adb8aada1'},
-        {'musicbrainz_recording_id': 'c7e5ae79-b20b-46ab-89b4-63612ac3206f'},
+        {
+            'musicbrainz_recording_id': '8ac7f923-8418-4766-b3d7-406adb8aada1'
+        },
+        {
+            'musicbrainz_recording_id': 'c7e5ae79-b20b-46ab-89b4-63612ac3206f'
+        },
     ]
 
     recordings = pd.DataFrame(recordings)
@@ -141,6 +142,7 @@ def acousticbrainz_get(feature_type, recording_ids):
     result = requests.get(url, params=payload, headers=headers)
 
     return result.json()
+
 
 def write_json_file(file_name, data):
     with open(file_name, 'w') as outfile:
