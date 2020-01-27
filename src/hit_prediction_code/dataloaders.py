@@ -2,9 +2,7 @@
 import json
 
 from dbispipeline.base import Loader
-
 import numpy as np
-
 import pandas as pd
 
 from .common import feature_columns
@@ -47,7 +45,7 @@ class MsdBbLoader(Loader):
         data = key_mapping(data)
 
         self.labels = np.ravel(data[[label]])
-        nan_values = np.isnan(self.labels)
+        nan_values = pd.isnull(self.labels)
         self.labels[nan_values] = nan_value
 
         non_label_columns = list(data.columns)
@@ -153,16 +151,23 @@ class MelSpectLoader(Loader):
         data = hits.append(non_hits, sort=False, ignore_index=True)
 
         self.labels = np.ravel(data[[label]])
-        nan_values = np.isnan(self.labels)
+        nan_values = pd.isnull(self.labels)
         self.labels[nan_values] = nan_value
 
         non_label_columns = list(data.columns)
         non_label_columns.remove(label)
-        self.data = data[non_label_columns]
+        data = data[non_label_columns]
+        for index, row in data.iterrows():
+            print(row['msd_id'], row['artist'], row['title'],
+                  row['librosa_melspectrogram'].shape)
+        self.data = data['librosa_melspectrogram'].values
+        self.data = np.stack(self.data, axis=0)
+        print(self.data)
+        print(self.data.shape)
 
     def load(self):
         """Returns the data loaded by the dataloader."""
-        return self.data.values, self.labels
+        return self.data, self.labels
 
     @property
     def configuration(self):

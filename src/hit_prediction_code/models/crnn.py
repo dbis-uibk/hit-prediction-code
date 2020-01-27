@@ -22,7 +22,10 @@ from tensorflow.keras.layers import RepeatVector
 from tensorflow.keras.layers import Reshape
 from tensorflow.keras.layers import ZeroPadding2D
 from tensorflow.keras.models import Model
-from utils import cached_model_predict, cached_model_predict_clear, find_elbow
+
+from ..common import cached_model_predict
+from ..common import cached_model_predict_clear
+from ..common import find_elbow
 
 
 class CRNNModel(BaseEstimator, ClassifierMixin):
@@ -184,6 +187,9 @@ class CRNNModel(BaseEstimator, ClassifierMixin):
         return cached_model_predict(self.model, X)
 
     def _reshape_data(self, X):
+        data_shape = (X.shape[0], *X[0][0].shape, 1)
+        print(data_shape)
+        X = X.reshape(data_shape)
         return X
 
 
