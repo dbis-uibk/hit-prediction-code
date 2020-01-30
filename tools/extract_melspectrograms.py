@@ -153,7 +153,6 @@ def merge_song_samples_with_features(data):
         melspectrogram features are available.
 
     """
-    del data['Unnamed: 0']
     dataset_columns = list(data.columns)
     dataset_columns.append('librosa_melspectrogram')
     LOGGER.info(dataset_columns)
@@ -229,7 +228,7 @@ def extract(chunk, chunk_count):
     """
     if chunk >= chunk_count:
         print('Chunk needs to be smaller than chunk_count.', file=sys.stderr)
-        exit(1)
+        sys.exit(1)
 
     archive_files = glob.glob(os.path.join(MP3_ARCHIVE_PATH, '*.zip'))
     file_count = 0
@@ -267,7 +266,7 @@ def combine():
 
     """
     hits_file_path = os.path.join(PROCESSED_PATH, 'msd_bb_matches.csv')
-    hits = pd.read_csv(hits_file_path)
+    hits = pd.read_csv(hits_file_path, index_col=0)
 
     dataset = merge_song_samples_with_features(hits)
     dataset_file_name = OUTPUT_PREFIX + 'hits.pickle'
@@ -280,7 +279,7 @@ def combine():
     del dataset
 
     non_hits_file_path = os.path.join(PROCESSED_PATH, 'msd_bb_non_matches.csv')
-    non_hits = pd.read_csv(non_hits_file_path)
+    non_hits = pd.read_csv(non_hits_file_path, index_col=0)
 
     dataset = merge_song_samples_with_features(non_hits)
     dataset_file_name = OUTPUT_PREFIX + 'non_hits.pickle'
@@ -306,7 +305,7 @@ def _extract_features(zipfile_name, dataset):
             for_tracks=dataset['msd_id'],
             min_time=1200,  # routhly a 30 sec timeframe
             window=use_center_window,
-            window_size=1200  # routhly a 30 sec timeframe
+            window_size=1200,  # routhly a 30 sec timeframe
         )
     except Exception as ex:
         LOGGER.exception(ex)
@@ -334,9 +333,9 @@ def combine_with_dataset(dataset_file, processes_count):
     """
     if not os.path.isfile(dataset_file):
         print('Specified dataset file does not exist', file=sys.stderr)
-        exit(1)
+        sys.exit(1)
 
-    dataset = pd.read_csv(dataset_file)
+    dataset = pd.read_csv(dataset_file, index_col=0)
     archive_files = glob.glob(os.path.join(MP3_ARCHIVE_PATH, '*.zip'))
 
     output_file_name, _ = os.path.splitext(os.path.basename(dataset_file))
