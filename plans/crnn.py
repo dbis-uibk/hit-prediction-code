@@ -7,10 +7,7 @@ from hit_prediction_code.models.crnn import CRNNModel
 from sklearn.pipeline import Pipeline
 
 dataloader = MelSpectLoader(
-    hits_file_path='data/processed/msd_librosa_melspectrogram_hits.pickle',
-    non_hits_file_path=
-    'data/processed/msd_librosa_melspectrogram_non_hits.pickle',
-    non_hits_per_hit=1,
+    dataset_path='data/processed/msd_bb_balanced.pickle',
     features=['librosa_melspectrogram'],
     label='peak',
     nan_value=150,

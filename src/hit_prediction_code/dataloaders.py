@@ -123,32 +123,18 @@ class MelSpectLoader(Loader):
     """Loads dataset with hits and non-hits contaning melspectrogramms."""
 
     def __init__(self,
-                 hits_file_path,
-                 non_hits_file_path,
-                 non_hits_per_hit=None,
+                 dataset_path,
                  features=None,
                  label=None,
                  nan_value=0,
                  random_state=None):
         self._config = {
-            'hits_file_path': hits_file_path,
-            'non_hits_file_path': non_hits_file_path,
-            'non_hits_per_hit': non_hits_per_hit,
+            'dataset_path': dataset_path,
             'features': features,
             'label': label,
         }
 
-        hits = pd.read_pickle(hits_file_path)
-        non_hits = pd.read_pickle(non_hits_file_path)
-
-        if non_hits_per_hit:
-            num_of_samples = len(hits) * non_hits_per_hit
-            non_hits = non_hits.sample(
-                n=num_of_samples,
-                random_state=random_state,
-            )
-
-        data = hits.append(non_hits, sort=False, ignore_index=True)
+        data = pd.read_pickle(dataset_path)
 
         self.labels = np.ravel(data[[label]])
         nan_values = pd.isnull(self.labels)
