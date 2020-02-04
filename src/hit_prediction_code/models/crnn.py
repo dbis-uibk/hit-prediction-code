@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 """CRNN model for hit song prediction."""
+import logging
+
 import numpy as np
 from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.metrics import roc_curve
@@ -27,6 +29,8 @@ from ..common import cached_model_predict
 from ..common import cached_model_predict_clear
 from ..common import find_elbow
 
+LOGGER = logging.getLogger(__name__)
+
 
 class CRNNModel(BaseEstimator, ClassifierMixin):
 
@@ -42,7 +46,7 @@ class CRNNModel(BaseEstimator, ClassifierMixin):
         self.padding = padding
         self.dataloader = dataloader
         self.output_dropout = output_dropout
-        self.network_input_width = 1440
+        self.network_input_width = 1200
         self.attention = attention
 
     def fit(self, X, y):
@@ -74,7 +78,7 @@ class CRNNModel(BaseEstimator, ClassifierMixin):
             try:
                 idx = find_elbow(tpr, fpr)
             except ValueError as ex:
-                print(ex)
+                LOGGER.exception(ex)
                 idx = -1
 
             if idx >= 0:
@@ -187,61 +191,6 @@ class CRNNModel(BaseEstimator, ClassifierMixin):
         return cached_model_predict(self.model, X)
 
     def _reshape_data(self, X):
-        data_shape = (X.shape[0], *X[0][0].shape, 1)
-        print(data_shape)
+        data_shape = (*X.shape, 1)
         X = X.reshape(data_shape)
         return X
-
-
-class CRNNPlusModel(CRNNModel):
-
-    def __init__(self,
-                 batch_size=64,
-                 epochs=100,
-                 padding='same',
-                 dataloader=None,
-                 output_dropout=0.3,
-                 concat_bn=False,
-                 attention=False):
-        super().__init__(batch_size=batch_size,
-                         epochs=epochs,
-                         padding=padding,
-                         dataloader=dataloader,
-                         output_dropout=output_dropout,
-                         attention=attention)
-        self.concat_bn = concat_bn
-
-    def _data_shapes(self, X, y):
-        mel_shape = X[0][0].shape
-        ess_shape = X[1][0].shape
-
-        if mel_shape[1] > self.network_input_width:
-            raise ValueError('window_size > ' + str(self.network_input_width))
-
-        input_shape = (mel_shape, ess_shape)
-        output_shape = y.shape[1]
-
-        return input_shape, output_shape
-
-    def _reshape_data(self, X):
-        return list(zip(*X))
-
-    def _create_model(self, input_shape, output_shape):
-        mel_input, crnn_output = self._crnn_layers(input_shape[0],
-                                                   output_shape)
-        essentia_input = Input(shape=input_shape[1], dtype="float32")
-
-        concat = Concatenate()([crnn_output, essentia_input])
-        if self.concat_bn:
-            concat = BatchNormalization(axis=-1, name='concat_bn')(concat)
-
-        # Dense
-        dense = Dense(128, activation="tanh", name="dense_10")(concat)
-        output = Dense(output_shape, activation='sigmoid',
-                       name='output')(dense)
-
-        self.model = Model(inputs=[mel_input, essentia_input], outputs=output)
-        self.model.compile(optimizer="adam",
-                           loss="binary_crossentropy",
-                           metrics=['accuracy'])
-        self.model.summary()

@@ -1,4 +1,5 @@
 """Dataloaders for the hit song prediction."""
+import logging
 import json
 
 from dbispipeline.base import Loader
@@ -6,6 +7,8 @@ import numpy as np
 import pandas as pd
 
 from .common import feature_columns
+
+LOGGER = logging.getLogger(__name__)
 
 
 class MsdBbLoader(Loader):
@@ -66,7 +69,7 @@ class MsdBbLoader(Loader):
             self._features_index_list.append((index, part))
 
         self._config['features_list'] = self._features_list
-        print(self._features_list)
+        LOGGER.info(self._features_list)
 
     def load(self):
         return self.data.values, self.labels
@@ -140,16 +143,15 @@ class MelSpectLoader(Loader):
         nan_values = pd.isnull(self.labels)
         self.labels[nan_values] = nan_value
 
+        # ensure that the array is at least 2d
+        if len(self.labels.shape) == 1:
+            self.labels = self.labels.reshape((*self.labels.shape, 1))
+
         non_label_columns = list(data.columns)
         non_label_columns.remove(label)
         data = data[non_label_columns]
-        for index, row in data.iterrows():
-            print(row['msd_id'], row['artist'], row['title'],
-                  row['librosa_melspectrogram'].shape)
-        self.data = data['librosa_melspectrogram'].values
+        self.data = data[features].values
         self.data = np.stack(self.data, axis=0)
-        print(self.data)
-        print(self.data.shape)
 
     def load(self):
         """Returns the data loaded by the dataloader."""

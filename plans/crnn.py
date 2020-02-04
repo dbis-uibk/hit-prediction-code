@@ -8,7 +8,7 @@ from sklearn.pipeline import Pipeline
 
 dataloader = MelSpectLoader(
     dataset_path='data/processed/msd_bb_balanced.pickle',
-    features=['librosa_melspectrogram'],
+    features='librosa_melspectrogram',
     label='peak',
     nan_value=150,
     random_state=42,
