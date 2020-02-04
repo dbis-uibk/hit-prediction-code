@@ -12,7 +12,7 @@ LOGGER = logging.getLogger(__name__)
 
 
 class MsdBbLoader(Loader):
-    """Million song dataset / billboard charts loaer."""
+    """Million song dataset / billboard charts loader."""
 
     def __init__(self,
                  hits_file_path,
@@ -162,4 +162,54 @@ class MelSpectLoader(Loader):
     @property
     def configuration(self):
         """Returns the configuration in json serializable format."""
+        return self._config
+
+
+class EssentiaLoader(Loader):
+    """Essentia feature loader."""
+
+    def __init__(self, dataset_path, features=None, label=None, nan_value=0):
+        self._config = {
+            'dataset_path': dataset_path,
+            'features': features,
+            'label': label,
+            'nan_value': nan_value,
+        }
+
+        data = pd.read_pickle(dataset_path)
+        data = key_mapping(data)
+
+        self.labels = np.ravel(data[[label]])
+        nan_values = pd.isnull(self.labels)
+        self.labels[nan_values] = nan_value
+
+        non_label_columns = list(data.columns)
+        non_label_columns.remove(label)
+        data = data[non_label_columns]
+
+        feature_cols = []
+        self._features_list = []
+        for feature in features:
+            cols, part = feature_columns(data.columns, feature)
+            feature_cols += cols
+            self._features_list.append((cols, part))
+
+        self.data = data[feature_cols]
+        self._features_index_list = []
+        for cols, part in self._features_list:
+            index = [self.data.columns.get_loc(c) for c in cols]
+            self._features_index_list.append((index, part))
+
+        self._config['features_list'] = self._features_list
+        LOGGER.info(self._features_list)
+
+    def load(self):
+        return self.data.values, self.labels
+
+    @property
+    def feature_indices(self):
+        return self._features_index_list
+
+    @property
+    def configuration(self):
         return self._config
