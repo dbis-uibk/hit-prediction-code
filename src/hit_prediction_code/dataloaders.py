@@ -150,6 +150,8 @@ class MelSpectLoader(Loader):
         non_label_columns = list(data.columns)
         non_label_columns.remove(label)
         data = data[non_label_columns]
+
+        # TODO: do this in a generic fashion and rename the dataloader.
         self.data = data[features].values
         self.data = np.stack(self.data, axis=0)
 
