@@ -3,7 +3,7 @@
 import logging
 
 import numpy as np
-from sklearn.base import BaseEstimator, ClassifierMixin
+from sklearn.base import BaseEstimator, RegressorMixin
 from sklearn.metrics import roc_curve
 import tensorflow.compat.v2.keras.backend as K
 from tensorflow.keras.layers import Activation
@@ -32,19 +32,17 @@ from ..common import find_elbow
 LOGGER = logging.getLogger(__name__)
 
 
-class CRNNModel(BaseEstimator, ClassifierMixin):
+class CRNNModel(BaseEstimator, RegressorMixin):
 
     def __init__(self,
                  batch_size=64,
                  epochs=100,
                  padding='same',
-                 dataloader=None,
                  output_dropout=0.3,
                  attention=False):
         self.batch_size = batch_size
         self.epochs = epochs
         self.padding = padding
-        self.dataloader = dataloader
         self.output_dropout = output_dropout
         self.network_input_width = 1200
         self.attention = attention
@@ -56,37 +54,6 @@ class CRNNModel(BaseEstimator, ClassifierMixin):
 
         self.model.fit(X, y, batch_size=self.batch_size, epochs=self.epochs)
         cached_model_predict_clear()
-
-        if self.dataloader:
-            try:
-                validation_data = self.dataloader.load_validate()
-            except (NotImplementedError, AttributeError):
-                validation_data = None
-
-            if validation_data:
-                self.validate(*validation_data)
-            else:
-                self.threshold(np.full(output_shape, .5))
-
-    def validate(self, X, y):
-        X = self._reshape_data(X)
-        y_pred = self.model.predict(X)
-        threshold = []
-        for label_idx in range(y_pred.shape[1]):
-            fpr, tpr, thresholds = roc_curve(y[..., label_idx],
-                                             y_pred[..., label_idx])
-            try:
-                idx = find_elbow(tpr, fpr)
-            except ValueError as ex:
-                LOGGER.exception(ex)
-                idx = -1
-
-            if idx >= 0:
-                threshold.append(thresholds[idx])
-            else:
-                threshold.append(0.5)
-
-        self.threshold = np.array(threshold)
 
     def _data_shapes(self, X, y):
         if X.shape[2] > self.network_input_width:
@@ -186,12 +153,6 @@ class CRNNModel(BaseEstimator, ClassifierMixin):
         return melgram_input, output
 
     def predict(self, X):
-        predictions = self.predict_proba(X)
-        labels = np.greater(predictions, self.threshold)
-
-        return labels
-
-    def predict_proba(self, X):
         X = self._reshape_data(X)
         return cached_model_predict(self.model, X)
 
