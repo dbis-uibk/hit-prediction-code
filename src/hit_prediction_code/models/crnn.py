@@ -175,7 +175,7 @@ class CRNNModel(BaseEstimator, ClassifierMixin):
 
         if self.output_dropout:
             hidden = Dropout(self.output_dropout)(hidden)
-        output = Dense(output_shape, activation='sigmoid',
+        output = Dense(output_shape, activation=None,
                        name='crnn_output')(hidden)
 
         return melgram_input, output
