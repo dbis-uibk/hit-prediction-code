@@ -99,9 +99,11 @@ class CRNNModel(BaseEstimator, ClassifierMixin):
     def _create_model(self, input_shape, output_shape):
         melgram_input, output = self._crnn_layers(input_shape, output_shape)
         self.model = Model(inputs=melgram_input, outputs=output)
-        self.model.compile(optimizer="adam",
-                           loss="binary_crossentropy",
-                           metrics=['accuracy'])
+        self.model.compile(
+            optimizer="adam",
+            loss="mean_absolute_error",
+            metrics=['mean_absolute_error'],
+        )
         self.model.summary()
 
     def _crnn_layers(self, input_shape, output_shape):
@@ -175,8 +177,11 @@ class CRNNModel(BaseEstimator, ClassifierMixin):
 
         if self.output_dropout:
             hidden = Dropout(self.output_dropout)(hidden)
-        output = Dense(output_shape, activation='relu',
-                       name='crnn_output')(hidden)
+        output = Dense(
+            output_shape,
+            activation='linear',
+            name='crnn_output',
+        )(hidden)
 
         return melgram_input, output
 
