@@ -2,13 +2,10 @@
 """CRNN model for hit song prediction."""
 import logging
 
-import numpy as np
 from sklearn.base import BaseEstimator, RegressorMixin
-from sklearn.metrics import roc_curve
 import tensorflow.compat.v2.keras.backend as K
 from tensorflow.keras.layers import Activation
 from tensorflow.keras.layers import BatchNormalization
-from tensorflow.keras.layers import Concatenate
 from tensorflow.keras.layers import Conv2D
 from tensorflow.keras.layers import Dense
 from tensorflow.keras.layers import Dropout
@@ -27,7 +24,6 @@ from tensorflow.keras.models import Model
 
 from ..common import cached_model_predict
 from ..common import cached_model_predict_clear
-from ..common import find_elbow
 
 LOGGER = logging.getLogger(__name__)
 
@@ -46,20 +42,26 @@ class CRNNModel(BaseEstimator, RegressorMixin):
         self.output_dropout = output_dropout
         self.network_input_width = 1200
         self.attention = attention
+        self.model = None
 
-    def fit(self, X, y):
-        X = self._reshape_data(X)
-        input_shape, output_shape = self._data_shapes(X, y)
+    def fit(self, data, labels):
+        data = self._reshape_data(data)
+        input_shape, output_shape = self._data_shapes(data, labels)
         self._create_model(input_shape, output_shape)
 
-        self.model.fit(X, y, batch_size=self.batch_size, epochs=self.epochs)
+        self.model.fit(
+            data,
+            labels,
+            batch_size=self.batch_size,
+            epochs=self.epochs,
+        )
         cached_model_predict_clear()
 
-    def _data_shapes(self, X, y):
-        if X.shape[2] > self.network_input_width:
+    def _data_shapes(self, data, labels):
+        if data.shape[2] > self.network_input_width:
             raise ValueError('window_size > ' + str(self.network_input_width))
-        input_shape = (X.shape[1], X.shape[2], X.shape[3])
-        output_shape = y.shape[1]
+        input_shape = (data.shape[1], data.shape[2], data.shape[3])
+        output_shape = labels.shape[1]
 
         return input_shape, output_shape
 
@@ -152,11 +154,10 @@ class CRNNModel(BaseEstimator, RegressorMixin):
 
         return melgram_input, output
 
-    def predict(self, X):
-        X = self._reshape_data(X)
-        return cached_model_predict(self.model, X)
+    def predict(self, data):
+        data = self._reshape_data(data)
+        return cached_model_predict(self.model, data)
 
-    def _reshape_data(self, X):
-        data_shape = (*X.shape, 1)
-        X = X.reshape(data_shape)
-        return X
+    def _reshape_data(self, data):
+        data_shape = (*data.shape, 1)
+        return data.reshape(data_shape)
