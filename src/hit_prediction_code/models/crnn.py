@@ -155,7 +155,7 @@ class CRNNModel(BaseEstimator, ClassifierMixin):
         hidden = Dropout(0.1, name='dropout4')(hidden)
 
         # reshaping
-        hidden = Reshape((15, 128))(hidden)
+        hidden = Reshape((12, 128))(hidden)
 
         # GRU block 1, 2, output
         embed_size = 32
