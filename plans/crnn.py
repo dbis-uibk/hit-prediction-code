@@ -21,7 +21,7 @@ pipeline = Pipeline([
 evaluator = GridEvaluator(
     parameters={
         'model__batch_size': [64],
-        'model__epochs': [4, 8, 12],
+        'model__epochs': [1, 2],
     },
     grid_parameters=evaluations.grid_parameters(),
 )
