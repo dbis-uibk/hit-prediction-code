@@ -40,7 +40,8 @@ class CRNNModel(BaseEstimator, RegressorMixin):
                  dense_output_size=None,
                  num_dense_layer=0,
                  dense_activation='relu',
-                 output_activation=None):
+                 output_activation=None,
+                 loss='mean_absolute_error'):
         self.batch_size = batch_size
         self.epochs = epochs
         self.padding = padding
@@ -51,6 +52,7 @@ class CRNNModel(BaseEstimator, RegressorMixin):
         self.num_dense_layer = num_dense_layer
         self.dense_activation = dense_activation
         self.output_activation = output_activation
+        self.loss = loss
 
         self.network_input_width = 1200
         self.model = None
@@ -81,7 +83,7 @@ class CRNNModel(BaseEstimator, RegressorMixin):
         self.model = Model(inputs=melgram_input, outputs=output)
         self.model.compile(
             optimizer="adam",
-            loss="mean_absolute_error",
+            loss=self.loss,
             metrics=['mean_absolute_error'],
         )
         self.model.summary()
