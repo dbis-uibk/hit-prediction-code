@@ -34,7 +34,7 @@ class CRNNModel(BaseEstimator, RegressorMixin):
                  batch_size=64,
                  epochs=100,
                  padding='same',
-                 output_dropout=0.3,
+                 output_dropout=None,
                  attention=False):
         self.batch_size = batch_size
         self.epochs = epochs
@@ -91,7 +91,7 @@ class CRNNModel(BaseEstimator, RegressorMixin):
         hidden = ZeroPadding2D(padding=input_padding)(melgram_input)
 
         # Conv block 1
-        hidden = Conv2D(64, (3, 3), padding=self.padding, name='conv1')(hidden)
+        hidden = Conv2D(30, (3, 3), padding=self.padding, name='conv1')(hidden)
         hidden = BatchNormalization(axis=channel_axis, name='bn1')(hidden)
         hidden = ELU()(hidden)
         hidden = MaxPooling2D(pool_size=(2, 2), strides=(2, 2),
@@ -99,8 +99,7 @@ class CRNNModel(BaseEstimator, RegressorMixin):
         hidden = Dropout(0.1, name='dropout1')(hidden)
 
         # Conv block 2
-        hidden = Conv2D(128, (3, 3), padding=self.padding,
-                        name='conv2')(hidden)
+        hidden = Conv2D(60, (3, 3), padding=self.padding, name='conv2')(hidden)
         hidden = BatchNormalization(axis=channel_axis, name='bn2')(hidden)
         hidden = ELU()(hidden)
         hidden = MaxPooling2D(pool_size=(3, 3), strides=(3, 3),
@@ -108,8 +107,7 @@ class CRNNModel(BaseEstimator, RegressorMixin):
         hidden = Dropout(0.1, name='dropout2')(hidden)
 
         # Conv block 3
-        hidden = Conv2D(128, (3, 3), padding=self.padding,
-                        name='conv3')(hidden)
+        hidden = Conv2D(60, (3, 3), padding=self.padding, name='conv3')(hidden)
         hidden = BatchNormalization(axis=channel_axis, name='bn3')(hidden)
         hidden = ELU()(hidden)
         hidden = MaxPooling2D(pool_size=(4, 4), strides=(4, 4),
@@ -117,8 +115,7 @@ class CRNNModel(BaseEstimator, RegressorMixin):
         hidden = Dropout(0.1, name='dropout3')(hidden)
 
         # Conv block 4
-        hidden = Conv2D(128, (3, 3), padding=self.padding,
-                        name='conv4')(hidden)
+        hidden = Conv2D(60, (3, 3), padding=self.padding, name='conv4')(hidden)
         hidden = BatchNormalization(axis=channel_axis, name='bn4')(hidden)
         hidden = ELU()(hidden)
         hidden = MaxPooling2D(pool_size=(4, 4), strides=(4, 4),
@@ -126,10 +123,10 @@ class CRNNModel(BaseEstimator, RegressorMixin):
         hidden = Dropout(0.1, name='dropout4')(hidden)
 
         # reshaping
-        hidden = Reshape((12, 128))(hidden)
+        hidden = Reshape((12, 60))(hidden)
 
         # GRU block 1, 2, output
-        embed_size = 32
+        embed_size = 30
         hidden = GRU(embed_size, return_sequences=True, name='gru1')(hidden)
         hidden = GRU(embed_size, return_sequences=self.attention,
                      name='gru2')(hidden)
