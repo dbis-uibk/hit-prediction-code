@@ -34,14 +34,25 @@ class CRNNModel(BaseEstimator, RegressorMixin):
                  batch_size=64,
                  epochs=100,
                  padding='same',
-                 output_dropout=None,
-                 attention=False):
+                 attention=False,
+                 batch_normalization=False,
+                 dropout_rate=None,
+                 dense_output_size=None,
+                 num_dense_layer=0,
+                 dense_activation='relu',
+                 output_activation=None):
         self.batch_size = batch_size
         self.epochs = epochs
         self.padding = padding
-        self.output_dropout = output_dropout
-        self.network_input_width = 1200
         self.attention = attention
+        self.batch_normalization = batch_normalization
+        self.dropout_rate = dropout_rate
+        self.dense_output_size = dense_output_size
+        self.num_dense_layer = num_dense_layer
+        self.dense_activation = dense_activation
+        self.output_activation = output_activation
+
+        self.network_input_width = 1200
         self.model = None
 
     def fit(self, data, labels):
@@ -141,13 +152,38 @@ class CRNNModel(BaseEstimator, RegressorMixin):
             merged = Multiply()([hidden, attention])
             hidden = Lambda(lambda xin: K.sum(xin, axis=1))(merged)
 
-        if self.output_dropout:
-            hidden = Dropout(self.output_dropout)(hidden)
-        output = Dense(
-            output_shape,
-            activation='linear',
-            name='crnn_output',
-        )(hidden)
+        if self.batch_normalization:
+            use_bias = False
+            activation = None
+        else:
+            use_bias = True
+            activation = self.dense_activation
+
+        if self.dense_output_size:
+            dense_output_size = self.dense_output_size
+        else:
+            dense_output_size = embed_size
+
+        dense_layer = hidden
+        for i in range(1, self.num_dense_layer + 1):
+            dense_layer = Dense(dense_output_size,
+                                activation=activation,
+                                name='dense-' + str(i),
+                                use_bias=use_bias)(dense_layer)
+            if self.batch_normalization:
+                dense_layer = BatchNormalization(name='bn-' +
+                                                 str(i))(dense_layer)
+                dense_layer = Activation(self.dense_activation,
+                                         name='activation-' +
+                                         str(i))(dense_layer)
+            if self.dropout_rate:
+                dense_layer = Dropout(self.dropout_rate,
+                                      name='dropout-' + str(i))(dense_layer)
+
+        output = Dense(output_shape,
+                       activation=self.output_activation,
+                       name='output',
+                       use_bias=use_bias)(dense_layer)
 
         return melgram_input, output
 
