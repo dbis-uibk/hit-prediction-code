@@ -31,24 +31,33 @@ LOGGER = logging.getLogger(__name__)
 class CRNNModel(BaseEstimator, RegressorMixin):
 
     def __init__(self,
+                 layer_sizes=None,
                  batch_size=64,
                  epochs=100,
                  padding='same',
                  attention=False,
                  batch_normalization=False,
                  dropout_rate=None,
-                 dense_output_size=None,
                  num_dense_layer=0,
                  dense_activation='relu',
                  output_activation=None,
                  loss='mean_absolute_error'):
+        if layer_sizes is None:
+            layer_sizes = {
+                'conv1': 30,
+                'conv2': 60,
+                'conv3': 60,
+                'conv4': 60,
+                'rnn': 30,
+                'dense': 30,
+            }
+        self.layer_sizes = layer_sizes
         self.batch_size = batch_size
         self.epochs = epochs
         self.padding = padding
         self.attention = attention
         self.batch_normalization = batch_normalization
         self.dropout_rate = dropout_rate
-        self.dense_output_size = dense_output_size
         self.num_dense_layer = num_dense_layer
         self.dense_activation = dense_activation
         self.output_activation = output_activation
@@ -89,13 +98,6 @@ class CRNNModel(BaseEstimator, RegressorMixin):
         self.model.summary()
 
     def _crnn_layers(self, input_shape, output_shape):
-        layer_sizes = {
-            'conv1': 48,
-            'conv2': 96,
-            'conv3': 96,
-            'conv4': 96,
-            'rnn': 48,
-        }
         channel_axis = 3
 
         melgram_input = Input(shape=input_shape, dtype="float32")
@@ -111,7 +113,7 @@ class CRNNModel(BaseEstimator, RegressorMixin):
         hidden = ZeroPadding2D(padding=input_padding)(melgram_input)
 
         # Conv block 1
-        hidden = Conv2D(layer_sizes['conv1'], (3, 3),
+        hidden = Conv2D(self.layer_sizes['conv1'], (3, 3),
                         padding=self.padding,
                         name='conv1')(hidden)
         hidden = BatchNormalization(axis=channel_axis, name='bn1')(hidden)
@@ -121,7 +123,7 @@ class CRNNModel(BaseEstimator, RegressorMixin):
         hidden = Dropout(0.1, name='dropout1')(hidden)
 
         # Conv block 2
-        hidden = Conv2D(layer_sizes['conv2'], (3, 3),
+        hidden = Conv2D(self.layer_sizes['conv2'], (3, 3),
                         padding=self.padding,
                         name='conv2')(hidden)
         hidden = BatchNormalization(axis=channel_axis, name='bn2')(hidden)
@@ -131,7 +133,7 @@ class CRNNModel(BaseEstimator, RegressorMixin):
         hidden = Dropout(0.1, name='dropout2')(hidden)
 
         # Conv block 3
-        hidden = Conv2D(layer_sizes['conv3'], (3, 3),
+        hidden = Conv2D(self.layer_sizes['conv3'], (3, 3),
                         padding=self.padding,
                         name='conv3')(hidden)
         hidden = BatchNormalization(axis=channel_axis, name='bn3')(hidden)
@@ -141,7 +143,7 @@ class CRNNModel(BaseEstimator, RegressorMixin):
         hidden = Dropout(0.1, name='dropout3')(hidden)
 
         # Conv block 4
-        hidden = Conv2D(layer_sizes['conv4'], (3, 3),
+        hidden = Conv2D(self.layer_sizes['conv4'], (3, 3),
                         padding=self.padding,
                         name='conv4')(hidden)
         hidden = BatchNormalization(axis=channel_axis, name='bn4')(hidden)
@@ -151,12 +153,13 @@ class CRNNModel(BaseEstimator, RegressorMixin):
         hidden = Dropout(0.1, name='dropout4')(hidden)
 
         # reshaping
-        hidden = Reshape((12, layer_sizes['conv4']))(hidden)
+        hidden = Reshape((12, self.layer_sizes['conv4']))(hidden)
 
         # GRU block 1, 2, output
-        hidden = GRU(layer_sizes['rnn'], return_sequences=True,
+        hidden = GRU(self.layer_sizes['rnn'],
+                     return_sequences=True,
                      name='gru1')(hidden)
-        hidden = GRU(layer_sizes['rnn'],
+        hidden = GRU(self.layer_sizes['rnn'],
                      return_sequences=self.attention,
                      name='gru2')(hidden)
 
@@ -164,7 +167,7 @@ class CRNNModel(BaseEstimator, RegressorMixin):
             attention = Dense(1)(hidden)
             attention = Flatten()(attention)
             attention_act = Activation("softmax")(attention)
-            attention = RepeatVector(layer_sizes['rnn'])(attention_act)
+            attention = RepeatVector(self.layer_sizes['rnn'])(attention_act)
             attention = Permute((2, 1))(attention)
 
             merged = Multiply()([hidden, attention])
@@ -177,14 +180,14 @@ class CRNNModel(BaseEstimator, RegressorMixin):
             use_bias = True
             activation = self.dense_activation
 
-        if self.dense_output_size:
-            dense_output_size = self.dense_output_size
-        else:
-            dense_output_size = layer_sizes['rnn']
+        dense_size = self.layer_sizes.setdefault(
+            'dense',
+            self.layer_sizes['rnn'],
+        )
 
         dense_layer = hidden
         for i in range(1, self.num_dense_layer + 1):
-            dense_layer = Dense(dense_output_size,
+            dense_layer = Dense(dense_size,
                                 activation=activation,
                                 name='dense-' + str(i),
                                 use_bias=use_bias)(dense_layer)

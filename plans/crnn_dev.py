@@ -15,14 +15,25 @@ dataloader = MelSpectLoader(
 )
 
 pipeline = Pipeline([
-    ('model', CRNNModel()),
+    (
+        'model',
+        CRNNModel(
+            layer_sizes={
+                'conv1': 30,
+                'conv2': 60,
+                'conv3': 60,
+                'conv4': 60,
+                'rnn': 30,
+                'dense': 30,
+            }),
+    ),
 ])
 
 evaluator = GridEvaluator(
     parameters={
         'model__batch_size': [64],
-        'model__epochs': [1, 2, 4],
-        'model__num_dense_layer': [0, 1, 2],
+        'model__epochs': [8, 16, 32, 64],
+        'model__num_dense_layer': [2],
         'model__loss': ['mean_absolute_error', 'mean_squared_error'],
     },
     grid_parameters=evaluations.grid_parameters(),

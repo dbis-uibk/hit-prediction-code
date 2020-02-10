@@ -15,7 +15,18 @@ dataloader = MelSpectLoader(
 )
 
 pipeline = Pipeline([
-    ('model', CRNNModel()),
+    (
+        'model',
+        CRNNModel(
+            layer_sizes={
+                'conv1': 48,
+                'conv2': 96,
+                'conv3': 96,
+                'conv4': 96,
+                'rnn': 48,
+                'dense': 48,
+            }),
+    ),
 ])
 
 evaluator = GridEvaluator(
