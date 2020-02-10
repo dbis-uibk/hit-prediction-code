@@ -100,3 +100,7 @@ bandit: ## static code checking to find security issues in code
 	bandit -r src
 	bandit -r tests
 
+pytype:
+	pytype plans
+	pytype src
+	pytype tests
