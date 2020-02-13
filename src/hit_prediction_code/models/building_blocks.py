@@ -112,6 +112,7 @@ class HitPredictionModel(BaseEstimator, RegressorMixin, metaclass=ABCMeta):
         self._config = {
             **kwargs,
         }
+        self._model = None
 
     @property
     def batch_normalization(self):
