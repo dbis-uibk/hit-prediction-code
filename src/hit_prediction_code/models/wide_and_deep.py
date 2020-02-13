@@ -1,19 +1,18 @@
-import numpy as np
-from tensorflow.keras.layers import (Activation, BatchNormalization,
-                                     Concatenate, Dense, Dropout, Input)
-
+from tensorflow.keras.layers import Concatenate
+from tensorflow.keras.layers import Dense
+from tensorflow.keras.layers import Input
 from tensorflow.keras.models import Model
-from sklearn.base import BaseEstimator, RegressorMixin
 
 from .building_blocks import dense_layers
+from .building_blocks import HitPredictionModel
 
 
-class WideAndDeep(BaseEstimator, RegressorMixin):
+class WideAndDeep(HitPredictionModel):
 
     def __init__(self,
                  loss='mse',
                  optimizer='adam',
-                 metrics=['mae'],
+                 metrics=None,
                  deep_activation='sigmoid',
                  dense_activation='relu',
                  output_activation=None,
@@ -25,10 +24,16 @@ class WideAndDeep(BaseEstimator, RegressorMixin):
                  dense_output_size=None,
                  num_dense_layer=2,
                  **kwargs):
+        super(WideAndDeep, self).__init__(**kwargs)
+
         self.input_list = []
         self.loss = loss
         self.optimizer = optimizer
-        self.metrics = metrics
+
+        if metrics is None:
+            self.metrics = ['mae']
+        else:
+            self.metrics = metrics
         self.deep_activation = deep_activation
         self.dense_activation = dense_activation
         self.output_activation = output_activation
@@ -39,29 +44,32 @@ class WideAndDeep(BaseEstimator, RegressorMixin):
         self.dropout_rate = dropout_rate
         self.dense_output_size = dense_output_size
         self.num_dense_layer = num_dense_layer
-        self._config = {
-            'loss': loss,
-            'optimizer': optimizer,
-            'metrics': metrics,
-            'deep_activation': deep_activation,
-            'dense_activation': dense_activation,
-            'output_activation': output_activation,
-            'epochs': epochs,
-            'batch_size': batch_size,
-            'features': features,
-            'batch_normalization': batch_normalization,
-            'dropout_rate': dropout_rate,
-            'dense_output_size': dense_output_size,
-            'num_dense_layer': num_dense_layer,
-            **kwargs,
-        }
-        self._model = None
 
     @property
-    def configuration(self):
-        return self._config
+    def deep_activation(self):
+        return self._config.get('deep_activation')
 
-    def _build_model(self):
+    @deep_activation.setter
+    def deep_activation(self, value):
+        self._config['deep_activation'] = value
+
+    @property
+    def dense_output_size(self):
+        return self._config.get('dense_output_size')
+
+    @dense_output_size.setter
+    def dense_output_size(self, value):
+        self._config['dense_output_size'] = value
+
+    @property
+    def features(self):
+        return self._config.get('features')
+
+    @features.setter
+    def features(self, value):
+        self._config['features'] = value
+
+    def _create_model(self, input_shape, output_shape):
         input_list = []
         input_type_list = []
         concat_list = []
@@ -94,37 +102,19 @@ class WideAndDeep(BaseEstimator, RegressorMixin):
         dense_layer = dense_layers(self, dense_output_size, concat_tensor)
 
         use_bias = not self.batch_normalization
-        output = Dense(1,
+        output = Dense(output_shape,
                        activation=self.output_activation,
                        name='output',
                        use_bias=use_bias)(dense_layer)
 
-        model = Model(inputs=input_list, outputs=output)
-        model.compile(loss=self.loss,
-                      optimizer=self.optimizer,
-                      metrics=self.metrics)
+        self.model = Model(inputs=input_list, outputs=output)
 
-        return model
+    def _data_shapes(self, data, labels):
+        return None, 1
 
-    def _split_features(self, x):
+    def _reshape_data(self, x):
         features = []
         for index, _ in self.features:
             feature = x[..., index]
             features.append(feature)
         return features
-
-    def fit(self, x, y=None):
-        if self._model:
-            raise NotImplementedError('Refitting the model is not implemented')
-
-        features = self._split_features(x)
-        self._model = self._build_model()
-        self._model.summary()
-        self._model.fit(x=features,
-                        y=y,
-                        batch_size=self.batch_size,
-                        epochs=self.epochs)
-
-    def predict(self, x):
-        features = self._split_features(x)
-        return self._model.predict(features)

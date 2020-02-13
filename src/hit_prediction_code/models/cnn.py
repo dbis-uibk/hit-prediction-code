@@ -2,7 +2,6 @@
 """CRNN model for hit song prediction."""
 import logging
 
-from sklearn.base import BaseEstimator, RegressorMixin
 from tensorflow.keras.layers import Conv1D
 from tensorflow.keras.layers import Dense
 from tensorflow.keras.layers import Flatten
@@ -12,15 +11,14 @@ from tensorflow.keras.layers import Reshape
 from tensorflow.keras.models import Model
 
 from .building_blocks import dense_layers
+from .building_blocks import HitPredictionModel
 from .building_blocks import input_padding_layer
 from .building_blocks import mel_cnn_layers
-from ..common import cached_model_predict
-from ..common import cached_model_predict_clear
 
 LOGGER = logging.getLogger(__name__)
 
 
-class CNNModel(BaseEstimator, RegressorMixin):
+class CNNModel(HitPredictionModel):
 
     def __init__(self,
                  layer_sizes=None,
@@ -34,6 +32,11 @@ class CNNModel(BaseEstimator, RegressorMixin):
                  dense_activation='relu',
                  output_activation=None,
                  loss='mean_absolute_error'):
+        super(CNNModel, self).__init__(
+            metrics=['mean_absolute_error'],
+            optimizer='adam',
+        )
+
         if layer_sizes is None:
             layer_sizes = {
                 'conv1': 30,
@@ -58,38 +61,7 @@ class CNNModel(BaseEstimator, RegressorMixin):
         self.network_input_width = 1200
         self.model = None
 
-    def fit(self, data, labels):
-        data = self._reshape_data(data)
-        input_shape, output_shape = self._data_shapes(data, labels)
-        self._create_model(input_shape, output_shape)
-
-        self.model.fit(
-            data,
-            labels,
-            batch_size=self.batch_size,
-            epochs=self.epochs,
-        )
-        cached_model_predict_clear()
-
-    def _data_shapes(self, data, labels):
-        if data.shape[2] > self.network_input_width:
-            raise ValueError('window_size > ' + str(self.network_input_width))
-        input_shape = (data.shape[1], data.shape[2], data.shape[3])
-        output_shape = labels.shape[1]
-
-        return input_shape, output_shape
-
     def _create_model(self, input_shape, output_shape):
-        melgram_input, output = self._crnn_layers(input_shape, output_shape)
-        self.model = Model(inputs=melgram_input, outputs=output)
-        self.model.compile(
-            optimizer="adam",
-            loss=self.loss,
-            metrics=['mean_absolute_error'],
-        )
-        self.model.summary()
-
-    def _crnn_layers(self, input_shape, output_shape):
         melgram_input = Input(shape=input_shape, dtype="float32")
 
         hidden = input_padding_layer(self, melgram_input, input_shape)
@@ -114,11 +86,15 @@ class CNNModel(BaseEstimator, RegressorMixin):
                        activation=self.output_activation,
                        name='output')(dense_layer)
 
-        return melgram_input, output
+        self.model = Model(inputs=melgram_input, outputs=output)
 
-    def predict(self, data):
-        data = self._reshape_data(data)
-        return cached_model_predict(self.model, data)
+    def _data_shapes(self, data, labels):
+        if data.shape[2] > self.network_input_width:
+            raise ValueError('window_size > ' + str(self.network_input_width))
+        input_shape = (data.shape[1], data.shape[2], data.shape[3])
+        output_shape = labels.shape[1]
+
+        return input_shape, output_shape
 
     def _reshape_data(self, data):
         data_shape = (*data.shape, 1)
