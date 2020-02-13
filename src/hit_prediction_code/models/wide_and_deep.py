@@ -5,31 +5,7 @@ from tensorflow.keras.layers import (Activation, BatchNormalization,
 from tensorflow.keras.models import Model
 from sklearn.base import BaseEstimator, RegressorMixin
 
-from ..common import feature_columns
-
-
-def dense_layers(self, dense_size, dense_layer):
-    if self.batch_normalization:
-        use_bias = False
-        activation = None
-    else:
-        use_bias = True
-        activation = self.dense_activation
-
-    for i in range(1, self.num_dense_layer + 1):
-        dense_layer = Dense(dense_size,
-                            activation=activation,
-                            name='dense-' + str(i),
-                            use_bias=use_bias)(dense_layer)
-        if self.batch_normalization:
-            dense_layer = BatchNormalization(name='bn-' + str(i))(dense_layer)
-            dense_layer = Activation(self.dense_activation,
-                                     name='activation-' + str(i))(dense_layer)
-        if self.dropout_rate:
-            dense_layer = Dropout(self.dropout_rate,
-                                  name='dropout-' + str(i))(dense_layer)
-
-    return dense_layer
+from .building_blocks import dense_layers
 
 
 class WideAndDeep(BaseEstimator, RegressorMixin):

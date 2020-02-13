@@ -5,9 +5,7 @@ import logging
 from sklearn.base import BaseEstimator, RegressorMixin
 import tensorflow.compat.v2.keras.backend as K
 from tensorflow.keras.layers import Activation
-from tensorflow.keras.layers import BatchNormalization
 from tensorflow.keras.layers import Dense
-from tensorflow.keras.layers import Dropout
 from tensorflow.keras.layers import Flatten
 from tensorflow.keras.layers import GRU
 from tensorflow.keras.layers import Input
@@ -16,12 +14,11 @@ from tensorflow.keras.layers import Multiply
 from tensorflow.keras.layers import Permute
 from tensorflow.keras.layers import RepeatVector
 from tensorflow.keras.layers import Reshape
-from tensorflow.keras.layers import ZeroPadding2D
 from tensorflow.keras.models import Model
 
-from .cnn import input_padding_layer
-from .cnn import mel_cnn_layers
-from .wide_and_deep import dense_layers
+from .building_blocks import dense_layers
+from .building_blocks import input_padding_layer
+from .building_blocks import mel_cnn_layers
 from ..common import cached_model_predict
 from ..common import cached_model_predict_clear
 
