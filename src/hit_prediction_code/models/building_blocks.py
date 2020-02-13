@@ -175,11 +175,11 @@ class HitPredictionModel(BaseEstimator, RegressorMixin, metaclass=ABCMeta):
 
     @property
     def model(self):
-        return self._config.get('model')
+        return self._model
 
     @model.setter
     def model(self, value):
-        self._config['model'] = value
+        self._model = value
 
     @property
     def num_dense_layer(self):
