@@ -99,7 +99,14 @@ class WideAndDeep(HitPredictionModel):
         else:
             dense_output_size = len(input_list)
 
-        dense_layer = dense_layers(self, dense_output_size, concat_tensor)
+        dense_layer = dense_layers(
+            self.batch_normalization,
+            self.dropout_rate,
+            dense_output_size,
+            self.num_dense_layer,
+            self.dense_activation,
+            concat_tensor,
+        )
 
         use_bias = not self.batch_normalization
         output = Dense(output_shape,

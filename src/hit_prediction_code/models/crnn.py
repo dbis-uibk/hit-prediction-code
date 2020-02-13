@@ -77,8 +77,12 @@ class CRNNModel(HitPredictionModel):
     def _create_model(self, input_shape, output_shape):
         melgram_input = Input(shape=input_shape, dtype="float32")
 
-        hidden = input_padding_layer(self, melgram_input, input_shape)
-        hidden = mel_cnn_layers(self, hidden)
+        hidden = input_padding_layer(
+            self.network_input_width,
+            melgram_input,
+            input_shape,
+        )
+        hidden = mel_cnn_layers(self.layer_sizes, self.padding, hidden)
 
         # reshaping
         hidden = Reshape((12, self.layer_sizes['conv4']))(hidden)
@@ -106,7 +110,14 @@ class CRNNModel(HitPredictionModel):
             self.layer_sizes['rnn'],
         )
 
-        dense_layer = dense_layers(self, dense_size, hidden)
+        dense_layer = dense_layers(
+            self.batch_normalization,
+            self.dropout_rate,
+            dense_size,
+            self.num_dense_layer,
+            self.dense_activation,
+            hidden,
+        )
 
         output = Dense(output_shape,
                        activation=self.output_activation,

@@ -21,9 +21,9 @@ from ..common import cached_model_predict_clear
 LOGGER = logging.getLogger(__name__)
 
 
-def input_padding_layer(self, melgram_input, input_shape):
+def input_padding_layer(network_input_width, melgram_input, input_shape):
     # Input block
-    padding = self.network_input_width - input_shape[1]
+    padding = network_input_width - input_shape[1]
     left_pad = int(padding / 2)
     if padding % 2:
         right_pad = left_pad + 1
@@ -35,12 +35,12 @@ def input_padding_layer(self, melgram_input, input_shape):
     return hidden
 
 
-def mel_cnn_layers(self, hidden):
+def mel_cnn_layers(layer_sizes, padding, hidden):
     channel_axis = 3
 
     # Conv block 1
-    hidden = Conv2D(self.layer_sizes['conv1'], (3, 3),
-                    padding=self.padding,
+    hidden = Conv2D(layer_sizes['conv1'], (3, 3),
+                    padding=padding,
                     name='conv1')(hidden)
     hidden = BatchNormalization(axis=channel_axis, name='bn1')(hidden)
     hidden = ELU()(hidden)
@@ -49,8 +49,8 @@ def mel_cnn_layers(self, hidden):
     hidden = Dropout(0.1, name='dropout1')(hidden)
 
     # Conv block 2
-    hidden = Conv2D(self.layer_sizes['conv2'], (3, 3),
-                    padding=self.padding,
+    hidden = Conv2D(layer_sizes['conv2'], (3, 3),
+                    padding=padding,
                     name='conv2')(hidden)
     hidden = BatchNormalization(axis=channel_axis, name='bn2')(hidden)
     hidden = ELU()(hidden)
@@ -59,8 +59,8 @@ def mel_cnn_layers(self, hidden):
     hidden = Dropout(0.1, name='dropout2')(hidden)
 
     # Conv block 3
-    hidden = Conv2D(self.layer_sizes['conv3'], (3, 3),
-                    padding=self.padding,
+    hidden = Conv2D(layer_sizes['conv3'], (3, 3),
+                    padding=padding,
                     name='conv3')(hidden)
     hidden = BatchNormalization(axis=channel_axis, name='bn3')(hidden)
     hidden = ELU()(hidden)
@@ -69,8 +69,8 @@ def mel_cnn_layers(self, hidden):
     hidden = Dropout(0.1, name='dropout3')(hidden)
 
     # Conv block 4
-    hidden = Conv2D(self.layer_sizes['conv4'], (3, 3),
-                    padding=self.padding,
+    hidden = Conv2D(layer_sizes['conv4'], (3, 3),
+                    padding=padding,
                     name='conv4')(hidden)
     hidden = BatchNormalization(axis=channel_axis, name='bn4')(hidden)
     hidden = ELU()(hidden)
@@ -81,25 +81,26 @@ def mel_cnn_layers(self, hidden):
     return hidden
 
 
-def dense_layers(self, dense_size, dense_layer):
-    if self.batch_normalization:
+def dense_layers(batch_normalization, dropout_rate, dense_size,
+                 num_dense_layer, dense_activation, dense_layer):
+    if batch_normalization:
         use_bias = False
         activation = None
     else:
         use_bias = True
-        activation = self.dense_activation
+        activation = dense_activation
 
-    for i in range(1, self.num_dense_layer + 1):
+    for i in range(1, num_dense_layer + 1):
         dense_layer = Dense(dense_size,
                             activation=activation,
                             name='dense-' + str(i),
                             use_bias=use_bias)(dense_layer)
-        if self.batch_normalization:
+        if batch_normalization:
             dense_layer = BatchNormalization(name='bn-' + str(i))(dense_layer)
-            dense_layer = Activation(self.dense_activation,
+            dense_layer = Activation(dense_activation,
                                      name='activation-' + str(i))(dense_layer)
-        if self.dropout_rate:
-            dense_layer = Dropout(self.dropout_rate,
+        if dropout_rate:
+            dense_layer = Dropout(dropout_rate,
                                   name='dropout-' + str(i))(dense_layer)
 
     return dense_layer
