@@ -19,19 +19,35 @@ LOGGER = logging.getLogger(__name__)
 
 
 class CNNModel(HitPredictionModel):
+    """CNN Model designed for hit song prediction."""
 
     def __init__(self,
                  layer_sizes=None,
                  batch_size=64,
                  epochs=100,
                  padding='same',
-                 attention=False,
                  batch_normalization=False,
                  dropout_rate=None,
                  num_dense_layer=0,
                  dense_activation='relu',
                  output_activation=None,
                  loss='mean_absolute_error'):
+        """Initializes the CNN Model object.
+
+        Args:
+            layer_sizes: a dict containing the layer sizes (width) of the CNN.
+            batch_size: the batch size used to train the model.
+            epochs: the number of epochs used during training.
+            padding: the padding type used for inputs.
+            batch_normalization: configures if batch normalization is used for
+                the dense network part.
+            dropout_rate: the dropout rate used for the dense part.
+            num_dense_layer: the number of dense layers in the dense part.
+            dense_activation: the activation function used for the dense part.
+            output_activation: the activation function used for the output.
+            loss: the loss function used to train the network.
+
+        """
         super(CNNModel, self).__init__(
             metrics=['mean_absolute_error'],
             optimizer='adam',
@@ -50,7 +66,6 @@ class CNNModel(HitPredictionModel):
         self.batch_size = batch_size
         self.epochs = epochs
         self.padding = padding
-        self.attention = attention
         self.batch_normalization = batch_normalization
         self.dropout_rate = dropout_rate
         self.num_dense_layer = num_dense_layer

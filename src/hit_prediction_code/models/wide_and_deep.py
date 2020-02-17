@@ -1,3 +1,4 @@
+"""Module containing implementations of the wide and deep model."""
 from tensorflow.keras.layers import Concatenate
 from tensorflow.keras.layers import Dense
 from tensorflow.keras.layers import Input
@@ -8,6 +9,7 @@ from .building_blocks import HitPredictionModel
 
 
 class WideAndDeep(HitPredictionModel):
+    """Wide and Deep Model designed for hit song prediction."""
 
     def __init__(self,
                  loss='mse',
@@ -24,6 +26,30 @@ class WideAndDeep(HitPredictionModel):
                  dense_output_size=None,
                  num_dense_layer=2,
                  **kwargs):
+        """Initializes the Wide and Deep Model object.
+
+        Args:
+            loss: the loss function used to train the network.
+            optimizer: the optimizer used to train the model.
+            metrics: a list of metrics used to evaluate the model during
+                training. If set to None, MAE is used.
+            deep_activation: the activation function used for the deep part of
+                the network.
+            dense_activation: the activation function used for the dense part.
+            output_activation: the activation function used for the output.
+            epochs: the number of epochs used during training.
+            batch_size: the batch size used to train the model.
+            features: a list of tuples describing the features used for
+                training and the network part (wide or deep) that is used to
+                handle them.
+            batch_normalization: configures if batch normalization is used for
+                the dense network part.
+            dropout_rate: the dropout rate used for the dense part.
+            dense_output_size: the output width of the dense layers.
+            num_dense_layer: the number of dense layers in the dense part.
+            kwargs: key-value arguments passed to the super constructor.
+
+        """
         super(WideAndDeep, self).__init__(**kwargs)
 
         self.input_list = []
@@ -47,6 +73,7 @@ class WideAndDeep(HitPredictionModel):
 
     @property
     def deep_activation(self):
+        """Property specifying the deep activation function."""
         return self._config.get('deep_activation')
 
     @deep_activation.setter
@@ -55,6 +82,7 @@ class WideAndDeep(HitPredictionModel):
 
     @property
     def dense_output_size(self):
+        """Property specifying the output size of the dense layers."""
         return self._config.get('dense_output_size')
 
     @dense_output_size.setter
@@ -63,6 +91,7 @@ class WideAndDeep(HitPredictionModel):
 
     @property
     def features(self):
+        """Property specifying the features that are used."""
         return self._config.get('features')
 
     @features.setter
@@ -119,9 +148,9 @@ class WideAndDeep(HitPredictionModel):
     def _data_shapes(self, data, labels):
         return None, 1
 
-    def _reshape_data(self, x):
+    def _reshape_data(self, data):
         features = []
         for index, _ in self.features:
-            feature = x[..., index]
+            feature = data[..., index]
             features.append(feature)
         return features
