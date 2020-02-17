@@ -34,6 +34,8 @@ evaluator = GridEvaluator(
         'model__batch_size': [64],
         'model__epochs': [1, 2],
         'model__num_dense_layer': [2],
+        'model__batch_normalization': [True],
+        'model__dropout_rate': [0.1],
         'model__loss': ['mean_squared_error'],
     },
     grid_parameters=evaluations.grid_parameters(),
