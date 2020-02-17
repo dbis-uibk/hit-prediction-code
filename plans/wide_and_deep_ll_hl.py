@@ -11,6 +11,9 @@ dataloader = EssentiaLoader(
     dataset_path='data/processed/msd_bb_balanced_essentia.pickle',
     features=[
         *common.mood_list(),
+        *common.genre_list(),
+        *common.voice_list(),
+        *common.ll_list(),
     ],
     label='peak',
     nan_value=150,

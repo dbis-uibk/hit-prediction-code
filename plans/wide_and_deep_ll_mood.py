@@ -10,7 +10,7 @@ from sklearn.preprocessing import MinMaxScaler
 dataloader = EssentiaLoader(
     dataset_path='data/processed/msd_bb_balanced_essentia.pickle',
     features=[
-        *common.mood_list(),
+        *common.all_ll_mood_list(),
     ],
     label='peak',
     nan_value=150,
