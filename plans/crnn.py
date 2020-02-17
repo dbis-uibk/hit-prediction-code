@@ -19,12 +19,12 @@ pipeline = Pipeline([
         'model',
         CRNNModel(
             layer_sizes={
-                'conv1': 48,
-                'conv2': 96,
-                'conv3': 96,
-                'conv4': 96,
-                'rnn': 48,
-                'dense': 48,
+                'conv1': 30,
+                'conv2': 60,
+                'conv3': 60,
+                'conv4': 60,
+                'rnn': 30,
+                'dense': 30,
             }),
     ),
 ])
@@ -32,9 +32,9 @@ pipeline = Pipeline([
 evaluator = GridEvaluator(
     parameters={
         'model__batch_size': [64],
-        'model__epochs': [4, 8, 12],
+        'model__epochs': [16, 32, 64],
         'model__num_dense_layer': [2],
-        'model__loss': ['mean_absolute_error', 'mean_squared_error'],
+        'model__loss': ['mean_squared_error'],
     },
     grid_parameters=evaluations.grid_parameters(),
 )
