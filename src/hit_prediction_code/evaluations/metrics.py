@@ -1,7 +1,10 @@
 from sklearn import metrics
 
 
-def hit_nonhit_accuracy_score(estimator, x, y, normalize=True,
+def hit_nonhit_accuracy_score(estimator,
+                              x,
+                              y,
+                              normalize=True,
                               threshold=100.5):
     y_true = y > threshold
     y_pred = estimator.predict(x) > threshold
