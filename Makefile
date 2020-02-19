@@ -51,7 +51,7 @@ clean-test: ## remove test and coverage artifacts
 	rm -fr .pytest_cache
 
 lint: ## check style with flake8
-	flake8 plans src tests
+	flake8 plans src tests tools
 
 test: ## run tests quickly with the default Python
 	pytest
@@ -94,11 +94,13 @@ format: ## formats the code
 	yapf -i -r plans 
 	yapf -i -r src
 	yapf -i -r tests
+	yapf -i -r tools
 
 bandit: ## static code checking to find security issues in code
 	bandit -r plans
 	bandit -r src
 	bandit -r tests
+	bandit -r tools
 
 pytype:
 	pytype plans

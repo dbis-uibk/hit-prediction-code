@@ -46,6 +46,7 @@ qwikidata = "*"
 billboard-py = "*"
 musicbrainzngs = "*"
 requests = "*"
+librosa = "*"
 
 [requires]
 python_version = "3.7"
