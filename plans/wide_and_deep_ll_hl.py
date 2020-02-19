@@ -1,5 +1,6 @@
-import dbispipeline.result_handlers as result_handlers
+"""Wide and deep model evaluation plan using high- and lowlevel features."""
 from dbispipeline.evaluators import GridEvaluator
+import dbispipeline.result_handlers as result_handlers
 import hit_prediction_code.common as common
 from hit_prediction_code.dataloaders import EssentiaLoader
 import hit_prediction_code.evaluations as evaluations

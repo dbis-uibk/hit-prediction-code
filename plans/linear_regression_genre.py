@@ -1,3 +1,4 @@
+"""Linear regression model evaluation plan using genre features only."""
 from dbispipeline.evaluators import GridEvaluator
 import dbispipeline.result_handlers as result_handlers
 import hit_prediction_code.common as common

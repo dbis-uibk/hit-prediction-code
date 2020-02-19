@@ -1,6 +1,6 @@
+"""Linear regression model evaluation plan using year features only."""
 from dbispipeline.evaluators import GridEvaluator
 import dbispipeline.result_handlers as result_handlers
-import hit_prediction_code.common as common
 from hit_prediction_code.dataloaders import EssentiaLoader
 import hit_prediction_code.evaluations as evaluations
 from sklearn.linear_model import LinearRegression

@@ -1,3 +1,4 @@
+"""Linear regression model evaluation plan using mood features only."""
 from dbispipeline.evaluators import GridEvaluator
 import dbispipeline.result_handlers as result_handlers
 import hit_prediction_code.common as common
