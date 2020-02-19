@@ -21,14 +21,16 @@ dataloader = EssentiaLoader(
 
 pipeline = Pipeline([
     ('scale', MinMaxScaler()),
-    ('wide_and_deep', WideAndDeep(features=dataloader.feature_indices)),
+    ('model', WideAndDeep(features=dataloader.feature_indices)),
 ])
 
 evaluator = GridEvaluator(
     parameters={
-        'wide_and_deep__epochs': [10, 25, 50, 100, 200, 300],
-        'wide_and_deep__batch_normalization': [True],
-        'wide_and_deep__dropout_rate': [0.1],
+        'model__epochs': [10, 25, 50, 100, 200, 300],
+        'model__batch_normalization': [False],
+        'model__dense_activation': ['elu'],
+        'model__output_activation': ['elu'],
+        'model__dropout_rate': [0.1],
     },
     grid_parameters=evaluations.grid_parameters(),
 )

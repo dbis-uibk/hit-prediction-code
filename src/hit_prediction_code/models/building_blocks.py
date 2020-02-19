@@ -35,14 +35,15 @@ def input_padding_layer(network_input_width, melgram_input, input_shape):
     return hidden
 
 
-def mel_cnn_layers(layer_sizes, padding, hidden):
+def mel_cnn_layers(layer_sizes, padding, hidden, batch_normalization=True):
     channel_axis = 3
 
     # Conv block 1
     hidden = Conv2D(layer_sizes['conv1'], (3, 3),
                     padding=padding,
                     name='conv1')(hidden)
-    hidden = BatchNormalization(axis=channel_axis, name='bn1')(hidden)
+    if batch_normalization:
+        hidden = BatchNormalization(axis=channel_axis, name='bn1')(hidden)
     hidden = ELU()(hidden)
     hidden = MaxPooling2D(pool_size=(2, 2), strides=(2, 2),
                           name='pool1')(hidden)
@@ -52,7 +53,8 @@ def mel_cnn_layers(layer_sizes, padding, hidden):
     hidden = Conv2D(layer_sizes['conv2'], (3, 3),
                     padding=padding,
                     name='conv2')(hidden)
-    hidden = BatchNormalization(axis=channel_axis, name='bn2')(hidden)
+    if batch_normalization:
+        hidden = BatchNormalization(axis=channel_axis, name='bn2')(hidden)
     hidden = ELU()(hidden)
     hidden = MaxPooling2D(pool_size=(3, 3), strides=(3, 3),
                           name='pool2')(hidden)
@@ -62,7 +64,8 @@ def mel_cnn_layers(layer_sizes, padding, hidden):
     hidden = Conv2D(layer_sizes['conv3'], (3, 3),
                     padding=padding,
                     name='conv3')(hidden)
-    hidden = BatchNormalization(axis=channel_axis, name='bn3')(hidden)
+    if batch_normalization:
+        hidden = BatchNormalization(axis=channel_axis, name='bn3')(hidden)
     hidden = ELU()(hidden)
     hidden = MaxPooling2D(pool_size=(4, 4), strides=(4, 4),
                           name='pool3')(hidden)
@@ -72,7 +75,8 @@ def mel_cnn_layers(layer_sizes, padding, hidden):
     hidden = Conv2D(layer_sizes['conv4'], (3, 3),
                     padding=padding,
                     name='conv4')(hidden)
-    hidden = BatchNormalization(axis=channel_axis, name='bn4')(hidden)
+    if batch_normalization:
+        hidden = BatchNormalization(axis=channel_axis, name='bn4')(hidden)
     hidden = ELU()(hidden)
     hidden = MaxPooling2D(pool_size=(4, 4), strides=(4, 4),
                           name='pool4')(hidden)

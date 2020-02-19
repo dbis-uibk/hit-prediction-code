@@ -11,7 +11,6 @@ dataloader = MelSpectLoader(
     features='librosa_melspectrogram',
     label='peak',
     nan_value=150,
-    random_state=42,
 )
 
 pipeline = Pipeline([
@@ -34,7 +33,10 @@ evaluator = GridEvaluator(
         'model__batch_size': [64],
         'model__epochs': [16, 32, 64],
         'model__num_dense_layer': [2],
-        'model__batch_normalization': [True],
+        'model__batch_normalization': [False],
+        'model__cnn_batch_normalization': [False],
+        'model__dense_activation': ['elu'],
+        'model__output_activation': ['elu'],
         'model__dropout_rate': [0.1],
         'model__loss': ['mean_squared_error'],
     },

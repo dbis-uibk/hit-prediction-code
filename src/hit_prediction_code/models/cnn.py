@@ -27,6 +27,7 @@ class CNNModel(HitPredictionModel):
                  epochs=100,
                  padding='same',
                  batch_normalization=False,
+                 cnn_batch_normalization=True,
                  dropout_rate=None,
                  num_dense_layer=0,
                  dense_activation='relu',
@@ -41,6 +42,8 @@ class CNNModel(HitPredictionModel):
             padding: the padding type used for inputs.
             batch_normalization: configures if batch normalization is used for
                 the dense network part.
+            cnn_batch_normalization: configures if batch normalization is used
+                for the cnn part of the network.
             dropout_rate: the dropout rate used for the dense part.
             num_dense_layer: the number of dense layers in the dense part.
             dense_activation: the activation function used for the dense part.
@@ -67,6 +70,7 @@ class CNNModel(HitPredictionModel):
         self.epochs = epochs
         self.padding = padding
         self.batch_normalization = batch_normalization
+        self.cnn_batch_normalization = cnn_batch_normalization
         self.dropout_rate = dropout_rate
         self.num_dense_layer = num_dense_layer
         self.dense_activation = dense_activation
@@ -76,6 +80,15 @@ class CNNModel(HitPredictionModel):
         self.network_input_width = 1200
         self.model = None
 
+    @property
+    def cnn_batch_normalization(self):
+        """Property specifying if cnn part uses batch normalization."""
+        return self._config.get('cnn_batch_normalization')
+
+    @cnn_batch_normalization.setter
+    def cnn_batch_normalization(self, value):
+        self._config['cnn_batch_normalization'] = value
+
     def _create_model(self, input_shape, output_shape):
         melgram_input = Input(shape=input_shape, dtype="float32")
 
@@ -84,7 +97,12 @@ class CNNModel(HitPredictionModel):
             melgram_input,
             input_shape,
         )
-        hidden = mel_cnn_layers(self.layer_sizes, self.padding, hidden)
+        hidden = mel_cnn_layers(
+            self.layer_sizes,
+            self.padding,
+            hidden,
+            batch_normalization=self.cnn_batch_normalization,
+        )
 
         # reshaping
         hidden = Reshape((12, self.layer_sizes['conv4']))(hidden)

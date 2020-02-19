@@ -125,12 +125,7 @@ def key_mapping(df):
 class MelSpectLoader(Loader):
     """Loads dataset with hits and non-hits contaning melspectrogramms."""
 
-    def __init__(self,
-                 dataset_path,
-                 features=None,
-                 label=None,
-                 nan_value=0,
-                 random_state=None):
+    def __init__(self, dataset_path, features=None, label=None, nan_value=0):
         self._config = {
             'dataset_path': dataset_path,
             'features': features,

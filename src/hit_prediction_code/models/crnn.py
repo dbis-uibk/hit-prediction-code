@@ -32,6 +32,7 @@ class CRNNModel(HitPredictionModel):
                  padding='same',
                  attention=False,
                  batch_normalization=False,
+                 cnn_batch_normalization=True,
                  dropout_rate=None,
                  num_dense_layer=0,
                  dense_activation='relu',
@@ -57,6 +58,7 @@ class CRNNModel(HitPredictionModel):
         self.padding = padding
         self.attention = attention
         self.batch_normalization = batch_normalization
+        self.cnn_batch_normalization = cnn_batch_normalization
         self.dropout_rate = dropout_rate
         self.num_dense_layer = num_dense_layer
         self.dense_activation = dense_activation
@@ -65,6 +67,15 @@ class CRNNModel(HitPredictionModel):
 
         self.network_input_width = 1200
         self.model = None
+
+    @property
+    def cnn_batch_normalization(self):
+        """Property specifying if cnn part uses batch normalization."""
+        return self._config.get('cnn_batch_normalization')
+
+    @cnn_batch_normalization.setter
+    def cnn_batch_normalization(self, value):
+        self._config['cnn_batch_normalization'] = value
 
     def _data_shapes(self, data, labels):
         if data.shape[2] > self.network_input_width:
@@ -82,7 +93,12 @@ class CRNNModel(HitPredictionModel):
             melgram_input,
             input_shape,
         )
-        hidden = mel_cnn_layers(self.layer_sizes, self.padding, hidden)
+        hidden = mel_cnn_layers(
+            self.layer_sizes,
+            self.padding,
+            hidden,
+            batch_normalization=self.cnn_batch_normalization,
+        )
 
         # reshaping
         hidden = Reshape((12, self.layer_sizes['conv4']))(hidden)
