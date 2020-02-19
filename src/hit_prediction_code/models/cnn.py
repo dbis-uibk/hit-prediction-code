@@ -95,7 +95,6 @@ class CNNModel(HitPredictionModel):
         hidden = input_padding_layer(
             self.network_input_width,
             melgram_input,
-            input_shape,
         )
         hidden = mel_cnn_layers(
             self.layer_sizes,
