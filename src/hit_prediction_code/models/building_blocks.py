@@ -75,7 +75,7 @@ def mel_cnn_layers(layer_sizes, padding, hidden, batch_normalization=True):
 
     kernel_size = {
         'conv1': (3, 3),
-        'conv3': (3, 3),
+        'conv2': (3, 3),
         'conv3': (3, 3),
         'conv4': (3, 3),
     }
