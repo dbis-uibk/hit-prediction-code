@@ -40,7 +40,7 @@ sklearn = "*"
 tables = "*"
 fuzzywuzzy = {extras = ["speedup"],version = "*"}
 click = "*"
-dbispipeline = "*" 
+dbispipeline = "*"
 sparqlwrapper = "*"
 qwikidata = "*"
 billboard-py = "*"
