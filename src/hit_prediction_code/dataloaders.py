@@ -1,6 +1,7 @@
+# -*- coding: utf-8 -*-
 """Dataloaders for the hit song prediction."""
-import logging
 import json
+import logging
 
 from dbispipeline.base import Loader
 import numpy as np
@@ -12,7 +13,11 @@ LOGGER = logging.getLogger(__name__)
 
 
 class MsdBbLoader(Loader):
-    """Million song dataset / billboard charts loader."""
+    """Million song dataset / billboard charts loader.
+
+    This loader is depricated please look at the EssentiaLoader.
+
+    """
 
     def __init__(self,
                  hits_file_path,
@@ -23,6 +28,21 @@ class MsdBbLoader(Loader):
                  label=None,
                  nan_value=0,
                  random_state=None):
+        """Initializes the msd billboard loader.
+
+        Args:
+            hits_file_path: the path to the csv containing all hit songs.
+            non_hits_file_path: the path to the csv containing all non-hits.
+            features_path: the path to the directory containing features in
+                json format.
+            non_hits_per_hit: the number of non-hits per hit in the resulting
+                dataset.
+            features: a list of selected columns used as features.
+            label: the column selected as the target variable.
+            nan_value: the values used for NaN values in the dataset.
+            random_state: the random state used for non-hit subsampling.
+
+        """
         self._config = {
             'hits_file_path': hits_file_path,
             'non_hits_file_path': non_hits_file_path,
@@ -45,7 +65,7 @@ class MsdBbLoader(Loader):
         data = data.merge(ll_features, on='msd_id')
         hl_features = pd.read_hdf(features_path + '/msd_bb_hl_features.h5')
         data = data.merge(hl_features, on='msd_id')
-        data = key_mapping(data)
+        data = _key_mapping(data)
 
         self.labels = np.ravel(data[[label]])
         nan_values = pd.isnull(self.labels)
@@ -72,14 +92,17 @@ class MsdBbLoader(Loader):
         LOGGER.info(self._features_list)
 
     def load(self):
+        """Returns the data loaded by the dataloader."""
         return self.data.values, self.labels
 
     @property
     def feature_indices(self):
+        """Returns the mapping between features and indeces."""
         return self._features_index_list
 
     @property
     def configuration(self):
+        """Returns the configuration in json serializable format."""
         return self._config
 
 
@@ -101,11 +124,14 @@ def _load_feature(features_path, msd_id, file_suffix):
         return json.load(features)
 
 
-def key_mapping(df):
+def _key_mapping(df):
     # https://stackoverflow.com/questions/37292872/how-can-i-one-hot-encode-in-python
     string_columns = [
-        'tonal.chords_key', 'tonal.chords_scale', 'tonal.key_scale',
-        'tonal.key_key', 'artist'
+        'tonal.chords_key',
+        'tonal.chords_scale',
+        'tonal.key_scale',
+        'tonal.key_key',
+        'artist',
     ]
     for c in string_columns:
         if c in list(df):
@@ -125,7 +151,20 @@ def key_mapping(df):
 class MelSpectLoader(Loader):
     """Loads dataset with hits and non-hits contaning melspectrogramms."""
 
-    def __init__(self, dataset_path, features=None, label=None, nan_value=0):
+    def __init__(self,
+                 dataset_path,
+                 features='librosa_melspectrogram',
+                 label=None,
+                 nan_value=0):
+        """Initializes the mel spect loader.
+
+        Args:
+            dataset_path: the path to the pickeled dataset.
+            features: a column or a list of selected columns used as features.
+            label: the column selected as the target variable.
+            nan_value: the values used for NaN values in the dataset.
+
+        """
         self._config = {
             'dataset_path': dataset_path,
             'features': features,
@@ -163,7 +202,16 @@ class MelSpectLoader(Loader):
 class EssentiaLoader(Loader):
     """Essentia feature loader."""
 
-    def __init__(self, dataset_path, features=None, label=None, nan_value=0):
+    def __init__(self, dataset_path, features, label=None, nan_value=0):
+        """Initializes the essentia loader.
+
+        Args:
+            dataset_path: the path to the pickeled dataset.
+            features: a list of selected columns used as features.
+            label: the column selected as the target variable.
+            nan_value: the values used for NaN values in the dataset.
+
+        """
         self._config = {
             'dataset_path': dataset_path,
             'features': features,
@@ -172,7 +220,7 @@ class EssentiaLoader(Loader):
         }
 
         data = pd.read_pickle(dataset_path)
-        data = key_mapping(data)
+        data = _key_mapping(data)
 
         self.labels = np.ravel(data[[label]])
         nan_values = pd.isnull(self.labels)
@@ -199,12 +247,15 @@ class EssentiaLoader(Loader):
         LOGGER.info(self._features_list)
 
     def load(self):
+        """Returns the data loaded by the dataloader."""
         return self.data.values, self.labels
 
     @property
     def feature_indices(self):
+        """Returns the mapping between features and indeces."""
         return self._features_index_list
 
     @property
     def configuration(self):
+        """Returns the configuration in json serializable format."""
         return self._config
