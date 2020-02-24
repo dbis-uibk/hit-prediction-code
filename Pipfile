@@ -28,6 +28,7 @@ tox = "*"
 watchdog = "*"
 wheel = "*"
 yapf = "*"
+isort = "*"
 
 [packages]
 hit_prediction_code = {editable = true,path = "."}
