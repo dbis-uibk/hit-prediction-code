@@ -16,7 +16,6 @@ flake8-builtins = "*"
 flake8-commas = "*"
 flake8-deprecated = "*"
 flake8-docstrings = "*"
-flake8-import-order = "*"
 m2r = "*"
 pep8-naming = "*"
 pylint = "*"
@@ -29,6 +28,7 @@ watchdog = "*"
 wheel = "*"
 yapf = "*"
 isort = "*"
+flake8-isort = "*"
 
 [packages]
 hit_prediction_code = {editable = true,path = "."}
