@@ -1,11 +1,12 @@
+# -*- coding: utf-8 -*-
 """Module containing implementations of the wide and deep model."""
 from tensorflow.keras.layers import Concatenate
 from tensorflow.keras.layers import Dense
 from tensorflow.keras.layers import Input
 from tensorflow.keras.models import Model
 
-from .building_blocks import dense_layers
 from .building_blocks import HitPredictionModel
+from .building_blocks import dense_layers
 
 
 class WideAndDeep(HitPredictionModel):
@@ -50,7 +51,7 @@ class WideAndDeep(HitPredictionModel):
             kwargs: key-value arguments passed to the super constructor.
 
         """
-        super(WideAndDeep, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
         self.input_list = []
         self.loss = loss

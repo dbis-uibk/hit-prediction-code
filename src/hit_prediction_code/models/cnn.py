@@ -10,8 +10,8 @@ from tensorflow.keras.layers import MaxPooling1D
 from tensorflow.keras.layers import Reshape
 from tensorflow.keras.models import Model
 
-from .building_blocks import dense_layers
 from .building_blocks import HitPredictionModel
+from .building_blocks import dense_layers
 from .building_blocks import input_padding_layer
 from .building_blocks import mel_cnn_layers
 
@@ -51,7 +51,7 @@ class CNNModel(HitPredictionModel):
             loss: the loss function used to train the network.
 
         """
-        super(CNNModel, self).__init__(
+        super().__init__(
             metrics=['mean_absolute_error'],
             optimizer='adam',
         )
@@ -90,7 +90,7 @@ class CNNModel(HitPredictionModel):
         self._config['cnn_batch_normalization'] = value
 
     def _create_model(self, input_shape, output_shape):
-        melgram_input = Input(shape=input_shape, dtype="float32")
+        melgram_input = Input(shape=input_shape, dtype='float32')
 
         hidden = input_padding_layer(
             self.network_input_width,

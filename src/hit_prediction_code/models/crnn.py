@@ -3,10 +3,10 @@
 import logging
 
 import tensorflow.compat.v2.keras.backend as keras_backend
+from tensorflow.keras.layers import GRU
 from tensorflow.keras.layers import Activation
 from tensorflow.keras.layers import Dense
 from tensorflow.keras.layers import Flatten
-from tensorflow.keras.layers import GRU
 from tensorflow.keras.layers import Input
 from tensorflow.keras.layers import Lambda
 from tensorflow.keras.layers import Multiply
@@ -15,8 +15,8 @@ from tensorflow.keras.layers import RepeatVector
 from tensorflow.keras.layers import Reshape
 from tensorflow.keras.models import Model
 
-from .building_blocks import dense_layers
 from .building_blocks import HitPredictionModel
+from .building_blocks import dense_layers
 from .building_blocks import input_padding_layer
 from .building_blocks import mel_cnn_layers
 
@@ -59,7 +59,7 @@ class CRNNModel(HitPredictionModel):
             loss: the loss function used to train the network.
 
         """
-        super(CRNNModel, self).__init__(
+        super().__init__(
             metrics=['mean_absolute_error'],
             optimizer='adam',
         )
@@ -107,7 +107,7 @@ class CRNNModel(HitPredictionModel):
         return input_shape, output_shape
 
     def _create_model(self, input_shape, output_shape):
-        melgram_input = Input(shape=input_shape, dtype="float32")
+        melgram_input = Input(shape=input_shape, dtype='float32')
 
         hidden = input_padding_layer(
             self.network_input_width,
@@ -134,7 +134,7 @@ class CRNNModel(HitPredictionModel):
         if self.attention:
             attention = Dense(1)(hidden)
             attention = Flatten()(attention)
-            attention_act = Activation("softmax")(attention)
+            attention_act = Activation('softmax')(attention)
             attention = RepeatVector(self.layer_sizes['rnn'])(attention_act)
             attention = Permute((2, 1))(attention)
 
