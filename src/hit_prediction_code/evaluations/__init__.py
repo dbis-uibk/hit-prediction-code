@@ -11,7 +11,7 @@ def cv():
 
 
 def grid_parameters():
-    """Returns commonly used gird parameters used for gird search."""
+    """Returns commonly used grid parameters used for grid search."""
     return {
         'verbose': 3,
         'cv': cv(),
