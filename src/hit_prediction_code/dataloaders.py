@@ -2,6 +2,7 @@
 """Dataloaders for the hit song prediction."""
 import json
 import logging
+import os.path
 
 from dbispipeline.base import Loader
 import numpy as np
@@ -61,9 +62,17 @@ class MsdBbLoader(Loader):
                                        random_state=random_state)
 
         data = hits.append(non_hits, sort=False, ignore_index=True)
-        ll_features = pd.read_hdf(features_path + '/msd_bb_ll_features.h5')
+        ll_features = pd.read_hdf(
+            os.path.join(
+                features_path,
+                'msd_bb_ll_features.h5',
+            ))
         data = data.merge(ll_features, on='msd_id')
-        hl_features = pd.read_hdf(features_path + '/msd_bb_hl_features.h5')
+        hl_features = pd.read_hdf(
+            os.path.join(
+                features_path,
+                'msd_bb_hl_features.h5',
+            ))
         data = data.merge(hl_features, on='msd_id')
         data = _key_mapping(data)
 
@@ -117,8 +126,12 @@ def _get_lowlevel_feature(features_path, msd_id):
 
 
 def _load_feature(features_path, msd_id, file_suffix):
-    file_prefix = '/features_tracks_' + msd_id[2].lower() + '/'
-    file_name = features_path + file_prefix + msd_id + file_suffix
+    file_prefix = 'features_tracks_' + msd_id[2].lower()
+    file_name = os.path.join(
+        features_path,
+        file_prefix,
+        msd_id + file_suffix,
+    )
 
     with open(file_name) as features:
         return json.load(features)
