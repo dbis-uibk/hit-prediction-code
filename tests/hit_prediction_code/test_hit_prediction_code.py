@@ -5,8 +5,8 @@
 import unittest
 
 from click.testing import CliRunner
+
 from hit_prediction_code import cli
-from hit_prediction_code import hit_prediction_code
 
 
 class TestProject(unittest.TestCase):
