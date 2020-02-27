@@ -27,6 +27,7 @@ class CNNModel(HitPredictionModel):
                  epochs=100,
                  padding='same',
                  batch_normalization=False,
+                 cnn_activation='elu',
                  cnn_batch_normalization=True,
                  dropout_rate=None,
                  num_dense_layer=0,
@@ -42,6 +43,7 @@ class CNNModel(HitPredictionModel):
             padding: the padding type used for inputs.
             batch_normalization: configures if batch normalization is used for
                 the dense network part.
+            cnn_activation: the activation function used in the cnn blocks.
             cnn_batch_normalization: configures if batch normalization is used
                 for the cnn part of the network.
             dropout_rate: the dropout rate used for the dense part.
@@ -70,6 +72,7 @@ class CNNModel(HitPredictionModel):
         self.epochs = epochs
         self.padding = padding
         self.batch_normalization = batch_normalization
+        self.cnn_activation = cnn_activation
         self.cnn_batch_normalization = cnn_batch_normalization
         self.dropout_rate = dropout_rate
         self.num_dense_layer = num_dense_layer
@@ -79,6 +82,15 @@ class CNNModel(HitPredictionModel):
 
         self.network_input_width = 1200
         self.model = None
+
+    @property
+    def cnn_activation(self):
+        """Property specifying the activation used for the cnn blocks."""
+        return self._config.get('cnn_batch_normalization')
+
+    @cnn_activation.setter
+    def cnn_activation(self, value):
+        self._config['cnn_activation'] = value
 
     @property
     def cnn_batch_normalization(self):
@@ -101,6 +113,7 @@ class CNNModel(HitPredictionModel):
             self.padding,
             hidden,
             batch_normalization=self.cnn_batch_normalization,
+            activation=self.cnn_activation,
         )
 
         # reshaping

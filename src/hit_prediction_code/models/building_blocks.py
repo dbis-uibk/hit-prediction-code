@@ -6,8 +6,8 @@ import logging
 
 from sklearn.base import BaseEstimator
 from sklearn.base import RegressorMixin
-from tensorflow.keras.layers import ELU
 from tensorflow.keras.layers import Activation
+from tensorflow.keras.layers import AlphaDropout
 from tensorflow.keras.layers import BatchNormalization
 from tensorflow.keras.layers import Conv2D
 from tensorflow.keras.layers import Dense
@@ -56,22 +56,36 @@ def _add_conv_dropout_block(config, hidden):
                     name='conv' + config['name_suffix'])(hidden)
     if config['batch_normalization'] is True:
         hidden = BatchNormalization(axis=channel_axis, name='bn1')(hidden)
-    hidden = ELU()(hidden)
+    hidden = Activation(config['activation'])(hidden)
+
     hidden = MaxPooling2D(pool_size=config['pool_size'],
                           strides=config['pool_stride'],
                           name='pool' + config['name_suffix'])(hidden)
-    hidden = Dropout(config['dropout_rate'],
-                     name='dropout' + config['name_suffix'])(hidden)
+    if config['activation'] == 'selu':
+        hidden = AlphaDropout(
+            config['dropout_rate'],
+            name='alpha_dropout' + config['name_suffix'],
+        )(hidden)
+    else:
+        hidden = Dropout(
+            config['dropout_rate'],
+            name='dropout' + config['name_suffix'],
+        )(hidden)
 
     return hidden
 
 
-def mel_cnn_layers(layer_sizes, padding, hidden, batch_normalization=True):
+def mel_cnn_layers(layer_sizes,
+                   padding,
+                   hidden,
+                   batch_normalization=True,
+                   activation='elu'):
     """Creates the CNN layers used to process the mel specs.
 
     This CNN builing block consists of four blocks each consisting of a 2D
     convolution layer followed by an optional batch normalization layer
-    followed by an ELU activation and a dropout layer.
+    followed by an activation and a dropout layer. In case of SELU activation,
+    an alpha dropout layer is used instead of the normal dropout layer.
 
     The convolution layer kernel sizes are (3,3), (3, 3), (3, 3), (3, 3)
     respectively. The max pool sizes and strides of the max pooling layers are
@@ -85,7 +99,7 @@ def mel_cnn_layers(layer_sizes, padding, hidden, batch_normalization=True):
         hidden: the hidden layer where the CNN layers are are connected to.
         batch_normalization: specifies if the optinal batch normalization
             layers are used.
-
+        activation: the name (as a string) of the used activation function.
     Returns: the last layer of that CNN layer block.
 
     """
@@ -112,7 +126,7 @@ def mel_cnn_layers(layer_sizes, padding, hidden, batch_normalization=True):
         'pool4': (4, 4),
     }
 
-    # creat 4 conv blocks
+    # create 4 conv blocks
     for block in range(1, 5):
         block = str(block)
 
@@ -126,6 +140,7 @@ def mel_cnn_layers(layer_sizes, padding, hidden, batch_normalization=True):
                 'pool_size': pool_size['pool' + block],
                 'pool_stride': pool_strides['pool' + block],
                 'dropout_rate': dropout_rate,
+                'activation': activation,
             },
             hidden=hidden,
         )
@@ -145,7 +160,8 @@ def dense_layers(batch_normalization, dropout_rate, dense_size,
         dense_size: the output size of each dense layer in that block of dense
             layers.
         num_dense_layer: the number of dense layers contained in that block.
-        dense_activation: the activation used for the dense layers.
+        dense_activation: the activation used for the dense layers. If selu is
+            used, alpha dropout is used instead of normal dropout.
         hidden_layer: the hidden layer passed to this dense layer block.
 
     Returns:
@@ -172,8 +188,16 @@ def dense_layers(batch_normalization, dropout_rate, dense_size,
                                       name='activation-' +
                                       str(i))(hidden_layer)
         if dropout_rate:
-            hidden_layer = Dropout(dropout_rate,
-                                   name='dropout-' + str(i))(hidden_layer)
+            if dense_activation == 'selu':
+                hidden_layer = AlphaDropout(
+                    dropout_rate,
+                    name='alpha_dropout-' + str(i),
+                )(hidden_layer)
+            else:
+                hidden_layer = Dropout(
+                    dropout_rate,
+                    name='dropout-' + str(i),
+                )(hidden_layer)
 
     return hidden_layer
 
