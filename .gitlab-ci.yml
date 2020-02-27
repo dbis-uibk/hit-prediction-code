@@ -3,10 +3,9 @@ stages:
   - test
 
 test:
-  image: python:3.7-slim
+  image: python:3.7-buster
   stage: test
   script:
-    - apt-get install -y --no-install-recommends python3-dev build-essential
     - pip install pipenv
     - pipenv sync && pipenv sync --dev
     - pipenv run make test
