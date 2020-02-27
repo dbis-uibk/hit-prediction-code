@@ -32,107 +32,203 @@ class FakeEstimator():
 class TestHitNonHitAccuracyScore(unittest.TestCase):
     """Tests for the hit_nonhit_accuracy_score."""
 
-    def test_all_correct(self):
-        """Test if the score works for all correct predictions."""
-        predictions = np.array([
-            1,
-            2,
-            3,
-            50,
-            100,
-            101,
-            15,
-            150,
-        ])
-
+    def _test_accuracy_score(self,
+                             predictions,
+                             expected_predictions,
+                             expected_score,
+                             normalize=None,
+                             threshold=None):
+        predictions = np.array(predictions)
+        expected_predictions = np.array(expected_predictions)
         estimator = FakeEstimator(predictions)
 
-        expected = np.array([
-            100,
-            100,
-            100,
-            100,
-            100,
-            101,
-            100,
-            101,
-        ])
-
-        self.assertEqual(
-            hit_nonhit_accuracy_score(
+        if normalize is not None and threshold is not None:
+            actual_score = hit_nonhit_accuracy_score(
                 estimator=estimator,
-                x=None,
-                y=expected,
-            ),
-            1.0,
+                x=None,  # x is ignored by FakeEstimator
+                y=expected_predictions,
+                normalize=normalize,
+                threshold=threshold,
+            )
+        elif normalize is not None:
+            actual_score = hit_nonhit_accuracy_score(
+                estimator=estimator,
+                x=None,  # x is ignored by FakeEstimator
+                y=expected_predictions,
+                normalize=normalize,
+            )
+        elif threshold is not None:
+            actual_score = hit_nonhit_accuracy_score(
+                estimator=estimator,
+                x=None,  # x is ignored by FakeEstimator
+                y=expected_predictions,
+                threshold=threshold,
+            )
+        else:
+            actual_score = hit_nonhit_accuracy_score(
+                estimator=estimator,
+                x=None,  # x is ignored by FakeEstimator
+                y=expected_predictions,
+            )
+
+        self.assertEqual(actual_score, expected_score)
+
+    def test_all_correct(self):
+        """Test if the score works for all correct predictions."""
+        self._test_accuracy_score(
+            predictions=[
+                1,
+                2,
+                3,
+                50,
+                100,
+                101,
+                15,
+                150,
+            ],
+            expected_predictions=[
+                100,
+                100,
+                100,
+                100,
+                100,
+                101,
+                100,
+                101,
+            ],
+            expected_score=1.0,
         )
 
     def test_all_wrong(self):
         """Test if the score works for all wrong predictions."""
-        predictions = np.array([
-            1,
-            2,
-            3,
-            50,
-            100,
-            101,
-            15,
-            150,
-        ])
-
-        estimator = FakeEstimator(predictions)
-
-        expected = np.array([
-            101,
-            101,
-            101,
-            101,
-            101,
-            100,
-            101,
-            100,
-        ])
-
-        self.assertEqual(
-            hit_nonhit_accuracy_score(
-                estimator=estimator,
-                x=None,
-                y=expected,
-            ),
-            0.0,
+        self._test_accuracy_score(
+            predictions=[
+                1,
+                2,
+                3,
+                50,
+                100,
+                101,
+                15,
+                150,
+            ],
+            expected_predictions=[
+                101,
+                101,
+                101,
+                101,
+                101,
+                100,
+                101,
+                100,
+            ],
+            expected_score=0.0,
         )
 
     def test_some_correct(self):
         """Test if the score works for 25% wrong predictions."""
-        predictions = np.array([
-            1,
-            2,
-            3,
-            50,
-            100,
-            101,
-            15,
-            150,
-        ])
+        self._test_accuracy_score(
+            predictions=[
+                1,
+                2,
+                3,
+                50,
+                100,
+                101,
+                15,
+                150,
+            ],
+            expected_predictions=[
+                100,
+                101,
+                100,
+                101,
+                100,
+                101,
+                100,
+                101,
+            ],
+            expected_score=0.75,
+        )
 
-        estimator = FakeEstimator(predictions)
+    def test_normalize(self):
+        """Test if the normalize parameter is able to switch to counting."""
+        self._test_accuracy_score(
+            predictions=[
+                1,
+                2,
+                3,
+                50,
+                100,
+                101,
+                15,
+                150,
+            ],
+            expected_predictions=[
+                100,
+                100,
+                100,
+                100,
+                100,
+                101,
+                100,
+                101,
+            ],
+            expected_score=8,
+            normalize=False,
+        )
 
-        expected = np.array([
-            100,
-            101,
-            100,
-            101,
-            100,
-            101,
-            100,
-            101,
-        ])
+    def test_threshold(self):
+        """Test if the threshold with a changed value works as expected."""
+        self._test_accuracy_score(
+            predictions=[
+                1,
+                2,
+                3,
+                50,
+                100,
+                145,
+                140,
+                141,
+            ],
+            expected_predictions=[
+                100,
+                100,
+                100,
+                100,
+                100,
+                150,
+                141,
+                140,
+            ],
+            expected_score=0.75,
+            threshold=140,
+        )
 
-        self.assertEqual(
-            hit_nonhit_accuracy_score(
-                estimator=estimator,
-                x=None,
-                y=expected,
-            ),
-            0.75,
+    def test_normalize_threshold(self):
+        """Test if threshold works as expected without normalize."""
+        self._test_accuracy_score(
+            predictions=[
+                1,
+                2,
+                3,
+                50,
+                100,
+                145,
+                140,
+                141,
+            ],
+            expected_predictions=[
+                100,
+                100,
+                100,
+                100,
+                100,
+                150,
+                141,
+                140,
+            ],
+            expected_score=6,
+            normalize=False,
+            threshold=140,
         )
