@@ -3,7 +3,7 @@ stages:
   - test
 
 test:
-  image: python:3.6-slim
+  image: python:3.7-slim
   stage: test
   script:
     - pip install pipenv
