@@ -86,7 +86,7 @@ class CNNModel(HitPredictionModel):
     @property
     def cnn_activation(self):
         """Property specifying the activation used for the cnn blocks."""
-        return self._config.get('cnn_batch_normalization')
+        return self._config.get('cnn_activation')
 
     @cnn_activation.setter
     def cnn_activation(self, value):
