@@ -1,12 +1,14 @@
+# -*- coding: utf-8 -*-
 """Wide and deep model evaluation plan using high- and lowlevel features."""
 from dbispipeline.evaluators import GridEvaluator
 import dbispipeline.result_handlers as result_handlers
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import MinMaxScaler
+
 import hit_prediction_code.common as common
 from hit_prediction_code.dataloaders import EssentiaLoader
 import hit_prediction_code.evaluations as evaluations
 from hit_prediction_code.models.wide_and_deep import WideAndDeep
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import MinMaxScaler
 
 dataloader = EssentiaLoader(
     dataset_path='data/processed/msd_bb_balanced_essentia.pickle',
@@ -27,9 +29,9 @@ pipeline = Pipeline([
 
 evaluator = GridEvaluator(
     parameters={
-        'model__epochs': [10, 25, 50, 100, 200, 300],
+        'model__epochs': [10, 25, 50, 100, 200, 300, 500],
         'model__batch_normalization': [False],
-        'model__dense_activation': ['elu'],
+        'model__dense_activation': ['elu', 'selu'],
         'model__output_activation': ['elu'],
         'model__dropout_rate': [0.1],
     },

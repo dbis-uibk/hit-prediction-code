@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Wide and deep model evaluation plan using mood features only."""
+"""Wide and deep model evaluation plan using lowlevel features."""
 from dbispipeline.evaluators import GridEvaluator
 import dbispipeline.result_handlers as result_handlers
 from sklearn.pipeline import Pipeline
@@ -13,7 +13,7 @@ from hit_prediction_code.models.wide_and_deep import WideAndDeep
 dataloader = EssentiaLoader(
     dataset_path='data/processed/msd_bb_balanced_essentia.pickle',
     features=[
-        *common.mood_list(),
+        *common.ll_list(),
     ],
     label='peak',
     nan_value=150,
