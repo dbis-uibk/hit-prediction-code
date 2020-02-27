@@ -47,6 +47,25 @@ def input_padding_layer(network_input_width, input_layer):
     return hidden
 
 
+def _add_conv_dropout_block(config, hidden):
+    channel_axis = 3
+
+    hidden = Conv2D(filters=config['filter_size'],
+                    kernel_size=config['kernel_size'],
+                    padding=config['padding'],
+                    name='conv' + config['name_suffix'])(hidden)
+    if config['batch_normalization'] is True:
+        hidden = BatchNormalization(axis=channel_axis, name='bn1')(hidden)
+    hidden = ELU()(hidden)
+    hidden = MaxPooling2D(pool_size=config['pool_size'],
+                          strides=config['pool_stride'],
+                          name='pool' + config['name_suffix'])(hidden)
+    hidden = Dropout(config['dropout_rate'],
+                     name='dropout' + config['name_suffix'])(hidden)
+
+    return hidden
+
+
 def mel_cnn_layers(layer_sizes, padding, hidden, batch_normalization=True):
     """Creates the CNN layers used to process the mel specs.
 
@@ -70,7 +89,6 @@ def mel_cnn_layers(layer_sizes, padding, hidden, batch_normalization=True):
     Returns: the last layer of that CNN layer block.
 
     """
-    channel_axis = 3
     dropout_rate = 0.1
 
     kernel_size = {
@@ -94,57 +112,23 @@ def mel_cnn_layers(layer_sizes, padding, hidden, batch_normalization=True):
         'pool4': (4, 4),
     }
 
-    # Conv block 1
-    hidden = Conv2D(filters=layer_sizes['conv1'],
-                    kernel_size=kernel_size['conv1'],
-                    padding=padding,
-                    name='conv1')(hidden)
-    if batch_normalization:
-        hidden = BatchNormalization(axis=channel_axis, name='bn1')(hidden)
-    hidden = ELU()(hidden)
-    hidden = MaxPooling2D(pool_size=pool_size['pool1'],
-                          strides=pool_strides['pool1'],
-                          name='pool1')(hidden)
-    hidden = Dropout(dropout_rate, name='dropout1')(hidden)
+    # creat 4 conv blocks
+    for block in range(1, 5):
+        block = str(block)
 
-    # Conv block 2
-    hidden = Conv2D(filters=layer_sizes['conv2'],
-                    kernel_size=kernel_size['conv2'],
-                    padding=padding,
-                    name='conv2')(hidden)
-    if batch_normalization:
-        hidden = BatchNormalization(axis=channel_axis, name='bn2')(hidden)
-    hidden = ELU()(hidden)
-    hidden = MaxPooling2D(pool_size=pool_size['pool2'],
-                          strides=pool_strides['pool2'],
-                          name='pool2')(hidden)
-    hidden = Dropout(dropout_rate, name='dropout2')(hidden)
-
-    # Conv block 3
-    hidden = Conv2D(filters=layer_sizes['conv3'],
-                    kernel_size=kernel_size['conv3'],
-                    padding=padding,
-                    name='conv3')(hidden)
-    if batch_normalization:
-        hidden = BatchNormalization(axis=channel_axis, name='bn3')(hidden)
-    hidden = ELU()(hidden)
-    hidden = MaxPooling2D(pool_size=pool_size['pool3'],
-                          strides=pool_strides['pool3'],
-                          name='pool3')(hidden)
-    hidden = Dropout(dropout_rate, name='dropout3')(hidden)
-
-    # Conv block 4
-    hidden = Conv2D(filters=layer_sizes['conv4'],
-                    kernel_size=kernel_size['conv4'],
-                    padding=padding,
-                    name='conv4')(hidden)
-    if batch_normalization:
-        hidden = BatchNormalization(axis=channel_axis, name='bn4')(hidden)
-    hidden = ELU()(hidden)
-    hidden = MaxPooling2D(pool_size=pool_size['pool4'],
-                          strides=pool_strides['pool4'],
-                          name='pool4')(hidden)
-    hidden = Dropout(dropout_rate, name='dropout4')(hidden)
+        hidden = _add_conv_dropout_block(
+            config={
+                'name_suffix': block,
+                'filter_size': layer_sizes['conv' + block],
+                'kernel_size': kernel_size['conv' + block],
+                'padding': padding,
+                'batch_normalization': batch_normalization,
+                'pool_size': pool_size['pool' + block],
+                'pool_stride': pool_strides['pool' + block],
+                'dropout_rate': dropout_rate,
+            },
+            hidden=hidden,
+        )
 
     return hidden
 
