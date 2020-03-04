@@ -35,7 +35,7 @@ def input_padding_layer(network_input_width, input_layer):
     Returns: the resulting layer including the padding.
 
     """
-    padding = network_input_width - int(input_layer.shape[1])
+    padding = network_input_width - int(input_layer.shape[2])
     left_pad = int(padding / 2)
     if padding % 2:
         right_pad = left_pad + 1
