@@ -7,6 +7,7 @@ from tensorflow.keras.models import Model
 
 from .building_blocks import HitPredictionModel
 from .building_blocks import dense_layers
+from .building_blocks import get_initializer
 
 
 class WideAndDeep(HitPredictionModel):
@@ -139,10 +140,13 @@ class WideAndDeep(HitPredictionModel):
         )
 
         use_bias = not self.batch_normalization
-        output = Dense(output_shape,
-                       activation=self.output_activation,
-                       name='output',
-                       use_bias=use_bias)(dense_layer)
+        output = Dense(
+            output_shape,
+            activation=self.output_activation,
+            kernel_initializer=get_initializer(self.output_activation),
+            name='output',
+            use_bias=use_bias,
+        )(dense_layer)
 
         self.model = Model(inputs=input_list, outputs=output)
 

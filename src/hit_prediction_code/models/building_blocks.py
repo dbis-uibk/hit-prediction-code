@@ -47,13 +47,30 @@ def input_padding_layer(network_input_width, input_layer):
     return hidden
 
 
+def get_initializer(activation):
+    """Returns the appropriate initializer.
+
+    Args:
+        activation: used to determine the initializer.
+    """
+    if activation == 'selu':
+        return 'lecun_normal'  # used for selu activation
+    else:
+        return 'glorot_uniform'  # the default from keras
+
+
 def _add_conv_dropout_block(config, hidden):
     channel_axis = 3
 
-    hidden = Conv2D(filters=config['filter_size'],
-                    kernel_size=config['kernel_size'],
-                    padding=config['padding'],
-                    name='conv' + config['name_suffix'])(hidden)
+    initializer = get_initializer(config['activation'])
+    hidden = Conv2D(
+        filters=config['filter_size'],
+        kernel_size=config['kernel_size'],
+        padding=config['padding'],
+        kernel_initializer=initializer,
+        name='conv' + config['name_suffix'],
+    )(hidden)
+
     if config['batch_normalization'] is True:
         hidden = BatchNormalization(axis=channel_axis, name='bn1')(hidden)
     hidden = Activation(config['activation'])(hidden)
@@ -176,11 +193,16 @@ def dense_layers(batch_normalization, dropout_rate, dense_size,
         use_bias = True
         activation = dense_activation
 
+    initializer = get_initializer(activation)
+
     for i in range(1, num_dense_layer + 1):
-        hidden_layer = Dense(dense_size,
-                             activation=activation,
-                             name='dense-' + str(i),
-                             use_bias=use_bias)(hidden_layer)
+        hidden_layer = Dense(
+            dense_size,
+            activation=activation,
+            name='dense-' + str(i),
+            use_bias=use_bias,
+            kernel_initializer=initializer,
+        )(hidden_layer)
         if batch_normalization:
             hidden_layer = BatchNormalization(name='bn-' +
                                               str(i))(hidden_layer)

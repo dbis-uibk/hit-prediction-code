@@ -12,6 +12,7 @@ from tensorflow.keras.models import Model
 
 from .building_blocks import HitPredictionModel
 from .building_blocks import dense_layers
+from .building_blocks import get_initializer
 from .building_blocks import input_padding_layer
 from .building_blocks import mel_cnn_layers
 
@@ -138,9 +139,12 @@ class CNNModel(HitPredictionModel):
             hidden,
         )
 
-        output = Dense(output_shape,
-                       activation=self.output_activation,
-                       name='output')(dense_layer)
+        output = Dense(
+            output_shape,
+            activation=self.output_activation,
+            kernel_initializer=get_initializer(self.output_activation),
+            name='output',
+        )(dense_layer)
 
         self.model = Model(inputs=melgram_input, outputs=output)
 
