@@ -16,3 +16,6 @@ To run code using pipenv prefix your command with `pipenv run` or execute `pipen
 
 ## License
 The project is licensed under the BSD 2-Clause License.
+
+## Contributing
+Please use the [pre-commit](https://pre-commit.com/) hooks.
