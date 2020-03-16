@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+"""Sphinx configuration."""
 #
 # hit_prediction_code documentation build configuration file, created by
 # sphinx-quickstart on Fri Jun  9 13:47:02 2017.
@@ -20,9 +21,10 @@
 #
 import os
 import sys
-sys.path.insert(0, os.path.abspath('../../'))
 
 import hit_prediction_code
+
+sys.path.insert(0, os.path.abspath('../../'))
 
 # -- General configuration ---------------------------------------------
 
@@ -42,7 +44,6 @@ extensions = [
     'sphinx.ext.viewcode',
 ]
 
-
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
@@ -56,8 +57,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Hit Prediction Code'
-copyright = u"2019, Michael Voetter"
-author = u"Michael Voetter"
+copyright = u'2019, Michael Voetter'  # noqa A001
+author = u'Michael Voetter'
 
 # The version info for the project you're documenting, acts as replacement
 # for |version| and |release|, also used in various other places throughout
@@ -86,7 +87,6 @@ pygments_style = 'sphinx'
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = False
 
-
 # -- Options for HTML output -------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
@@ -105,12 +105,10 @@ html_theme = 'sphinx_rtd_theme'
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 
-
 # -- Options for HTMLHelp output ---------------------------------------
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'hit_prediction_codedoc'
-
 
 # -- Options for LaTeX output ------------------------------------------
 
@@ -137,21 +135,15 @@ latex_elements = {
 # [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'hit_prediction_code.tex',
-     u'Hit Prediction Code Documentation',
-     u'Michael Voetter', 'manual'),
+     u'Hit Prediction Code Documentation', u'Michael Voetter', 'manual'),
 ]
-
 
 # -- Options for manual page output ------------------------------------
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [
-    (master_doc, 'hit_prediction_code',
-     u'Hit Prediction Code Documentation',
-     [author], 1)
-]
-
+man_pages = [(master_doc, 'hit_prediction_code',
+              u'Hit Prediction Code Documentation', [author], 1)]
 
 # -- Options for Texinfo output ----------------------------------------
 
@@ -159,10 +151,7 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'hit_prediction_code',
-     u'Hit Prediction Code Documentation',
-     author,
-     'hit_prediction_code',
-     'One line description of project.',
+    (master_doc, 'hit_prediction_code', u'Hit Prediction Code Documentation',
+     author, 'hit_prediction_code', 'One line description of project.',
      'Miscellaneous'),
 ]
