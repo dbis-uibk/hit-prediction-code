@@ -1,14 +1,13 @@
-import dbispipeline.result_handlers as result_handlers
+# -*- coding: utf-8 -*-
+"""Plan for ISMIR2019."""
 from dbispipeline.evaluators import GridEvaluator
-
+import dbispipeline.result_handlers as result_handlers
 from sklearn.linear_model import LinearRegression
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import MinMaxScaler
 
 import hit_prediction_code.common as common
-
 from hit_prediction_code.dataloaders import MsdBbLoader
-
 import hit_prediction_code.evaluations as evaluations
 
 dataloader = MsdBbLoader(
