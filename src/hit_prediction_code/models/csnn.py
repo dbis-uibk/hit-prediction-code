@@ -1,13 +1,10 @@
 # -*- coding: utf-8 -*-
-"""CNN model for hit song prediction."""
+"""CSNN model for hit song prediction."""
 import logging
 
-from tensorflow.keras.layers import Conv1D
 from tensorflow.keras.layers import Dense
 from tensorflow.keras.layers import Flatten
 from tensorflow.keras.layers import Input
-from tensorflow.keras.layers import MaxPooling1D
-from tensorflow.keras.layers import Reshape
 from tensorflow.keras.models import Model
 
 from .building_blocks import HitPredictionModel
@@ -19,20 +16,16 @@ from .building_blocks import mel_cnn_layers
 LOGGER = logging.getLogger(__name__)
 
 
-class CNNModel(HitPredictionModel):
-    """CNN Model designed for hit song prediction."""
+class CSNNModel(HitPredictionModel):
+    """CSNN Model designed for hit song prediction."""
 
     def __init__(self,
                  layer_sizes=None,
                  batch_size=64,
                  epochs=100,
                  padding='same',
-                 batch_normalization=False,
-                 cnn_activation='elu',
-                 cnn_batch_normalization=True,
                  dropout_rate=None,
-                 num_dense_layer=0,
-                 dense_activation='relu',
+                 num_dense_layer=8,
                  output_activation=None,
                  loss='mean_absolute_error'):
         """Initializes the CNN Model object.
@@ -42,14 +35,9 @@ class CNNModel(HitPredictionModel):
             batch_size: the batch size used to train the model.
             epochs: the number of epochs used during training.
             padding: the padding type used for inputs.
-            batch_normalization: configures if batch normalization is used for
                 the dense network part.
-            cnn_activation: the activation function used in the cnn blocks.
-            cnn_batch_normalization: configures if batch normalization is used
-                for the cnn part of the network.
             dropout_rate: the dropout rate used for the dense part.
             num_dense_layer: the number of dense layers in the dense part.
-            dense_activation: the activation function used for the dense part.
             output_activation: the activation function used for the output.
             loss: the loss function used to train the network.
 
@@ -66,18 +54,18 @@ class CNNModel(HitPredictionModel):
                 'conv3': 60,
                 'conv4': 60,
                 'cnn': 30,
-                'dense': 30,
+                'dense': 360,
             }
         self.layer_sizes = layer_sizes
         self.batch_size = batch_size
         self.epochs = epochs
         self.padding = padding
-        self.batch_normalization = batch_normalization
-        self.cnn_activation = cnn_activation
-        self.cnn_batch_normalization = cnn_batch_normalization
+        self.batch_normalization = False
+        self.cnn_activation = 'selu'
+        self.cnn_batch_normalization = False
         self.dropout_rate = dropout_rate
         self.num_dense_layer = num_dense_layer
-        self.dense_activation = dense_activation
+        self.dense_activation = 'selu'
         self.output_activation = output_activation
         self.loss = loss
 
@@ -118,11 +106,6 @@ class CNNModel(HitPredictionModel):
         )
 
         # reshaping
-        hidden = Reshape((12, self.layer_sizes['conv4']))(hidden)
-
-        # reduce size
-        hidden = MaxPooling1D(12)(hidden)
-        hidden = Conv1D(self.layer_sizes['cnn'], 1)(hidden)
         hidden = Flatten()(hidden)
 
         dense_size = self.layer_sizes.setdefault(

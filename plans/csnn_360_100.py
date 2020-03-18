@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""CNN model evaluation plan."""
+"""CRNN model evaluation plan."""
 from dbispipeline.evaluators import GridEvaluator
 import dbispipeline.result_handlers as result_handlers
 from sklearn.pipeline import Pipeline
@@ -9,7 +9,7 @@ import hit_prediction_code.evaluations as evaluations
 from hit_prediction_code.models.cnn import CNNModel
 
 dataloader = MelSpectLoader(
-    dataset_path='data/processed/msd_bb_balanced_dev_sample.pickle',
+    dataset_path='data/processed/msd_bb_balanced.pickle',
     features='librosa_melspectrogram',
     label='peak',
     nan_value=150,
@@ -25,7 +25,7 @@ pipeline = Pipeline([
                 'conv3': 60,
                 'conv4': 60,
                 'cnn': 30,
-                'dense': 30,
+                'dense': 360,
             }),
     ),
 ])
@@ -33,11 +33,8 @@ pipeline = Pipeline([
 evaluator = GridEvaluator(
     parameters={
         'model__batch_size': [64],
-        'model__epochs': [1, 2],
-        'model__num_dense_layer': [2],
-        'model__batch_normalization': [False],
-        'model__cnn_batch_normalization': [False],
-        'model__dense_activation': ['elu'],
+        'model__epochs': [100],
+        'model__num_dense_layer': [8],
         'model__output_activation': ['elu'],
         'model__dropout_rate': [0.1],
         'model__loss': ['mean_squared_error'],
