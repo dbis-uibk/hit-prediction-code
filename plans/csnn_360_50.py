@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-"""CRNN model evaluation plan."""
+"""CSNN model evaluation plan."""
 from dbispipeline.evaluators import GridEvaluator
 import dbispipeline.result_handlers as result_handlers
 from sklearn.pipeline import Pipeline
 
 from hit_prediction_code.dataloaders import MelSpectLoader
 import hit_prediction_code.evaluations as evaluations
-from hit_prediction_code.models.cnn import CNNModel
+from hit_prediction_code.models.csnn import CSNNModel
 
 dataloader = MelSpectLoader(
     dataset_path='data/processed/msd_bb_balanced.pickle',
@@ -18,7 +18,7 @@ dataloader = MelSpectLoader(
 pipeline = Pipeline([
     (
         'model',
-        CNNModel(
+        CSNNModel(
             layer_sizes={
                 'conv1': 30,
                 'conv2': 60,
