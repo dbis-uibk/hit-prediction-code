@@ -26,7 +26,7 @@ pipeline = Pipeline([
 
 evaluator = GridEvaluator(
     parameters={
-        'model__epochs': [500],
+        'model__epochs': [1000],
         'model__batch_normalization': [False],
         'model__deep_activation': ['selu'],
         'model__dense_activation': ['selu'],
