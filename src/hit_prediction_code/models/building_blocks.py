@@ -351,9 +351,6 @@ class HitPredictionModel(BaseEstimator, RegressorMixin, metaclass=ABCMeta):
                 trained for all epochs set in the model.
 
         """
-        if self.model is not None:
-            raise NotImplementedError('Refitting the model is not implemented')
-
         data = self._reshape_data(data)
         input_shape, output_shape = self._data_shapes(data, target)
         self._create_model(input_shape, output_shape)
