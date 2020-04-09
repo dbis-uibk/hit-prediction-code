@@ -22,7 +22,7 @@ pipeline = Pipeline([
     ('scale', MinMaxScaler()),
     ('model',
      WideAndDeep(
-         epochs=50,
+         epochs=1000,
          features=dataloader.feature_indices,
          batch_normalization=False,
          deep_activation='selu',
@@ -36,7 +36,7 @@ pipeline = Pipeline([
 evaluator = CvEpochEvaluator(
     cv=evaluations.cv(),
     scoring=evaluations.metrics.scoring(),
-    scoring_step_size=5,
+    scoring_step_size=10,
 )
 
 result_handlers = [
