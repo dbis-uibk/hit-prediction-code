@@ -352,15 +352,17 @@ class HitPredictionModel(BaseEstimator, RegressorMixin, metaclass=ABCMeta):
 
         """
         data = self._reshape_data(data)
-        input_shape, output_shape = self._data_shapes(data, target)
-        self._create_model(input_shape, output_shape)
 
-        self.model.compile(
-            loss=self.loss,
-            metrics=self.metrics,
-            optimizer=self.optimizer,
-        )
-        self.model.summary()
+        if self.model is None:
+            input_shape, output_shape = self._data_shapes(data, target)
+            self._create_model(input_shape, output_shape)
+
+            self.model.compile(
+                loss=self.loss,
+                metrics=self.metrics,
+                optimizer=self.optimizer,
+            )
+            self.model.summary()
 
         if epochs is None:
             epochs = self.epochs

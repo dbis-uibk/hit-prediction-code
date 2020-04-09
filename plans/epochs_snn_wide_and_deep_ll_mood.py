@@ -22,7 +22,7 @@ pipeline = Pipeline([
     ('scale', MinMaxScaler()),
     ('model',
      WideAndDeep(
-         epochs=500,
+         epochs=50,
          features=dataloader.feature_indices,
          batch_normalization=False,
          deep_activation='selu',
