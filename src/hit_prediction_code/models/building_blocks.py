@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Building blocks that can be reused in the models."""
 from abc import ABCMeta
 from abc import abstractmethod
@@ -342,12 +341,14 @@ class HitPredictionModel(BaseEstimator, RegressorMixin, metaclass=ABCMeta):
     def output_activation(self, value):
         self._config['output_activation'] = value
 
-    def fit(self, data, target):
+    def fit(self, data, target, epochs=None):
         """Fits the model.
 
         Args:
             data: the training samples.
             target: the target values for the training samples.
+            epochs: how much epochs should be trained. If None, the model is
+                trained for all epochs set in the model.
 
         """
         if self.model is not None:
@@ -364,11 +365,14 @@ class HitPredictionModel(BaseEstimator, RegressorMixin, metaclass=ABCMeta):
         )
         self.model.summary()
 
+        if epochs is None:
+            epochs = self.epochs
+
         self.model.fit(
             x=data,
             y=target,
             batch_size=self.batch_size,
-            epochs=self.epochs,
+            epochs=epochs,
         )
         cached_model_predict_clear()
 
