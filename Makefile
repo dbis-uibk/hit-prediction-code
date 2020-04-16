@@ -91,7 +91,7 @@ install: clean ## install the package to the active Python's site-packages
 	python setup.py install
 
 format: ## formats the code
-	yapf -i -r plans 
+	yapf -i -r plans
 	yapf -i -r src
 	yapf -i -r tests
 	yapf -i -r tools
@@ -102,3 +102,7 @@ bandit: ## static code checking to find security issues in code
 	bandit -r tests
 	bandit -r tools
 
+pytype:
+	pytype plans
+	pytype src
+	pytype tests

@@ -1,5 +1,24 @@
 import re
 
+import numpy as np
+from sklearn.preprocessing import normalize
+
+cache = {'model': None, 'X': None, 'y': None}
+
+
+def cached_model_predict(model, X):
+    if cache['model'] != model or not np.array_equal(cache['X'], X):
+        cache['model'] = model
+        cache['X'] = X
+        cache['y'] = model.predict(X)
+    return cache['y']
+
+
+def cached_model_predict_clear():
+    cache['model'] = None
+    cache['X'] = None
+    cache['y'] = None
+
 
 def feature_columns(columns, feature_select):
     try:

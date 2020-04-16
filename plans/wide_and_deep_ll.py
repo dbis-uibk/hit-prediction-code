@@ -1,40 +1,36 @@
-import dbispipeline.result_handlers as result_handlers
+# -*- coding: utf-8 -*-
+"""Wide and deep model evaluation plan using lowlevel features."""
 from dbispipeline.evaluators import GridEvaluator
-
+import dbispipeline.result_handlers as result_handlers
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import MinMaxScaler
 
 import hit_prediction_code.common as common
-
-from hit_prediction_code.dataloaders import MsdBbLoader
-
+from hit_prediction_code.dataloaders import EssentiaLoader
 import hit_prediction_code.evaluations as evaluations
+from hit_prediction_code.models.wide_and_deep import WideAndDeep
 
-from models.wide_and_deep import WideAndDeep
-
-dataloader = MsdBbLoader(
-    hits_file_path='data/processed/msd_bb_matches.csv',
-    non_hits_file_path='data/processed/msd_bb_non_matches.csv',
-    features_path='data/processed',
-    non_hits_per_hit=1,
+dataloader = EssentiaLoader(
+    dataset_path='data/processed/msd_bb_balanced_essentia.pickle',
     features=[
         *common.ll_list(),
     ],
     label='peak',
     nan_value=150,
-    random_state=42,
 )
 
 pipeline = Pipeline([
     ('scale', MinMaxScaler()),
-    ('wide_and_deep', WideAndDeep(features=dataloader.feature_indices)),
+    ('model', WideAndDeep(features=dataloader.feature_indices)),
 ])
 
 evaluator = GridEvaluator(
     parameters={
-        'wide_and_deep__epochs': [10, 50, 100, 200],
-        'wide_and_deep__batch_normalization': [False, True],
-        'wide_and_deep__dropout_rate': [None, 0.25, 0.5],
+        'model__epochs': [10, 25, 50, 100, 200, 300, 500],
+        'model__batch_normalization': [False],
+        'model__dense_activation': ['elu', 'selu'],
+        'model__output_activation': ['elu'],
+        'model__dropout_rate': [0.1],
     },
     grid_parameters=evaluations.grid_parameters(),
 )
