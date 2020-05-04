@@ -1,7 +1,7 @@
-# -*- coding: utf-8 -*-
 """CSNN model for hit song prediction."""
 import logging
 
+from tensorflow.keras.layers import BatchNormalization
 from tensorflow.keras.layers import Dense
 from tensorflow.keras.layers import Flatten
 from tensorflow.keras.layers import Input
@@ -27,7 +27,8 @@ class CSNNModel(HitPredictionModel):
                  dropout_rate=None,
                  num_dense_layer=8,
                  output_activation=None,
-                 loss='mean_absolute_error'):
+                 loss='mean_absolute_error',
+                 input_normalization=False):
         """Initializes the CNN Model object.
 
         Args:
@@ -40,6 +41,7 @@ class CSNNModel(HitPredictionModel):
             num_dense_layer: the number of dense layers in the dense part.
             output_activation: the activation function used for the output.
             loss: the loss function used to train the network.
+            input_normalization: Applies a BN layer directly after the input.
 
         """
         super().__init__(
@@ -68,6 +70,7 @@ class CSNNModel(HitPredictionModel):
         self.dense_activation = 'selu'
         self.output_activation = output_activation
         self.loss = loss
+        self.input_normalization = input_normalization
 
         self.network_input_width = 1200
         self.model = None
@@ -90,13 +93,29 @@ class CSNNModel(HitPredictionModel):
     def cnn_batch_normalization(self, value):
         self._config['cnn_batch_normalization'] = value
 
+    @property
+    def input_normalization(self):
+        """Property specifying if input batch normalization is used."""
+        return self._config.get('input_normalization')
+
+    @input_normalization.setter
+    def input_normalization(self, value):
+        self._config['input_normalization'] = value
+
     def _create_model(self, input_shape, output_shape):
+        channel_axis = 3
+
         melgram_input = Input(shape=input_shape, dtype='float32')
 
         hidden = input_padding_layer(
             self.network_input_width,
             melgram_input,
         )
+        if self.input_normalization:
+            hidden = BatchNormalization(
+                axis=channel_axis,
+                name='input-bn',
+            )(hidden)
         hidden = mel_cnn_layers(
             self.layer_sizes,
             self.padding,
