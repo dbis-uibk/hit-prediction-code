@@ -17,7 +17,7 @@ dataloader = EssentiaLoader(
         *common.voice_list(),
         *common.ll_list(),
     ],
-    label='play_count',
+    label='listener_count',
     nan_value=-1,
 )
 
