@@ -1,4 +1,4 @@
-"""SNN Wide and deep model epoch evaluation plan using ll and hl features."""
+"""SNN W&D model plan using ll and hl features for play count."""
 from dbispipeline.evaluators import CvEpochEvaluator
 import dbispipeline.result_handlers
 from sklearn.pipeline import Pipeline
@@ -18,7 +18,7 @@ dataloader = EssentiaLoader(
         *common.ll_list(),
     ],
     label='play_count',
-    nan_value=-1,
+    nan_value=0,
 )
 
 pipeline = Pipeline([

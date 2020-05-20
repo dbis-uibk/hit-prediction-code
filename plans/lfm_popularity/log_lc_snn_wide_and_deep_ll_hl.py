@@ -1,6 +1,7 @@
-"""SNN W&D model plan using ll and hl features for listener count."""
+"""SNN W&D model plan using ll and hl features for log listener count."""
 from dbispipeline.evaluators import CvEpochEvaluator
 import dbispipeline.result_handlers
+import numpy as np
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import MinMaxScaler
 
@@ -19,6 +20,7 @@ dataloader = EssentiaLoader(
     ],
     label='listener_count',
     nan_value=0,
+    label_modifier=np.log1p,
 )
 
 pipeline = Pipeline([
