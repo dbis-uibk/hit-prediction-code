@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Dataloaders for the hit song prediction."""
 import json
 import logging
@@ -215,7 +214,12 @@ class MelSpectLoader(Loader):
 class EssentiaLoader(Loader):
     """Essentia feature loader."""
 
-    def __init__(self, dataset_path, features, label=None, nan_value=0):
+    def __init__(self,
+                 dataset_path,
+                 features,
+                 label=None,
+                 nan_value=0,
+                 label_modifier=None):
         """Initializes the essentia loader.
 
         Args:
@@ -223,6 +227,7 @@ class EssentiaLoader(Loader):
             features: a list of selected columns used as features.
             label: the column selected as the target variable.
             nan_value: the values used for NaN values in the dataset.
+            label_modifier: function applied to each label.
 
         """
         self._config = {
@@ -238,6 +243,9 @@ class EssentiaLoader(Loader):
         self.labels = np.ravel(data[[label]])
         nan_values = pd.isnull(self.labels)
         self.labels[nan_values] = nan_value
+
+        if label_modifier is not None:
+            self.labels = label_modifier(self.labels)
 
         non_label_columns = list(data.columns)
         non_label_columns.remove(label)
