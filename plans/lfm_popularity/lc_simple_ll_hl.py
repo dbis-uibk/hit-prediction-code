@@ -7,7 +7,7 @@ from sklearn.preprocessing import MinMaxScaler
 import hit_prediction_code.common as common
 from hit_prediction_code.dataloaders import EssentiaLoader
 import hit_prediction_code.evaluations as evaluations
-from hit_prediction_code.models.wide_and_deep import WideAndDeep
+from hit_prediction_code.models.simple_nn import SimpleNN
 
 dataloader = EssentiaLoader(
     dataset_path='data/processed/lfm_popularity_dataset_20.pickle',
@@ -24,7 +24,7 @@ dataloader = EssentiaLoader(
 pipeline = Pipeline([
     ('scale', MinMaxScaler()),
     ('model',
-     WideAndDeep(
+     SimpleNN(
          epochs=500,
          deep_activation='selu',
          dense_activation='selu',
