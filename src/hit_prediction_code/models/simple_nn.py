@@ -107,3 +107,6 @@ class SimpleNN(HitPredictionModel):
 
     def _data_shapes(self, data, labels):
         return None, 1
+
+    def _reshape_data(self, data):
+        return data
