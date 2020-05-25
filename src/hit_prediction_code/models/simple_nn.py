@@ -90,8 +90,9 @@ class SimpleNN(HitPredictionModel):
 
     def _create_model(self, input_shape, output_shape):
         # Input layer.
-        hidden = Input(shape=input_shape)
+        input_layer = Input(shape=input_shape)
 
+        hidden = input_layer
         for size in self.dense_sizes:
             hidden = Dense(
                 size,
@@ -103,10 +104,10 @@ class SimpleNN(HitPredictionModel):
                 hidden = AlphaDropout(self.dropout_rate)(hidden)
 
         output = Dense(output_shape, activation=self.output_activation)(hidden)
-        self.model = Model(inputs=hidden, outputs=output)
+        self.model = Model(inputs=input_layer, outputs=output)
 
     def _data_shapes(self, data, labels):
-        return None, 1
+        return data.shape[1], 1
 
     def _reshape_data(self, data):
         return data
