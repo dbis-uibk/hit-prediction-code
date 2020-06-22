@@ -29,6 +29,7 @@ wheel = "*"
 yapf = "*"
 isort = "*"
 flake8-isort = "*"
+jupyterlab = "*"
 
 [packages]
 hit_prediction_code = {editable = true,path = "."}
@@ -48,6 +49,7 @@ billboard-py = "*"
 musicbrainzngs = "*"
 requests = "*"
 librosa = "*"
+seaborn = "*"
 
 [requires]
 python_version = "3.6"
