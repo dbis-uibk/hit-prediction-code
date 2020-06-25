@@ -48,6 +48,7 @@ billboard-py = "*"
 musicbrainzngs = "*"
 requests = "*"
 librosa = "*"
+youtube-dl = "*"
 
 [requires]
 python_version = "3.6"
