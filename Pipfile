@@ -49,6 +49,7 @@ musicbrainzngs = "*"
 requests = "*"
 librosa = "*"
 youtube-dl = "*"
+pyarrow = "*"
 
 [requires]
 python_version = "3.6"
