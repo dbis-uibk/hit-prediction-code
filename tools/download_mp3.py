@@ -58,7 +58,7 @@ def download_mp3s(data,
 
 
 if __name__ == '__main__':
-    DATA = pd.read_parpuet('data/raw/lfm_popularity/dataset_20.parquet')
+    DATA = pd.read_parquet('data/raw/lfm_popularity/dataset_20.parquet')
     download_mp3s(
         data=DATA,
         id_column='recording_mbid',
