@@ -48,7 +48,7 @@ def download_mp3s(data,
         title_column: column containing the title of the track.
         target_directory: directory to store the files.
     """
-    for _, row in data.itterrows():
+    for _, row in data.iterrows():
         download_yt_mp3_for_track(
             target_directory=target_directory,
             track_id=row[id_column],
