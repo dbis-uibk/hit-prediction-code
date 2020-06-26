@@ -2,7 +2,7 @@
 import pandas as pd
 import youtube_dl
 
-TARGET_DIRECTORY = 'data/raw'
+TARGET_DIRECTORY = 'data/interim/lfm_popularity/mp3s'
 
 
 def download_yt_mp3_for_track(target_directory, track_id, artist, title):
@@ -48,7 +48,7 @@ def download_mp3s(data,
         title_column: column containing the title of the track.
         target_directory: directory to store the files.
     """
-    for _, row in data.rows():
+    for _, row in data.itterrows():
         download_yt_mp3_for_track(
             target_directory=target_directory,
             track_id=row[id_column],
@@ -58,7 +58,7 @@ def download_mp3s(data,
 
 
 if __name__ == '__main__':
-    DATA = pd.read_pickle('data/raw/dataset-20.pickle')
+    DATA = pd.read_parpuet('data/raw/lfm_popularity/dataset_20.parquet')
     download_mp3s(
         data=DATA,
         id_column='recording_mbid',
