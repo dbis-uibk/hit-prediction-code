@@ -1,6 +1,9 @@
 """Script for downloading mp3s."""
+from urllib.error import HTTPError
+
 import pandas as pd
 import youtube_dl
+from youtube_dl.utils import DownloadError
 
 TARGET_DIRECTORY = 'data/interim/lfm_popularity/mp3s'
 
@@ -30,6 +33,11 @@ def download_yt_mp3_for_track(target_directory, track_id, artist, title):
         # Ignore errors
         try:
             ydl.download([f'ytsearch1:{artist} {title}'])
+        except DownloadError as ex:
+            exc_class, exc, _ = ex.exc_info
+            if exc_class == HTTPError and exc.code == 429:
+                print(exc)
+                exit()
         except Exception:
             pass
 
