@@ -50,9 +50,6 @@ def download_yt_mp3_for_track(target_directory, track_id, artist, title):
         # Ignore errors
         try:
             ydl.download([f'ytsearch1:{artist} {title}'])
-            sleep_time = 10. + random() * 50.
-            print('sleep for', sleep_time, 'secs')
-            sleep(sleep_time)
         except DownloadError as ex:
             exc_class, exc, _ = ex.exc_info
             if exc_class == HTTPError and exc.code == 429:
@@ -60,6 +57,10 @@ def download_yt_mp3_for_track(target_directory, track_id, artist, title):
                 exit()
         except Exception:
             pass
+
+    sleep_time = 10. + random() * 50.
+    print('sleep for', sleep_time, 'secs')
+    sleep(sleep_time)
 
 
 def download_mp3s(data,
