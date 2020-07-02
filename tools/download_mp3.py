@@ -1,4 +1,5 @@
 """Script for downloading mp3s."""
+from glob import glob
 from random import random
 from time import sleep
 from urllib.error import HTTPError
@@ -8,6 +9,20 @@ import youtube_dl
 from youtube_dl.utils import DownloadError
 
 TARGET_DIRECTORY = 'data/interim/lfm_popularity/mp3s'
+
+
+def get_already_known_files():
+    """Returns a list of already downloaded files."""
+    mbid_start_idx = len(TARGET_DIRECTORY) + 1
+    mbid_end_idx = mbid_start_idx + 36
+
+    def mbid_extractor(name):
+        return name[mbid_start_idx:mbid_end_idx]
+
+    known_files = set(map(mbid_extractor, glob(TARGET_DIRECTORY + '/*.json')))
+    known_files |= set(map(mbid_extractor, glob(TARGET_DIRECTORY + '/*.mp3')))
+
+    return known_files
 
 
 def download_yt_mp3_for_track(target_directory, track_id, artist, title):
@@ -80,11 +95,21 @@ def download_mp3s(data,
             sleep(sleep_time * 3600)
 
 
-if __name__ == '__main__':
-    DATA = pd.read_parquet('data/raw/lfm_popularity/dataset_20.parquet')
+def download_dataset():
+    """Downloads all missing filse from the dataset."""
+    id_column = 'recording_mbid'
+
+    known_files = get_already_known_files()
+    data = pd.read_parquet('data/raw/lfm_popularity/dataset_20.parquet')
+    data = data[~data[id_column].isin(known_files)]
+
     download_mp3s(
-        data=DATA,
-        id_column='recording_mbid',
+        data=data,
+        id_column=id_column,
         artist_column='artist_name',
         title_column='recording_name',
     )
+
+
+if __name__ == '__main__':
+    download_dataset()
