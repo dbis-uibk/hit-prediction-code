@@ -1,4 +1,6 @@
 """Script for downloading mp3s."""
+from random import random
+from time import sleep
 from urllib.error import HTTPError
 
 import pandas as pd
@@ -33,6 +35,9 @@ def download_yt_mp3_for_track(target_directory, track_id, artist, title):
         # Ignore errors
         try:
             ydl.download([f'ytsearch1:{artist} {title}'])
+            sleep_time = 10. + random() * 50.
+            print('sleep for', sleep_time, 'secs')
+            sleep(sleep_time)
         except DownloadError as ex:
             exc_class, exc, _ = ex.exc_info
             if exc_class == HTTPError and exc.code == 429:
@@ -56,6 +61,8 @@ def download_mp3s(data,
         title_column: column containing the title of the track.
         target_directory: directory to store the files.
     """
+    count = 0
+    random_count = int(4000. + random() * 2000.)
     for _, row in data.iterrows():
         download_yt_mp3_for_track(
             target_directory=target_directory,
@@ -63,6 +70,14 @@ def download_mp3s(data,
             artist=row[artist_column],
             title=row[title_column],
         )
+
+        count += 1
+        if count >= random_count:
+            count = 0
+            random_count = int(4000. + random() * 2000.)
+            sleep_time = 1. + random() * 4.
+            print('long sleep for', sleep_time, 'hrs')
+            sleep(sleep_time * 3600)
 
 
 if __name__ == '__main__':
