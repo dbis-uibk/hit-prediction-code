@@ -9,6 +9,7 @@ import youtube_dl
 from youtube_dl.utils import DownloadError
 
 TARGET_DIRECTORY = 'data/interim/lfm_popularity/mp3s'
+VISITED_FILE = TARGET_DIRECTORY + '/visited.csv'
 
 
 def get_already_known_files():
@@ -23,6 +24,13 @@ def get_already_known_files():
     known_files |= set(map(mbid_extractor, glob(TARGET_DIRECTORY + '/*.mp3')))
 
     return known_files
+
+
+def get_visited_tracks():
+    """Returns a set of visited tracks."""
+    visited = pd.read_csv(VISITED_FILE)
+
+    return set(visited['track_id'])
 
 
 def download_yt_mp3_for_track(target_directory, track_id, artist, title):
@@ -79,7 +87,24 @@ def download_mp3s(data,
     """
     count = 0
     random_count = int(4000. + random() * 2000.)
+
+    visited_cols = ['track_id', 'artist', 'title']
+    try:
+        visited = pd.read_csv(VISITED_FILE, usecols=visited_cols)
+    except FileNotFoundError:
+        visited = pd.DataFrame(columns=visited_cols)
+
     for _, row in data.iterrows():
+        visited = visited.append(
+            {
+                'track_id': row[id_column],
+                'artist': row[artist_column],
+                'title': row[title_column],
+            },
+            ignore_index=True,
+        )
+        visited.to_csv(VISITED_FILE)
+
         download_yt_mp3_for_track(
             target_directory=target_directory,
             track_id=row[id_column],
@@ -103,6 +128,9 @@ def download_dataset():
     known_files = get_already_known_files()
     data = pd.read_parquet('data/raw/lfm_popularity/dataset_20.parquet')
     data = data[~data[id_column].isin(known_files)]
+
+    visited_tracks = get_visited_tracks()
+    data = data[~data[id_column].isin(visited_tracks)]
 
     download_mp3s(
         data=data,
