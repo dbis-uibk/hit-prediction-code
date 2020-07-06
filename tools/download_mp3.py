@@ -28,9 +28,11 @@ def get_already_known_files():
 
 def get_visited_tracks():
     """Returns a set of visited tracks."""
-    visited = pd.read_csv(VISITED_FILE)
-
-    return set(visited['track_id'])
+    try:
+        visited = pd.read_csv(VISITED_FILE)
+        return set(visited['track_id'])
+    except FileNotFoundError:
+        return set()
 
 
 def download_yt_mp3_for_track(target_directory, track_id, artist, title):
@@ -125,12 +127,13 @@ def download_dataset():
     """Downloads all missing filse from the dataset."""
     id_column = 'recording_mbid'
 
-    known_files = get_already_known_files()
     data = pd.read_parquet('data/raw/lfm_popularity/dataset_20.parquet')
-    data = data[~data[id_column].isin(known_files)]
 
     visited_tracks = get_visited_tracks()
     data = data[~data[id_column].isin(visited_tracks)]
+
+    known_files = get_already_known_files()
+    data = data[~data[id_column].isin(known_files)]
 
     download_mp3s(
         data=data,
