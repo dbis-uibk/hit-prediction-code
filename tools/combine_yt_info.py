@@ -4,7 +4,7 @@ import json
 
 import pandas as pd
 
-TARGET_DIRECTORY = 'data/interim/lfm_popularity'
+TARGET_DIRECTORY = 'data/interim/lfm_popularity/mp3s'
 
 
 def get_already_known_files():
@@ -16,11 +16,11 @@ def get_already_known_files():
         return {'mbid': name[mbid_start_idx:mbid_end_idx], 'file': name}
 
     json_files = pd.DataFrame(
-        map(mbid_extractor, glob(TARGET_DIRECTORY + '/mp3s/*.json')))
+        map(mbid_extractor, glob(TARGET_DIRECTORY + '/*.json')))
     json_files.rename(columns={'file': 'info_json_file'}, inplace=True)
 
     mp3_files = pd.DataFrame(
-        map(mbid_extractor, glob(TARGET_DIRECTORY + '/mp3s/*.mp3')))
+        map(mbid_extractor, glob(TARGET_DIRECTORY + '/*.mp3')))
     mp3_files.rename(columns={'file': 'mp3_file'}, inplace=True)
 
     known_files = mp3_files.merge(json_files, on=['mbid'])
