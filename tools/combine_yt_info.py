@@ -48,7 +48,6 @@ def combine_yt_info():
 
     combined_info = combined_info.merge(yt_info, on=['mbid'])
     combined_info.to_pickle(TARGET_DIRECTORY + '/yt_info.pickle')
-    print(combined_info)
 
 
 if __name__ == '__main__':
