@@ -3,6 +3,7 @@ from abc import ABCMeta
 from abc import abstractmethod
 import logging
 
+import numpy as np
 from sklearn.base import BaseEstimator
 from sklearn.base import RegressorMixin
 from tensorflow.keras.layers import Activation
@@ -288,6 +289,15 @@ class HitPredictionModel(BaseEstimator, RegressorMixin, metaclass=ABCMeta):
         self._config['epochs'] = value
 
     @property
+    def label_output(self):
+        """Property specifying if label output is used."""
+        return self._config.get('label_output')
+
+    @label_output.setter
+    def label_output(self, value):
+        self._config['label_output'] = value
+
+    @property
     def loss(self):
         """Property specifying the loss function used for training."""
         return self._config.get('loss')
@@ -385,7 +395,11 @@ class HitPredictionModel(BaseEstimator, RegressorMixin, metaclass=ABCMeta):
 
         """
         data = self._reshape_data(data)
-        return cached_model_predict(self.model, data)
+        prediction = cached_model_predict(self.model, data)
+        if self.label_output:
+            return prediction >= prediction[np.argmax(prediction, axis=1)]
+        else:
+            return prediction
 
     @abstractmethod
     def _create_model(self, input_shape, output_shape):
