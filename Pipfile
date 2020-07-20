@@ -29,6 +29,7 @@ wheel = "*"
 yapf = "*"
 isort = "*"
 flake8-isort = "*"
+jupyterlab = "*"
 
 [packages]
 hit_prediction_code = {editable = true,path = "."}
@@ -50,6 +51,7 @@ requests = "*"
 librosa = "*"
 youtube-dl = "*"
 pyarrow = "*"
+seaborn = "*"
 
 [requires]
 python_version = "3.6"

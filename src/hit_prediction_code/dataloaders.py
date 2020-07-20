@@ -229,6 +229,7 @@ class EssentiaLoader(Loader):
                  features,
                  label=None,
                  nan_value=0,
+                 label_modifier=None,
                  binarize_labels=False):
         """Initializes the essentia loader.
 
@@ -237,9 +238,9 @@ class EssentiaLoader(Loader):
             features: a list of selected columns used as features.
             label: the column selected as the target variable.
             nan_value: the values used for NaN values in the dataset.
+            label_modifier: function applied to each label.
             binarize_labels: specifies if sklearns LabelBinarizer is applied to
                 the target values.
-
         """
         self._config = {
             'dataset_path': dataset_path,
@@ -255,6 +256,9 @@ class EssentiaLoader(Loader):
         self.labels = np.ravel(data[[label]])
         nan_values = pd.isnull(self.labels)
         self.labels[nan_values] = nan_value
+
+        if label_modifier is not None:
+            self.labels = label_modifier(self.labels)
 
         if self._config['binarize_labels']:
             label_binarizer = preprocessing.LabelBinarizer()

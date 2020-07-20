@@ -6,5 +6,6 @@ test:
   image: python:3.6-buster
   stage: test
   script:
+    - pip install pipenv
     - pipenv sync && pipenv sync --dev
     - pipenv run make test
