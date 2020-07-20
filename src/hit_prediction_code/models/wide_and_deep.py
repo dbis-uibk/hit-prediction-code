@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Module containing implementations of the wide and deep model."""
 from tensorflow.keras.layers import Concatenate
 from tensorflow.keras.layers import Dense
@@ -27,6 +26,7 @@ class WideAndDeep(HitPredictionModel):
                  dropout_rate=None,
                  dense_output_size=None,
                  num_dense_layer=2,
+                 label_output=False,
                  **kwargs):
         """Initializes the Wide and Deep Model object.
 
@@ -49,6 +49,7 @@ class WideAndDeep(HitPredictionModel):
             dropout_rate: the dropout rate used for the dense part.
             dense_output_size: the output width of the dense layers.
             num_dense_layer: the number of dense layers in the dense part.
+            label_output: decides if the output is a vector of labels.
             kwargs: key-value arguments passed to the super constructor.
 
         """
@@ -72,6 +73,7 @@ class WideAndDeep(HitPredictionModel):
         self.dropout_rate = dropout_rate
         self.dense_output_size = dense_output_size
         self.num_dense_layer = num_dense_layer
+        self.label_output = label_output
 
     @property
     def deep_activation(self):
@@ -151,7 +153,10 @@ class WideAndDeep(HitPredictionModel):
         self.model = Model(inputs=input_list, outputs=output)
 
     def _data_shapes(self, data, labels):
-        return None, 1
+        try:
+            return None, labels.shape[1]
+        except IndexError:
+            return None, 1
 
     def _reshape_data(self, data):
         features = []
