@@ -6,6 +6,7 @@ import os.path
 from dbispipeline.base import Loader
 import numpy as np
 import pandas as pd
+from sklearn import preprocessing
 
 from .common import feature_columns
 
@@ -167,7 +168,8 @@ class MelSpectLoader(Loader):
                  dataset_path,
                  features='librosa_melspectrogram',
                  label=None,
-                 nan_value=0):
+                 nan_value=0,
+                 binarize_labels=False):
         """Initializes the mel spect loader.
 
         Args:
@@ -175,12 +177,16 @@ class MelSpectLoader(Loader):
             features: a column or a list of selected columns used as features.
             label: the column selected as the target variable.
             nan_value: the values used for NaN values in the dataset.
+            binarize_labels: specifies if sklearns LabelBinarizer is applied to
+                the target values.
 
         """
         self._config = {
             'dataset_path': dataset_path,
             'features': features,
             'label': label,
+            'nan_value': nan_value,
+            'binarize_labels': binarize_labels,
         }
 
         data = pd.read_pickle(dataset_path)
@@ -192,6 +198,10 @@ class MelSpectLoader(Loader):
         # ensure that the array is at least 2d
         if len(self.labels.shape) == 1:
             self.labels = self.labels.reshape((*self.labels.shape, 1))
+
+        if self._config['binarize_labels']:
+            label_binarizer = preprocessing.LabelBinarizer()
+            self.labels = label_binarizer.fit_transform(self.labels)
 
         non_label_columns = list(data.columns)
         non_label_columns.remove(label)
@@ -219,7 +229,8 @@ class EssentiaLoader(Loader):
                  features,
                  label=None,
                  nan_value=0,
-                 label_modifier=None):
+                 label_modifier=None,
+                 binarize_labels=False):
         """Initializes the essentia loader.
 
         Args:
@@ -228,13 +239,15 @@ class EssentiaLoader(Loader):
             label: the column selected as the target variable.
             nan_value: the values used for NaN values in the dataset.
             label_modifier: function applied to each label.
-
+            binarize_labels: specifies if sklearns LabelBinarizer is applied to
+                the target values.
         """
         self._config = {
             'dataset_path': dataset_path,
             'features': features,
             'label': label,
             'nan_value': nan_value,
+            'binarize_labels': binarize_labels,
         }
 
         data = pd.read_pickle(dataset_path)
@@ -246,6 +259,10 @@ class EssentiaLoader(Loader):
 
         if label_modifier is not None:
             self.labels = label_modifier(self.labels)
+
+        if self._config['binarize_labels']:
+            label_binarizer = preprocessing.LabelBinarizer()
+            self.labels = label_binarizer.fit_transform(self.labels)
 
         non_label_columns = list(data.columns)
         non_label_columns.remove(label)
