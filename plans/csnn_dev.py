@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """CSNN model evaluation plan."""
 from dbispipeline.evaluators import GridEvaluator
 import dbispipeline.result_handlers as result_handlers
@@ -9,7 +8,7 @@ import hit_prediction_code.evaluations as evaluations
 from hit_prediction_code.models.csnn import CSNNModel
 
 dataloader = MelSpectLoader(
-    dataset_path='data/processed/msd_bb_balanced_dev_sample.pickle',
+    dataset_path='data/hit_song_prediction_ismir2020/processed/msd_bb_balanced_dev_sample.pickle',
     features='librosa_melspectrogram',
     label='peak',
     nan_value=150,

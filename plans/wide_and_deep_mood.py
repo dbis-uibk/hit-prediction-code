@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Wide and deep model evaluation plan using mood features only."""
 from dbispipeline.evaluators import GridEvaluator
 import dbispipeline.result_handlers as result_handlers
@@ -11,7 +10,7 @@ import hit_prediction_code.evaluations as evaluations
 from hit_prediction_code.models.wide_and_deep import WideAndDeep
 
 dataloader = EssentiaLoader(
-    dataset_path='data/processed/msd_bb_balanced_essentia.pickle',
+    dataset_path='data/hit_song_prediction_ismir2020/processed/msd_bb_balanced_essentia.pickle',
     features=[
         *common.mood_list(),
     ],

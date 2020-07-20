@@ -9,7 +9,7 @@ from hit_prediction_code.models.csnn import CSNNModel
 from hit_prediction_code.transformers.mel_spect import MelSpectScaler
 
 dataloader = MelSpectLoader(
-    dataset_path='data/processed/msd_bb_balanced.pickle',
+    dataset_path='data/hit_song_prediction_ismir2020/processed/msd_bb_balanced.pickle',
     features='librosa_melspectrogram',
     label='peak',
     nan_value=150,

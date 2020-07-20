@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Plan for ISMIR 2019."""
 from dbispipeline.evaluators import GridEvaluator
 import dbispipeline.result_handlers as result_handlers
@@ -11,8 +10,8 @@ from hit_prediction_code.dataloaders import MsdBbLoader
 import hit_prediction_code.evaluations as evaluations
 
 dataloader = MsdBbLoader(
-    hits_file_path='data/processed/msd_bb_matches.csv',
-    non_hits_file_path='data/processed/msd_bb_non_matches.csv',
+    hits_file_path='data/hit_song_prediction_ismir2020/processed/msd_bb_matches.csv',
+    non_hits_file_path='data/hit_song_prediction_ismir2020/processed/msd_bb_non_matches.csv',
     features_path='data/processed',
     non_hits_per_hit=1,
     features=[

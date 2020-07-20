@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Linear regression model evaluation plan using mood and lowlevel features."""
 from dbispipeline.evaluators import GridEvaluator
 import dbispipeline.result_handlers as result_handlers
@@ -11,7 +10,7 @@ from hit_prediction_code.dataloaders import EssentiaLoader
 import hit_prediction_code.evaluations as evaluations
 
 dataloader = EssentiaLoader(
-    dataset_path='data/processed/msd_bb_balanced_essentia.pickle',
+    dataset_path='data/hit_song_prediction_ismir2020/processed/msd_bb_balanced_essentia.pickle',
     features=[
         *common.all_ll_mood_list(),
     ],
