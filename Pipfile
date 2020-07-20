@@ -42,7 +42,7 @@ sklearn = "*"
 tables = "*"
 fuzzywuzzy = {extras = ["speedup"],version = "*"}
 click = "*"
-dbispipeline = "==0.6.3"
+dbispipeline = "==0.6.9"
 sparqlwrapper = "*"
 qwikidata = "*"
 billboard-py = "*"
@@ -52,6 +52,7 @@ librosa = "*"
 youtube-dl = "*"
 pyarrow = "*"
 seaborn = "*"
+logzero = "*"
 
 [requires]
 python_version = "3.6"
