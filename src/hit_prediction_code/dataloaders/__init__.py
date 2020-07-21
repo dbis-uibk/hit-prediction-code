@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 from sklearn import preprocessing
 
-from .common import feature_columns
+from ..common import feature_columns
 
 LOGGER = logging.getLogger(__name__)
 
