@@ -4,7 +4,7 @@ import json
 
 import pandas as pd
 
-TARGET_DIRECTORY = 'data/interim/lfm_popularity/mp3s'
+TARGET_DIRECTORY = 'data/hit_song_prediction_lfm_popularity/interim/mp3s'
 
 
 def get_already_known_files():

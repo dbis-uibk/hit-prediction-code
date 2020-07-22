@@ -8,7 +8,7 @@ import pandas as pd
 import youtube_dl
 from youtube_dl.utils import DownloadError
 
-TARGET_DIRECTORY = 'data/interim/lfm_popularity/mp3s'
+TARGET_DIRECTORY = 'data/hit_song_prediction_lfm_popularity/interim/mp3s'
 VISITED_FILE = TARGET_DIRECTORY + '/visited.csv'
 
 
@@ -127,7 +127,8 @@ def download_dataset():
     """Downloads all missing filse from the dataset."""
     id_column = 'recording_mbid'
 
-    data = pd.read_parquet('data/raw/lfm_popularity/dataset_20.parquet')
+    data = pd.read_parquet(
+        'data/hit_song_prediction_lfm_popularity/raw/dataset_20.parquet')
 
     visited_tracks = get_visited_tracks()
     data = data[~data[id_column].isin(visited_tracks)]

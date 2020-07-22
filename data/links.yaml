@@ -1,5 +1,6 @@
 ---
 datasets:
   - music/acousticbrainz
-  - music/hit_song_prediction_ismir2020
   - music/hit_song_prediction_ismir2019
+  - wip_mikevo/hit_song_prediction_ismir2020
+  - wip_mikevo/hit_song_prediction_lfm_popularity

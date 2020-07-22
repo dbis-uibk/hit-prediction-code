@@ -54,7 +54,7 @@ def load_ab_features(mbids, feature_type, project_home='.'):
 
 
 def _get_ab_features(mbid, project_home, path_type):
-    data_path = [project_home, 'data', 'acousticbrainz', 'processed']
+    data_path = [project_home, 'data', 'acousticbrainz']
     path = os.path.join(*data_path, path_type, mbid[0], mbid[0:2], mbid)
 
     search_path = path + '-*.json'
