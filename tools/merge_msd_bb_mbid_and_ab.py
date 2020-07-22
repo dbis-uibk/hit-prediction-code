@@ -14,7 +14,7 @@ def _load_features(name, feature):
     mbids = list(songs['mbid'])
 
     logger.info('Combine %s features for %s' % (feature, name))
-    acousticbrainz.load_ab_features_as_df(mbids, 'll').to_parquet(
+    acousticbrainz.load_ab_features_as_df(mbids, feature).to_parquet(
         os.path.join(
             path_prefix,
             name + '_ab_' + feature + '_features.parquet',
