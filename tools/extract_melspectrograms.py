@@ -209,7 +209,7 @@ def cli(debug):
 
     """
     if debug:
-        logging.loglevel(level=logging.DEBUG)
+        logzero.loglevel(level=logging.DEBUG)
     else:
         logzero.loglevel(level=logging.INFO)
 
