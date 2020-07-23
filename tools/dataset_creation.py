@@ -1,17 +1,15 @@
-import json
 import multiprocessing as mp
 
 import click
-
 from fuzzywuzzy import fuzz
-
 import numpy as np
-
 import pandas as pd
+
+from hit_prediction_code.dataloaders import millionsongdataset
 
 RESULT_PATH = 'data/processed'
 BB_PATH = '/storage/nas3/datasets/music/billboard'
-MSD_PATH = '/storage/nas3/datasets/music/millionsongdataset'
+MSD_PATH = 'data/millionsongdataset'
 
 
 @click.group()
@@ -28,8 +26,8 @@ def main1():
 
 
 def main2():
-    msd = read_msd_unique_tracks()
-    year = read_msd_tracks_per_year()[['msd_id', 'year']]
+    msd = millionsongdataset.read_msd_unique_tracks()
+    year = millionsongdataset.read_msd_tracks_per_year()[['msd_id', 'year']]
     billboard = read_billboard_tracks()
     features = read_msd_feature_files()
 
@@ -51,8 +49,8 @@ def main2():
 
 @cli.command()
 def match():
-    msd = read_msd_unique_tracks()
-    year = read_msd_tracks_per_year()[['msd_id', 'year']]
+    msd = millionsongdataset.read_msd_unique_tracks()
+    year = millionsongdataset.read_msd_tracks_per_year()[['msd_id', 'year']]
     billboard = read_billboard_tracks()
     features = read_msd_feature_files()
 
@@ -81,7 +79,11 @@ def match():
 
         fuzzy_results = fuzzy_results.loc[fuzzy_results['title_sim'] <= 40]
         fuzzy_results = fuzzy_results[[
-            'msd_id', 'echo_nest_id', 'artist', 'title', 'year'
+            'msd_id',
+            'echo_nest_id',
+            'artist',
+            'title',
+            'year',
         ]]
         fuzzy_results.to_csv(RESULT_PATH + '/msd_bb_non_matches.csv')
 
@@ -153,7 +155,7 @@ def bb_track_duplicates():
 
 
 def msd_track_duplicates():
-    msd = read_msd_unique_tracks()
+    msd = millionsongdataset.read_msd_unique_tracks()
     unique_file_count = len(set(msd['msd_id']))
     unique_id_count = len(set(msd['echo_nest_id']))
     print(str(unique_file_count) + ',' + str(unique_id_count))
@@ -170,33 +172,6 @@ def msd_track_duplicates():
             count += 1
 
     print(len(tracks), count)
-
-
-def read_msd_tracks_per_year():
-    file_path = MSD_PATH + '/additional_files/tracks_per_year.txt'
-
-    return pd.read_csv(file_path,
-                       sep='<SEP>',
-                       header=None,
-                       names=['year', 'msd_id', 'artist', 'title'])
-
-
-def read_msd_unique_artists():
-    file_path = MSD_PATH + '/additional_files/unique_artists.txt'
-
-    return pd.read_csv(file_path,
-                       sep='<SEP>',
-                       header=None,
-                       names=['artist_id', 'mb_artist_id', 'msd_id', 'artist'])
-
-
-def read_msd_unique_tracks():
-    file_path = MSD_PATH + '/additional_files/unique_tracks.txt'
-
-    return pd.read_csv(file_path,
-                       sep='<SEP>',
-                       header=None,
-                       names=['msd_id', 'echo_nest_id', 'artist', 'title'])
 
 
 def read_msd_feature_files():

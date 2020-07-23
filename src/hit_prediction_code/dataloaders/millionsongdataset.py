@@ -12,7 +12,7 @@ def load_msd_features_as_df(msd_ids, feature_type, project_home='.'):
     Args:
         msd_ids: a list of millionsongdataset ids.
         feature_type: use highlevel (hl) or lowlevel (ll).
-        project_home: path to the data folder
+        project_home: path to the data folder.
 
     Returns a dataframe.
     """
@@ -30,7 +30,7 @@ def load_msd_features(msd_ids, feature_type, project_home='.'):
     Args:
         mbids: a list of millionsongdataset ids.
         feature_type: use highlevel (hl) or lowlevel (ll).
-        project_home: path to the data folder
+        project_home: path to the data folder.
 
     Returns a generator of generators generating dicts.
     """
@@ -54,9 +54,7 @@ def load_msd_features(msd_ids, feature_type, project_home='.'):
 
 def _get_msd_features(msd_id, project_home, path_type):
     data_path = [
-        project_home,
-        'data',
-        'millionsongdataset',
+        _msd_path(project_home),
         'msd_audio_features',
     ]
     sub_folder = 'features_tracks_' + msd_id[2].lower()
@@ -72,3 +70,90 @@ def _get_msd_features(msd_id, project_home, path_type):
             feature_data['file'] = filename[len(project_home) + 1:]
 
             yield feature_data
+
+
+def _msd_path(project_home):
+    msd_path = [
+        project_home,
+        'data',
+        'millionsongdataset',
+    ]
+
+    return os.path.join(*msd_path)
+
+
+def read_msd_tracks_per_year(project_home='.'):
+    """Loads the msd tracks per year file.
+
+    Args:
+        project_home: path to the data folder.
+    """
+    file_path = [
+        _msd_path(project_home),
+        'additional_files',
+        'tracks_per_year.txt',
+    ]
+    file_path = os.path.join(*file_path)
+
+    return pd.read_csv(file_path,
+                       sep='<SEP>',
+                       header=None,
+                       names=['year', 'msd_id', 'artist', 'title'])
+
+
+def read_msd_unique_artists(project_home='.'):
+    """Loads the msd unique artists file.
+
+    Args:
+        project_home: path to the data folder.
+    """
+    file_path = [
+        _msd_path(project_home),
+        'additional_files',
+        'unique_artists.txt',
+    ]
+    file_path = os.path.join(*file_path)
+
+    return pd.read_csv(file_path,
+                       sep='<SEP>',
+                       header=None,
+                       names=['artist_id', 'mb_artist_id', 'msd_id', 'artist'])
+
+
+def read_msd_unique_tracks(project_home='.'):
+    """Loads the msd unique tracks file.
+
+    Args:
+        project_home: path to the data folder.
+    """
+    file_path = [
+        _msd_path(project_home),
+        'additional_files',
+        'unique_tracks.txt',
+    ]
+
+    file_path = os.path.join(*file_path)
+
+    return pd.read_csv(file_path,
+                       sep='<SEP>',
+                       header=None,
+                       names=['msd_id', 'echo_nest_id', 'artist', 'title'])
+
+
+def read_msd_track_titles_artists(project_home='.'):
+    """Loads the msd track titles artists file.
+
+    Args:
+        project_home: path to the data folder.
+    """
+    file_path = [
+        _msd_path(project_home),
+        'track_titles_artists.csv',
+    ]
+
+    file_path = os.path.join(*file_path)
+
+    return pd.read_csv(file_path,
+                       sep='<SEP>',
+                       header=None,
+                       names=['msd_id', 'echo_nest_id', 'artist', 'title'])
