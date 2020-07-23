@@ -1,7 +1,5 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """Command line tool to extract melspectrogram features for a given dataset."""
-
 import functools
 import glob
 import logging
@@ -14,6 +12,7 @@ import zipfile
 
 import click
 import librosa
+from logzero import logger
 import pandas as pd
 
 DATAFRAME_COLUMNS = [
@@ -22,22 +21,32 @@ DATAFRAME_COLUMNS = [
     'librosa_melspectrogram',
 ]
 
-INTERIM_PATH = os.path.join('data', 'interim')
-PROCESSED_PATH = os.path.join('data', 'processed')
+INTERIM_PATH = os.path.join(
+    'data',
+    'hit_song_prediction_ismir2020',
+    'interim',
+)
+PROCESSED_PATH = os.path.join(
+    'data',
+    'hit_song_prediction_ismir2020',
+    'interim',
+)
 TMP_PATH = tempfile.gettempdir()
 
-MP3_ARCHIVE_PATH = os.path.join('data', 'raw', 'mp3s')
-OUTPUT_PREFIX = 'msd_librosa_melspectrogram_'
+MP3_ARCHIVE_PATH = os.path.join(
+    'data',
+    'millionsongdataset',
+    'mp3s',
+)
+OUTPUT_PREFIX = 'msd_librosa_melspect'
 
-LOGGER = logging.getLogger(__name__)
 
-
-def extract_mfcc_from_mp3s_in_zipfile(zipfile_name,
-                                      for_tracks=None,
-                                      min_time=None,
-                                      n_mels=128,
-                                      window=None,
-                                      window_size=None):
+def extract_mel_from_mp3s_in_zipfile(zipfile_name,
+                                     for_tracks=None,
+                                     min_time=None,
+                                     n_mels=128,
+                                     window=None,
+                                     window_size=None):
     """Extracts melspectrograms from mp3 files that are packed in a zip file.
 
     Args:
@@ -111,7 +120,7 @@ def extract_mfcc_from_mp3s_in_zipfile(zipfile_name,
 
                     if min_time is not None:
                         if librosa_melspectrogram.shape[1] < min_time:
-                            LOGGER.info('Sample to short.')
+                            logger.info('Sample to short.')
                             continue
 
                     if window is not None:
@@ -126,15 +135,15 @@ def extract_mfcc_from_mp3s_in_zipfile(zipfile_name,
                         librosa_melspectrogram,
                     ))
                 except Exception as ex:
-                    LOGGER.exception(ex)
+                    logger.exception(ex)
 
                 try:
                     os.remove(temp_file)
                 except OSError as ex:
-                    LOGGER.exception(ex)
+                    logger.exception(ex)
 
                 if len(result) % 1000 == 0:
-                    LOGGER.info('Looked at %s tracks.', len(result))
+                    logger.info('Looked at %s tracks.', len(result))
 
     return pd.DataFrame(result, columns=DATAFRAME_COLUMNS)
 
@@ -155,14 +164,14 @@ def merge_song_samples_with_features(data):
     """
     dataset_columns = list(data.columns)
     dataset_columns.append('librosa_melspectrogram')
-    LOGGER.info(dataset_columns)
+    logger.info(dataset_columns)
     dataset = pd.DataFrame(columns=dataset_columns)
 
-    output_file_name_regex = OUTPUT_PREFIX + '*.pickle'
+    output_file_name_regex = OUTPUT_PREFIX + '_*.parquet'
     search_path = os.path.join(INTERIM_PATH, output_file_name_regex)
     feature_files = glob.glob(search_path)
     for feature_file in feature_files:
-        features = pd.read_pickle(feature_file)
+        features = pd.read_parquet(feature_file)
         samples = data.merge(features, on=['msd_id'])[dataset_columns]
         dataset = dataset.append(
             samples,
@@ -227,7 +236,7 @@ def extract(chunk, chunk_count):
 
     """
     if chunk >= chunk_count:
-        print('Chunk needs to be smaller than chunk_count.', file=sys.stderr)
+        logger.error('Chunk needs to be smaller than chunk_count.')
         sys.exit(1)
 
     archive_files = glob.glob(os.path.join(MP3_ARCHIVE_PATH, '*.zip'))
@@ -241,53 +250,20 @@ def extract(chunk, chunk_count):
         end_idx = (chunk + 1) * chunk_size
 
     for zipfile_name in archive_files[start_idx:end_idx]:
-        LOGGER.info('Extracting: %s', zipfile_name)
+        logger.info('Extracting: %s', zipfile_name)
         try:
-            features = extract_mfcc_from_mp3s_in_zipfile(zipfile_name)
+            features = extract_mel_from_mp3s_in_zipfile(zipfile_name)
             file_count += features.shape[0]
             output_file_name = os.path.join(INTERIM_PATH, OUTPUT_PREFIX)
             archive_file_name = os.path.basename(zipfile_name)
             archive_file_name, _ = os.path.splitext(archive_file_name)
-            output_file_name += (archive_file_name + '.pickle')
-            features.to_pickle(output_file_name)
+            output_file_name += ('_' + archive_file_name + '.parquet')
+            features.to_parquet(output_file_name)
 
         except Exception as ex:
-            LOGGER.exception(ex)
+            logger.exception(ex)
 
-    LOGGER.info('Extracted featrues for %s tracks.', file_count)
-
-
-@cli.command()
-def combine():
-    """The cli combine command combines song samples with their melspectrogram.
-
-    It allows to combine the extracted melspectrogram features with the given
-    hit and non-hit samples.
-
-    """
-    hits_file_path = os.path.join(PROCESSED_PATH, 'msd_bb_matches.csv')
-    hits = pd.read_csv(hits_file_path, index_col=0)
-
-    dataset = merge_song_samples_with_features(hits)
-    dataset_file_name = OUTPUT_PREFIX + 'hits.pickle'
-    dataset.to_pickle(os.path.join(PROCESSED_PATH, dataset_file_name))
-    LOGGER.info(
-        'Created dataset containing %d hit samples.',
-        dataset.shape[0],
-    )
-
-    del dataset
-
-    non_hits_file_path = os.path.join(PROCESSED_PATH, 'msd_bb_non_matches.csv')
-    non_hits = pd.read_csv(non_hits_file_path, index_col=0)
-
-    dataset = merge_song_samples_with_features(non_hits)
-    dataset_file_name = OUTPUT_PREFIX + 'non_hits.pickle'
-    dataset.to_pickle(os.path.join(PROCESSED_PATH, dataset_file_name))
-    LOGGER.info(
-        'Created dataset containing %d non-hit samples.',
-        dataset.shape[0],
-    )
+    logger.info('Extracted featrues for %s tracks.', file_count)
 
 
 def _extract_features(zipfile_name, dataset):
@@ -298,9 +274,9 @@ def _extract_features(zipfile_name, dataset):
         dataset: the dataframe to extract features for.
 
     """
-    LOGGER.info('Extracting: %s', zipfile_name)
+    logger.info('Extracting: %s', zipfile_name)
     try:
-        return extract_mfcc_from_mp3s_in_zipfile(
+        return extract_mel_from_mp3s_in_zipfile(
             zipfile_name,
             for_tracks=dataset['msd_id'],
             min_time=1200,  # routhly a 30 sec timeframe
@@ -308,7 +284,7 @@ def _extract_features(zipfile_name, dataset):
             window_size=1200,  # routhly a 30 sec timeframe
         )
     except Exception as ex:
-        LOGGER.exception(ex)
+        logger.exception(ex)
         return None
 
 
@@ -332,14 +308,14 @@ def combine_with_dataset(dataset_file, processes_count):
 
     """
     if not os.path.isfile(dataset_file):
-        print('Specified dataset file does not exist', file=sys.stderr)
+        logger.error('Specified dataset file does not exist')
         sys.exit(1)
 
     dataset = pd.read_csv(dataset_file, index_col=0)
     archive_files = glob.glob(os.path.join(MP3_ARCHIVE_PATH, '*.zip'))
 
     output_file_name, _ = os.path.splitext(os.path.basename(dataset_file))
-    output_file_name += '.pickle'
+    output_file_name += ('_' + OUTPUT_PREFIX + '.parquet')
     output_file_name = os.path.join(PROCESSED_PATH, output_file_name)
 
     extractor = functools.partial(_extract_features, dataset=dataset)
@@ -347,9 +323,9 @@ def combine_with_dataset(dataset_file, processes_count):
     with multiprocessing.Pool(processes=processes_count) as p:
         features = pd.concat(p.map(extractor, archive_files))
         dataset = dataset.merge(features, on=['msd_id'])
-        dataset.to_pickle(output_file_name)
+        dataset.to_parquet(output_file_name)
 
-        LOGGER.info('Extracted features for %d samples.', dataset.shape[0])
+        logger.info('Extracted features for %d samples.', dataset.shape[0])
 
 
 if __name__ == '__main__':
