@@ -12,6 +12,7 @@ import zipfile
 
 import click
 import librosa
+import logzero
 from logzero import logger
 import pandas as pd
 
@@ -208,9 +209,9 @@ def cli(debug):
 
     """
     if debug:
-        logging.basicConfig(level=logging.INFO)
+        logging.loglevel(level=logging.DEBUG)
     else:
-        logging.disable()
+        logzero.loglevel(level=logging.INFO)
 
     warnings.simplefilter('ignore')
 
