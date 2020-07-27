@@ -23,6 +23,11 @@ def _load_features(name, feature):
 
 # combine all features
 logger.info('Combine acousticbrainz features for msd_bb_mbid')
-for filename in ['msd_bb_mbid_matches', 'msd_bb_mbid_non_matches']:
+datasets = [
+    'msd_bb_mbid_cleaned_matches',
+    'msd_bb_mbid_exact_matches',
+    'msd_bb_mbid_non_matches',
+]
+for filename in datasets:
     for feature_type in ['ll', 'hl']:
         _load_features(filename, feature_type)
