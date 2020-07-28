@@ -1,9 +1,12 @@
 """Loads melspects for mbids in the msd_bb_mbid dataset."""
 import os.path
+import warnings
 
 from logzero import logger
 
 from hit_prediction_code.dataloaders import melspect
+
+warnings.simplefilter('ignore')
 
 path_prefix = 'data/hit_song_prediction_ismir2020/interim'
 
