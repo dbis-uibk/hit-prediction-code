@@ -316,7 +316,7 @@ def combine_with_dataset(dataset_file, processes_count):
     archive_files = glob.glob(os.path.join(MP3_ARCHIVE_PATH, '*.zip'))
 
     output_file_name, _ = os.path.splitext(os.path.basename(dataset_file))
-    output_file_name += ('_' + OUTPUT_PREFIX + '.parquet')
+    output_file_name += ('_' + OUTPUT_PREFIX + '.hdf5')
     output_file_name = os.path.join(PROCESSED_PATH, output_file_name)
 
     extractor = functools.partial(_extract_features, dataset=dataset)
@@ -324,7 +324,7 @@ def combine_with_dataset(dataset_file, processes_count):
     with multiprocessing.Pool(processes=processes_count) as p:
         features = pd.concat(p.map(extractor, archive_files))
         dataset = dataset.merge(features, on=['msd_id'])
-        dataset.to_parquet(output_file_name)
+        dataset.to_hdf(output_file_name, 'data')
 
         logger.info('Extracted features for %d samples.', dataset.shape[0])
 
