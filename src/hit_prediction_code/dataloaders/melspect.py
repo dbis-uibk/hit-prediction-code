@@ -20,7 +20,7 @@ MP3_ARCHIVE_PATH = os.path.join(
     'millionsongdataset',
     'mp3s',
 )
-OUTPUT_PREFIX = 'msd_librosa_melspect'
+OUTPUT_PREFIX = 'msd_melspect_features'
 TMP_PATH = tempfile.gettempdir()
 
 
@@ -214,7 +214,7 @@ def _extract_features(zipfile_name, dataset):
         return None
 
 
-def combine_with_dataset(dataset_file, processes_count, project_home='.'):
+def combine_with_dataset(dataset_file, processes_count=None, project_home='.'):
     """Extracts and combines melspectrogram features with a given dataset.
 
     Args:
