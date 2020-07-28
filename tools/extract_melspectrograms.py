@@ -49,7 +49,7 @@ def extract(chunk, chunk_count):
             files gets split.
 
     """
-    if chunk > chunk_count:
+    if chunk >= chunk_count:
         logger.error('Chunk needs to be smaller than chunk_count.')
         sys.exit(1)
 
