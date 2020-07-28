@@ -269,7 +269,7 @@ def extract(chunk, chunk_count, project_home='.'):
         project_home: path to the data folder.
 
     """
-    assert chunk > chunk_count
+    assert chunk < chunk_count
 
     archive_files = glob.glob(
         os.path.join(
