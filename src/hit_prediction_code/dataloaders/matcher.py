@@ -2,6 +2,7 @@
 import re
 
 from logzero import logger
+import pandas as pd
 
 
 def match_exact_msd_bb(msd_data, bb_data):
@@ -67,3 +68,27 @@ def match_clean_msd_bb(msd_data, bb_data):
     msd_bb.dropna(subset=['artist_clean', 'title_clean'], inplace=True)
 
     return msd_bb
+
+
+def filter_duplicates(data, id_cols, target_col, keep_lowest):
+    """Filters duplicates based on the target value.
+
+    Args:
+        data: dataframe containing all samples.
+        id_cols: list of columns identifying a song.
+        target: target to consider.
+        keep_lowest: True, if all entries containing a minimum value are keep.
+            Otherwise, the max value is kept.
+
+    Returns the filtered dataset.
+    """
+    keep = []
+    for _, group in data.groupby(id_cols):
+        if keep_lowest is True:
+            keep_group = group[group[target_col] <= group[target_col].min()]
+        else:
+            keep_group = group[group[target_col] >= group[target_col].max()]
+
+        keep.append(keep_group)
+
+    return pd.concat(keep)
