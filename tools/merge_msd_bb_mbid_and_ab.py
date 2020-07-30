@@ -11,6 +11,7 @@ path_prefix = 'data/hit_song_prediction_ismir2020/interim'
 
 def _load_features(name, feature):
     songs = pd.read_csv(os.path.join(path_prefix, name + '.csv'))
+    songs.drop_duplicates(['mbid'])
     mbids = list(songs['mbid'])
 
     logger.info('Combine %s features for %s' % (feature, name))
