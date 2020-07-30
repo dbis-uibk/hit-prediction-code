@@ -20,7 +20,7 @@ MP3_ARCHIVE_PATH = os.path.join(
     'millionsongdataset',
     'mp3s',
 )
-OUTPUT_PREFIX = 'msd_melspect_features'
+OUTPUT_PREFIX = 'melspect_features'
 TMP_PATH = tempfile.gettempdir()
 
 
