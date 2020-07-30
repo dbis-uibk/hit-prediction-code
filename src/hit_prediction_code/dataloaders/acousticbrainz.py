@@ -22,7 +22,11 @@ def load_ab_features_as_df(mbids, feature_type, project_home='.'):
                                  feature_type=feature_type,
                                  project_home=project_home):
         features += list(item)
-    return pd.json_normalize(features)
+    features = pd.json_normalize(features)
+    features['file_id'] = features['file'].apply(
+        lambda v: os.path.basename(os.path.splitext(v)[0]))
+
+    return features
 
 
 def load_ab_features(mbids, feature_type, project_home='.'):
