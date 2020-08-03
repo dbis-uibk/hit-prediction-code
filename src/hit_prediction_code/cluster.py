@@ -2,6 +2,7 @@
 from logzero import logger
 import pandas as pd
 from sklearn import cluster
+from sklearn import metrics
 
 
 def get_cluster_song_count(data,
@@ -101,8 +102,20 @@ def select_features_with_clustering(data,
     for i in range(1, max_iterations + 1):
         data_size = len(data)
         logger.debug('Iteration %d processing %d features.' % (i, data_size))
-        clustering = cluster.AgglomerativeClustering(
-            n_clusters=len(songs)).fit(data[feature_cols])
+        for cluster_algo in [
+                # cluster.KMeans,
+                cluster.AgglomerativeClustering,
+        ]:
+            clustering = cluster_algo(n_clusters=len(songs)).fit(
+                data[feature_cols])
+
+            score = metrics.adjusted_mutual_info_score(
+                data['song_id'],
+                clustering.labels_,
+            )
+            logger.debug('Perfomance of: %s is: %f' %
+                         (str(cluster_algo), score))
+
         data['cluster_id'] = clustering.labels_
 
         data = select_cluster_song_features(
