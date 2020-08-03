@@ -23,7 +23,7 @@ matches_mbid = matches.merge(
     on=['msd_id'],
     suffixes=('_msd_bb', '_msd_mbid'),
 )
-logger.info('Assign uuid for song')
+logger.info('Assign uuid for each song')
 matches_mbid = matcher.add_uuid_column(data=matches_mbid)
 logger.info('Remove duplicate target value \'peakPos\'')
 matches_mbid = matcher.filter_duplicates(
@@ -47,7 +47,7 @@ matches_mbid = matches.merge(
     on=['msd_id'],
     suffixes=('_msd_bb', '_msd_mbid'),
 )
-logger.info('Assign uuid for song')
+logger.info('Assign uuid for each song')
 matches_mbid = matcher.add_uuid_column(data=matches_mbid)
 logger.info('Remove duplicate target value \'peakPos\'')
 matches_mbid = matcher.filter_duplicates(
@@ -70,14 +70,7 @@ non_matches_mbid = non_matches.merge(
     on=['msd_id'],
     suffixes=('_msd_bb', '_msd_mbid'),
 )
-logger.info('Assign uuid for song')
+logger.info('Assign uuid for each song')
 non_matches_mbid = matcher.add_uuid_column(data=non_matches_mbid)
-logger.info('Remove duplicate target value \'peakPos\'')
-non_matches_mbid = matcher.filter_duplicates(
-    data=non_matches_mbid,
-    id_cols=['uuid'],
-    target_col='peakPos',
-    keep_lowest=True,
-)
 logger.info('Store msd_bb_mbid_non_matches.csv')
 non_matches_mbid.to_csv(data_path + '/interim/msd_bb_mbid_non_matches.csv')
