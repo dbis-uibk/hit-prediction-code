@@ -9,7 +9,7 @@ from hit_prediction_code.dataloaders import matcher
 
 path_prefix = 'data/hit_song_prediction_ismir2020/interim'
 
-for dataset in ['cleaned_matches', 'exact_matches', 'non_matche']:
+for dataset in ['cleaned_matches', 'exact_matches', 'non_matches']:
     logger.info('Read msd bb mbid %s' % dataset)
     msd_bb_mbid = pd.read_csv(
         os.path.join(
