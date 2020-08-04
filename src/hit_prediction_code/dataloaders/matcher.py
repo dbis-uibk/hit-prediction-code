@@ -3,7 +3,9 @@ import re
 import uuid
 
 from logzero import logger
+import numpy as np
 import pandas as pd
+from scipy.spatial.distance import cosine as cosine_distance
 
 
 def match_exact_msd_bb(msd_data, bb_data):
@@ -168,3 +170,69 @@ def add_uuid_column(data,
         unite_uuid(col)
 
     return data
+
+
+def drop_duplicate_uuid(data, features):
+    """Selects the representative sample per uuid.
+
+    The sample closest (defined by cosine distance) to the average of all
+    samples sharing a uuid is selected. If there are multiple samples with the
+    same distance to the average then the first one is used.
+
+    Args:
+        data: the dataframe to select the samples from.
+        features: the list of columns used to compute the average and distance.
+
+    Returns a dataframe containing one sample per uuid.
+    """
+    selected = []
+    for _, group in data.groupby(['uuid']):
+        average = group[features].mean()
+        distance = 1.
+        for _, row in group.iterrows():
+            current_distance = abs(
+                cosine_distance(
+                    row[features].astype(float),
+                    average.astype(float),
+                ))
+            if distance > current_distance:
+                chosen = row
+                distance = current_distance
+        selected.append(chosen)
+
+    return pd.DataFrame(selected)
+
+
+def select_feature_samples(data,
+                           features,
+                           min_length=120,
+                           max_length=600,
+                           length_col='metadata.audio_properties.length'):
+    """Selects the samples to use.
+
+    It ensures that there are not NaN values in the features, that all songes
+    are between min and max length and that there is only one sample per uuid.
+
+    Args:
+        data: the dataframe to select the samples from.
+        features: the list of columns used as features.
+        min_length: the minimum song length (included).
+        max_length: the maximum song length (excluded).
+        length_col: the column containing the length of the song sample.
+
+    Returns a dataframe containing the slected samples.
+    """
+    data = data.dropna(subset=features)
+
+    data = data[data[length_col] >= (min_length)]
+    data = data[data[length_col] < (max_length)]
+
+    return drop_duplicate_uuid(data, features)
+
+
+def get_numeric_columns(data):
+    """Returns columns containing numeric data.
+
+    Args: dataframe to select columns from.
+    """
+    return list(data.select_dtypes(include=[np.number]).columns.values)

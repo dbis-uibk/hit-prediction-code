@@ -61,6 +61,10 @@ def highlevel_regex():
     return r'highlevel\.\w+\.all\.\w+'
 
 
+def lowlevel_regex():
+    return r'lowlevel\.\w+\.\w+'
+
+
 def genre_regex():
     return r'highlevel\.genre_tzanetakis\.all\.\w+'
 
@@ -298,3 +302,12 @@ def all_filtered_list():
         *hl_list(),
         *ll_filterd_list(),
     ]
+
+
+def get_columns_matching_list(columns, filter_list):
+    matching_cols = []
+    for filter_entry in filter_list:
+        cols, _ = feature_columns(columns, filter_entry)
+        matching_cols += cols
+
+    return set(matching_cols)
