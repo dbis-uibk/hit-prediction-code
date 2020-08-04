@@ -11,7 +11,7 @@ path_prefix = 'data/hit_song_prediction_ismir2020/interim'
 
 def _load_features(name, feature):
     songs = pd.read_csv(os.path.join(path_prefix, name + '.csv'))
-    msd_ids = list(songs['msd_id'])
+    msd_ids = set(songs['msd_id'])
 
     logger.info('Combine %s features for %s' % (feature, name))
     millionsongdataset.load_msd_features_as_df(msd_ids, feature).to_parquet(
