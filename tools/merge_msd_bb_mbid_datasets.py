@@ -20,7 +20,11 @@ for dataset in ['cleaned_matches', 'exact_matches', 'non_matches']:
         )
         hl = pd.read_parquet(filename_prefix + 'hl_features_unique.parquet')
         ll = pd.read_parquet(filename_prefix + 'll_features_unique.parquet')
-        msd_bb_mbid[dataset][source] = hl.merge(ll, on=['uuid'])
+        msd_bb_mbid[dataset][source] = hl.merge(
+            ll,
+            on=['uuid'],
+            suffixes=('_hl', '_ll'),
+        )
 
         current_uuid = msd_bb_mbid[dataset][source][['uuid']]
 
