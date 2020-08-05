@@ -3,6 +3,7 @@ import os.path
 
 from logzero import logger
 import pandas as pd
+from sklearn.utils import shuffle
 
 path_prefix = 'data/hit_song_prediction_ismir2020/interim'
 final_prefix = 'data/hit_song_prediction_ismir2020/processed'
@@ -75,4 +76,5 @@ for dataset, uuids in all_uuid.items():
         logger.info('Store %s %s containing %d songs' %
                     (dataset, source, len(data.index)))
         data = data.merge(msd_bb_mbid_info, on=['uuid'])
+        data = shuffle(data, random_state=42)
         data.to_parquet(filename)
