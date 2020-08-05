@@ -145,7 +145,6 @@ def hl_no_year_list():
         *mood_list(),
         *genre_list(),
         *voice_list(),
-        ('year', 'wide'),
     ]
 
 
