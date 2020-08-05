@@ -16,7 +16,7 @@ PATH_PREFIX = 'data/hit_song_prediction_ismir2020/processed'
 dataloader = EssentiaLoader(
     dataset_path=os.path.join(
         PATH_PREFIX,
-        'msd_bb_mbid_cleaned_matches_ab_unique.parquet',
+        'msd_bb_mbid_cleaned_matches_essentia_unique.parquet',
     ),
     features=[
         *common.ll_list(),

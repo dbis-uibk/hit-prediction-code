@@ -251,9 +251,9 @@ class EssentiaLoader(Loader):
         }
 
         _, ext = os.path.splitext(dataset_path)
-        if ext == 'pickle':
+        if ext == '.pickle':
             data = pd.read_pickle(dataset_path)
-        elif ext == 'parquet':
+        elif ext == '.parquet':
             data = pd.read_parquet(dataset_path)
         else:
             raise ValueError('\'%s\' is in an unknown format' % dataset_path)
