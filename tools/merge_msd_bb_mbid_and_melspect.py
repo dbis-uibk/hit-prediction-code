@@ -3,6 +3,7 @@ import os.path
 import warnings
 
 from logzero import logger
+import pandas as pd
 
 from hit_prediction_code.dataloaders import melspect
 
@@ -16,6 +17,10 @@ datasets = [
     'msd_bb_mbid_exact_matches',
     'msd_bb_mbid_non_matches',
 ]
-for filename in datasets:
-    filename = os.path.join(path_prefix, filename + '.csv')
-    melspect.combine_with_dataset(filename)
+for dataset in datasets:
+    filename = os.path.join(
+        path_prefix,
+        dataset + '.csv',
+    )
+    dataset = pd.read_csv(filename, index_col=0)[['uuid', 'msd_id']]
+    melspect.combine_with_dataset(dataset, filename)

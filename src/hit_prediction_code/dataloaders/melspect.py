@@ -214,18 +214,21 @@ def _extract_features(zipfile_name, dataset):
         return None
 
 
-def combine_with_dataset(dataset_file, processes_count=None, project_home='.'):
+def combine_with_dataset(dataset,
+                         dataset_filename,
+                         processes_count=None,
+                         project_home='.'):
     """Extracts and combines melspectrogram features with a given dataset.
 
     Args:
-        dataset_file: path to a dataset file in csv format that is pandas
-            readable.
+        dataset: dataset to extract melspects for msd_id column.
+        dataset_filename: name of the dataset file used to base the output
+            filename on.
         processes_count: the number of processes used for the multiprocessing
             pool.
         project_home: path to the data folder.
 
     """
-    dataset = pd.read_csv(dataset_file, index_col=0)
     archive_files = glob.glob(
         os.path.join(
             project_home,
@@ -233,7 +236,7 @@ def combine_with_dataset(dataset_file, processes_count=None, project_home='.'):
             '*.zip',
         ))
 
-    output_file_name, _ = os.path.splitext(os.path.basename(dataset_file))
+    output_file_name, _ = os.path.splitext(os.path.basename(dataset_filename))
     output_file_name += ('_' + OUTPUT_PREFIX + '.pickle')
     output_file_name = os.path.join(
         project_home,

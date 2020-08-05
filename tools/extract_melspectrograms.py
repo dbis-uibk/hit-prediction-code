@@ -8,6 +8,7 @@ import warnings
 import click
 import logzero
 from logzero import logger
+import pandas as pd
 
 from hit_prediction_code.dataloaders import melspect
 
@@ -79,7 +80,8 @@ def combine_with_dataset(dataset_file, processes_count):
         logger.error('Specified dataset file does not exist')
         sys.exit(1)
 
-    melspect.combine_with_dataset(dataset_file, processes_count)
+    dataset = pd.read_csv(dataset_file, index_col=0)
+    melspect.combine_with_dataset(dataset, dataset_file, processes_count)
 
 
 if __name__ == '__main__':
