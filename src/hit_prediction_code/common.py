@@ -135,6 +135,13 @@ def voice_list():
 
 def hl_list():
     return [
+        *hl_no_year_list(),
+        ('year', 'wide'),
+    ]
+
+
+def hl_no_year_list():
+    return [
         *mood_list(),
         *genre_list(),
         *voice_list(),
@@ -293,6 +300,13 @@ def ll_list():
 def all_list():
     return [
         *hl_list(),
+        *ll_list(),
+    ]
+
+
+def all_no_year_list():
+    return [
+        *hl_no_year_list(),
         *ll_list(),
     ]
 

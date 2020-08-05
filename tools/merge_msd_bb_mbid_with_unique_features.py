@@ -45,7 +45,7 @@ for dataset in ['cleaned_matches', 'exact_matches', 'non_matches']:
             numeric_cols = matcher.get_numeric_columns(data)
             features = common.get_columns_matching_list(
                 numeric_cols,
-                common.all_list(),
+                common.all_no_year_list(),
             )
             data = matcher.select_feature_samples(
                 data=data,
