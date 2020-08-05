@@ -53,6 +53,10 @@ for dataset in ['cleaned_matches', 'exact_matches', 'non_matches']:
         header=0,
         index_col=0,
     )
+
+    if 'year' in current.columns:
+        del current['year']
+
     if msd_bb_mbid_info is None:
         msd_bb_mbid_info = current
     else:
