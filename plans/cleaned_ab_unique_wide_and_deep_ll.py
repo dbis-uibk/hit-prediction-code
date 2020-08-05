@@ -1,5 +1,7 @@
 """Wide and deep model evaluation plan using lowlevel features."""
-from dbispipeline.evaluators import GridEvaluator
+import os.path
+
+from dbispipeline.evaluators import CvEpochEvaluator
 import dbispipeline.result_handlers as result_handlers
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import MinMaxScaler
@@ -9,8 +11,13 @@ from hit_prediction_code.dataloaders import EssentiaLoader
 import hit_prediction_code.evaluations as evaluations
 from hit_prediction_code.models.wide_and_deep import WideAndDeep
 
+PATH_PREFIX = 'data/hit_song_prediction_ismir2020/processed'
+
 dataloader = EssentiaLoader(
-    dataset_path='data/hit_song_prediction_ismir2020/processed/msd_bb_balanced_essentia.pickle',
+    dataset_path=os.path.join(
+        PATH_PREFIX,
+        'msd_bb_mbid_cleaned_matches_ab_unique.parquet',
+    ),
     features=[
         *common.ll_list(),
     ],
@@ -20,18 +27,22 @@ dataloader = EssentiaLoader(
 
 pipeline = Pipeline([
     ('scale', MinMaxScaler()),
-    ('model', WideAndDeep(features=dataloader.feature_indices)),
+    ('model',
+     WideAndDeep(
+         epochs=1000,
+         features=dataloader.feature_indices,
+         batch_normalization=False,
+         deep_activation='selu',
+         dense_activation='selu',
+         output_activation='elu',
+         dropout_rate=0.1,
+     )),
 ])
 
-evaluator = GridEvaluator(
-    parameters={
-        'model__epochs': [10, 25, 50, 100, 200, 300, 500],
-        'model__batch_normalization': [False],
-        'model__dense_activation': ['elu', 'selu'],
-        'model__output_activation': ['elu'],
-        'model__dropout_rate': [0.1],
-    },
-    grid_parameters=evaluations.grid_parameters(),
+evaluator = CvEpochEvaluator(
+    cv=evaluations.cv(),
+    scoring=evaluations.metrics.scoring(),
+    scoring_step_size=10,
 )
 
 result_handlers = [

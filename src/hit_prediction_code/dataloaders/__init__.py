@@ -250,7 +250,13 @@ class EssentiaLoader(Loader):
             'binarize_labels': binarize_labels,
         }
 
-        data = pd.read_pickle(dataset_path)
+        _, ext = os.path.splitext(dataset_path)
+        if ext == 'pickle':
+            data = pd.read_pickle(dataset_path)
+        elif ext == 'parquet':
+            data = pd.read_parquet(dataset_path)
+        else:
+            raise ValueError('\'%s\' is in an unknown format' % dataset_path)
         data = _key_mapping(data)
 
         self.labels = np.ravel(data[[label]])
