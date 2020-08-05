@@ -19,7 +19,7 @@ dataloader = EssentiaLoader(
         'msd_bb_mbid_cleaned_matches_ab_unique.parquet',
     ),
     features=[
-        *common.all_list(),
+        *common.all_no_year_list(),
     ],
     label='peakPos',
     nan_value=150,
