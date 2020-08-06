@@ -40,6 +40,7 @@ pipeline = Pipeline([
              64,
              32,
          ),
+         output_activation='selu',
      )),
 ])
 
