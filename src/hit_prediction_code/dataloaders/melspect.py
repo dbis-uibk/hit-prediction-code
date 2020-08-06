@@ -237,7 +237,7 @@ def combine_with_dataset(dataset,
         ))
 
     output_file_name, _ = os.path.splitext(os.path.basename(dataset_filename))
-    output_file_name += ('_' + OUTPUT_PREFIX + '.pickle')
+    output_file_name += ('_' + OUTPUT_PREFIX + '.pickle.xz')
     output_file_name = os.path.join(
         project_home,
         INTERIM_PATH,
@@ -249,7 +249,7 @@ def combine_with_dataset(dataset,
     with multiprocessing.Pool(processes=processes_count) as p:
         features = pd.concat(p.map(extractor, archive_files))
         dataset = dataset.merge(features, on=['msd_id'])
-        dataset.to_pickle(output_file_name, 'data')
+        dataset.to_pickle(output_file_name, 'xz')
 
         logger.info('Extracted features for %d samples.', dataset.shape[0])
 
