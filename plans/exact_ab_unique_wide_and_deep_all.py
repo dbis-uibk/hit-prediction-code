@@ -34,7 +34,6 @@ pipeline = Pipeline([
          batch_normalization=False,
          deep_activation='elu',
          dense_activation='elu',
-         output_activation='elu',
          dropout_rate=0.1,
      )),
 ])
