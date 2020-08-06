@@ -34,7 +34,7 @@ def hit_nonhit_score(estimator, x, y, scorer):
     return scorer(y[:, -1], estimator.predict(x)[:, -1])
 
 
-def scoring():
+def scoring(hit_nonhit_accuracy_score=hit_nonhit_accuracy_score):
     """Returns a set of scoring functions used for evaluation."""
     return {
         'explained_variance':
