@@ -110,3 +110,5 @@ ENV/
 .vscode/
 
 results/
+
+/lastfm_api_info.json
