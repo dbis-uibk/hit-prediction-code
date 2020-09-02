@@ -6,7 +6,7 @@ import pandas as pd
 import pylast
 
 data_path = 'data/hit_song_prediction_ismir2020'
-dataset_name = '/interim/msd_mbid_lastfm.parquet'
+dataset_name = '/interim/msd_mbid_lastfm.pickle'
 
 with open('lastfm_api_info.json') as file:
     api_info = json.load(file)
@@ -71,7 +71,7 @@ for idx, mbid in enumerate(mbids):
         if (idx + 1) % 50 == 0:
             logger.info('Store intermediate result with %d items' %
                         lastfm_info.shape[0])
-            lastfm_info.to_parquet(data_path + dataset_name)
+            lastfm_info.to_pickle(data_path + dataset_name)
     except pylast.WSError as e:
         if e.get_id() == '6':
             logger.warning(e)
@@ -81,4 +81,4 @@ for idx, mbid in enumerate(mbids):
             break
 
 logger.info('Store Last.fm info for msd_mbid')
-lastfm_info.to_parquet(data_path + dataset_name)
+lastfm_info.to_pickle(data_path + dataset_name)
