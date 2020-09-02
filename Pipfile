@@ -53,6 +53,7 @@ youtube-dl = "*"
 pyarrow = "*"
 seaborn = "*"
 logzero = "*"
+pylast = "*"
 
 [requires]
 python_version = "3.6"
