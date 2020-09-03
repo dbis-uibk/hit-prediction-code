@@ -14,7 +14,17 @@ def _load_features(name, feature):
     mbids = set(songs)
 
     logger.info('Combine %s features for %s' % (feature, name))
-    acousticbrainz.load_ab_features_as_df(mbids, feature).to_parquet(
+    data = acousticbrainz.load_ab_features_as_df(mbids, feature)
+
+    if feature == 'll':
+        version_col = 'metadata.version.essentia_git_sha'
+    else:
+        version_col = 'metadata.version.lowlevel.essentia_git_sha'
+
+    data = data[data[version_col].apply(
+        lambda c: not c.startswith('v2.1_beta1'))]
+
+    data.to_parquet(
         os.path.join(
             path_prefix,
             name + '_ab_' + feature + '_features.parquet',
