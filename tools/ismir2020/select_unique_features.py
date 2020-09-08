@@ -65,7 +65,7 @@ logger.info('Join features of different type.')
 for dataset in ['cleaned_matches', 'exact_matches', 'non_matches']:
     for source in ['ab', 'essentia']:
         if source == 'ab':
-            join_cols = ['uuid', 'msd_id', 'mbid']
+            join_cols = ['uuid', 'mbid']
         else:
             join_cols = ['msd_id']
 
