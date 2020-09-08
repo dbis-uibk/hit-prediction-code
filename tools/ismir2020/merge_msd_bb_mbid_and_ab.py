@@ -21,21 +21,22 @@ def _load_features(name, feature):
     else:
         version_col = 'metadata.version.lowlevel.essentia_git_sha'
 
-    def is_clean_version(c):
+    def is_clean_version(version):
         try:
-            return not c.startswith('v2.1_beta1')
+            return not version.startswith('v2.1_beta1')
         except Exception as ex:
             logger.exception(ex)
-            logger.error('c is: %s' % str(c))
-            return True
+            logger.error('version is: %s' % str(version))
+
+            # Ignore sample if the value is no string
+            return False
 
     data = data[data[version_col].apply(is_clean_version)]
 
-    data.to_parquet(
-        os.path.join(
-            path_prefix,
-            name + '_ab_' + feature + '_features.parquet',
-        ))
+    filename = name + '_ab_' + feature + '_features.parquet'
+
+    logger.info('Store %s' % filename)
+    data.to_parquet(os.path.join(path_prefix, filename))
 
 
 # combine all features

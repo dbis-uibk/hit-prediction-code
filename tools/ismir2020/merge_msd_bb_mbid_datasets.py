@@ -10,23 +10,17 @@ final_prefix = 'data/hit_song_prediction_ismir2020/processed'
 
 logger.info('Compute common uuid per dataset')
 all_uuid = {}
-msd_bb_mbid = {}
+datasets = {}
 for dataset in ['cleaned_matches', 'exact_matches', 'non_matches']:
-    msd_bb_mbid[dataset] = {}
+    datasets[dataset] = {}
     for source in ['ab', 'essentia']:
-        filename_prefix = os.path.join(
-            path_prefix,
-            'msd_bb_mbid_' + dataset + '_' + source + '_',
-        )
-        hl = pd.read_parquet(filename_prefix + 'hl_features_unique.parquet')
-        ll = pd.read_parquet(filename_prefix + 'll_features_unique.parquet')
-        msd_bb_mbid[dataset][source] = hl.merge(
-            ll,
-            on=['uuid'],
-            suffixes=('_hl', '_ll'),
-        )
+        filename = 'msd_bb_mbid_' + dataset + '_' + source
+        filename += '_unique_features.parquet'
+        filename = os.path.join(path_prefix, filename)
 
-        current_uuid = msd_bb_mbid[dataset][source][['uuid']]
+        data = pd.read_parquet(filename)
+        current_uuid = data[['uuid']]
+        datasets[dataset][source] = data
 
         if all_uuid.get(dataset, None) is None:
             all_uuid[dataset] = current_uuid
@@ -65,10 +59,19 @@ for dataset in ['cleaned_matches', 'exact_matches', 'non_matches']:
 msd_bb_mbid_info = msd_bb_mbid_info.drop_duplicates(['uuid'])
 
 logger.info('Generate datasets')
+targets = pd.read_csv(
+    os.path.join(
+        path_prefix,
+        'msd_bb_mbid_targets.csv',
+    ),
+    header=0,
+    index_col=0,
+)
+
 for dataset, uuids in all_uuid.items():
-    for source, data in msd_bb_mbid[dataset].items():
+    for source, data in datasets[dataset].items():
         data = data.merge(uuids, on=['uuid'])
-        non_hit_data = msd_bb_mbid['non_matches'][source].merge(
+        non_hit_data = datasets['non_matches'][source].merge(
             uuids,
             on=['uuid'],
         )
@@ -81,5 +84,6 @@ for dataset, uuids in all_uuid.items():
         logger.info('Store %s %s containing %d songs' %
                     (dataset, source, len(data.index)))
         data = data.merge(msd_bb_mbid_info, on=['uuid'])
+        data = data.merge(targets, on=['uuid'])
         data = shuffle(data, random_state=42)
         data.to_parquet(filename)

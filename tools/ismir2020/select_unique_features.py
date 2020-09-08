@@ -24,7 +24,7 @@ for dataset in ['cleaned_matches', 'exact_matches', 'non_matches']:
         ('ab', 120, 'mbid', 'file_id'),
         ('essentia', 25, 'msd_id', 'msd_id'),
     ]:
-        for feature_type in ['hl', 'll']:
+        for feature_type in ['ll']:
             logger.info('Read %s %s %s features' % (
                 source,
                 dataset,
@@ -59,3 +59,48 @@ for dataset in ['cleaned_matches', 'exact_matches', 'non_matches']:
                     path_prefix,
                     filename + '_unique.parquet',
                 ))
+
+logger.info('Join features of different type.')
+for dataset in ['cleaned_matches', 'exact_matches', 'non_matches']:
+    for source in ['ab', 'essentia']:
+        if source == 'ab':
+            join_cols = ['mbid', 'file_id']
+        else:
+            join_cols = ['msd_id']
+
+        file_prefix = 'msd_bb_mbid_' + dataset + '_' + source
+        data = None
+        for feature_type in ['hl', 'll']:
+            logger.info('Read %s %s %s features' % (
+                source,
+                dataset,
+                feature_type,
+            ))
+
+            filename = file_prefix + '_' + feature_type + '_features'
+
+            if feature_type == 'll':
+                filename += '_unique.parquet'
+            else:
+                filename += '.parquet'
+
+            current_data = pd.read_parquet(os.path.join(
+                path_prefix,
+                filename,
+            ))
+
+            if data is None:
+                data = current_data
+            else:
+                data = data.merge(
+                    current_data,
+                    on=join_cols,
+                    suffixes=['_hl', '_ll'],
+                )
+
+        logger.info('Store %s %s feature dataset' % (dataset, source))
+        filename = file_prefix + '_unique_features.parquet'
+        data.to_parquet(os.path.join(
+            path_prefix,
+            filename,
+        ))

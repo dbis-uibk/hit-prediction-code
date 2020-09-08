@@ -20,7 +20,8 @@ datasets = [
 for dataset in datasets:
     filename = os.path.join(
         path_prefix,
-        dataset + '.csv',
+        dataset + '_essentia_unique_features.parquet',
     )
-    dataset = pd.read_csv(filename, index_col=0)[['uuid', 'msd_id']]
+    dataset = pd.read_parquet(filename)[['uuid', 'msd_id']]
+    dataset.drop_duplicates(inplace=True)
     melspect.combine_with_dataset(dataset, filename)
