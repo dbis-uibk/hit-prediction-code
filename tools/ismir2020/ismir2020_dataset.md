@@ -20,9 +20,9 @@ To get a singe feature set per song we need to select the "best fitting ones"
 by running:
 `select_unique_features.py`
 
+Final, we combine the whole dataset by running: `merge_msd_bb_mbid_dataset.py`
+
 *Start Missing*
 After that we need to extract the mel-spects for all known essentia features.
 * `merge_msd_bb_mbid_essentia_and_melspect.py`
 *End Missing*
-
-Final, we combine the whole dataset by running: `merge_msd_bb_mbid_dataset.py`
