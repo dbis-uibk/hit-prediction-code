@@ -39,25 +39,6 @@ for dataset in ['cleaned_matches', 'exact_matches']:
     all_uuid[dataset] = all_uuid[dataset].append(non_hit_sample)
 del all_uuid['non_matches']
 
-logger.info('Load msd bb mbid')
-msd_bb_mbid_info = None
-for dataset in ['cleaned_matches', 'exact_matches', 'non_matches']:
-    logger.info('Read msd bb mbid %s' % dataset)
-    current = pd.read_csv(
-        os.path.join(
-            path_prefix,
-            'msd_bb_mbid_' + dataset + '.csv',
-        ),
-        header=0,
-        index_col=0,
-    )
-
-    if msd_bb_mbid_info is None:
-        msd_bb_mbid_info = current
-    else:
-        msd_bb_mbid_info = msd_bb_mbid_info.append(current)
-msd_bb_mbid_info = msd_bb_mbid_info.drop_duplicates(['uuid'])
-
 logger.info('Generate datasets')
 targets = pd.read_csv(
     os.path.join(
@@ -83,7 +64,6 @@ for dataset, uuids in all_uuid.items():
         )
         logger.info('Store %s %s containing %d songs' %
                     (dataset, source, len(data.index)))
-        data = data.merge(msd_bb_mbid_info, on=['uuid'])
         data = data.merge(targets, on=['uuid'])
         data = shuffle(data, random_state=42)
         data.to_parquet(filename)
