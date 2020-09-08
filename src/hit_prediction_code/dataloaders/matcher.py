@@ -147,7 +147,7 @@ def add_uuid_column(data,
     Retruns a dataframe extended by a UUID.
     """
     if furhter_id_cols == 'default':
-        furhter_id_cols = ['mbid', 'msd_id', 'echo_nest_id']
+        furhter_id_cols = ['mbid', 'msd_id', 'echo_nest_id', 'lastfm_mbid']
 
     join_cols = [artist_col, title_col]
     songs = data[join_cols].drop_duplicates()
