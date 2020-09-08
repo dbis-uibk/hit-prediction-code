@@ -18,7 +18,8 @@ for dataset in ['cleaned_matches', 'exact_matches', 'non_matches']:
         ),
         header=0,
         index_col=0,
-    )
+    )[['uuid', 'msd_id', 'mbid']]
+    msd_bb_mbid.drop_duplicates(inplace=True)
 
     for source, min_length, join_col, sample_id_col in [
         ('ab', 120, 'mbid', 'file_id'),
@@ -38,7 +39,7 @@ for dataset in ['cleaned_matches', 'exact_matches', 'non_matches']:
                     filename + '.parquet',
                 ))
             data = data.merge(
-                msd_bb_mbid,
+                msd_bb_mbid[['uuid', join_col]],
                 on=[join_col],
             ).drop_duplicates(subset=[sample_id_col])
             logger.info('Select %s features from %s' % (feature_type, source))
@@ -64,7 +65,7 @@ logger.info('Join features of different type.')
 for dataset in ['cleaned_matches', 'exact_matches', 'non_matches']:
     for source in ['ab', 'essentia']:
         if source == 'ab':
-            join_cols = ['mbid']
+            join_cols = ['uuid', 'msd_id', 'mbid']
         else:
             join_cols = ['msd_id']
 
