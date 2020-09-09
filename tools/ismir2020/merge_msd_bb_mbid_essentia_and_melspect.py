@@ -17,11 +17,15 @@ datasets = [
     'msd_bb_mbid_exact_matches',
     'msd_bb_mbid_non_matches',
 ]
-for dataset in datasets:
+for dataset_name in datasets:
     filename = os.path.join(
         path_prefix,
-        dataset + '_essentia_unique_features.parquet',
+        dataset_name + '_essentia_unique_features.parquet',
     )
     dataset = pd.read_parquet(filename)[['uuid', 'msd_id']]
     dataset.drop_duplicates(inplace=True)
-    melspect.combine_with_dataset(dataset, filename)
+    melspect.combine_with_dataset(
+        dataset,
+        filename,
+        output_file_prefix=dataset_name,
+    )

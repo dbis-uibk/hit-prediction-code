@@ -217,7 +217,8 @@ def _extract_features(zipfile_name, dataset):
 def combine_with_dataset(dataset,
                          dataset_filename,
                          processes_count=None,
-                         project_home='.'):
+                         project_home='.',
+                         output_file_prefix=None):
     """Extracts and combines melspectrogram features with a given dataset.
 
     Args:
@@ -227,7 +228,8 @@ def combine_with_dataset(dataset,
         processes_count: the number of processes used for the multiprocessing
             pool.
         project_home: path to the data folder.
-
+        output_file_prefix: If not None, the given prefix is used instead of
+            the basename of the dataset_filename.
     """
     archive_files = glob.glob(
         os.path.join(
@@ -236,12 +238,16 @@ def combine_with_dataset(dataset,
             '*.zip',
         ))
 
-    output_file_name, _ = os.path.splitext(os.path.basename(dataset_filename))
-    output_file_name += ('_' + OUTPUT_PREFIX + '.pickle.xz')
-    output_file_name = os.path.join(
+    if output_file_prefix is not None:
+        output_filename = output_file_prefix
+    else:
+        output_filename, _ = os.path.splitext(
+            os.path.basename(dataset_filename))
+    output_filename += ('_' + OUTPUT_PREFIX + '.pickle.xz')
+    output_filename = os.path.join(
         project_home,
         INTERIM_PATH,
-        output_file_name,
+        output_filename,
     )
 
     extractor = functools.partial(_extract_features, dataset=dataset)
@@ -249,7 +255,7 @@ def combine_with_dataset(dataset,
     with multiprocessing.Pool(processes=processes_count) as p:
         features = pd.concat(p.map(extractor, archive_files))
         dataset = dataset.merge(features, on=['msd_id'])
-        dataset.to_pickle(output_file_name, 'xz')
+        dataset.to_pickle(output_filename, 'xz')
 
         logger.info('Extracted features for %d samples.', dataset.shape[0])
 
