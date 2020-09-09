@@ -22,4 +22,4 @@ by running: `select_unique_features.py`
 After that we need to extract the mel-spects for all known essentia features
 by running: `merge_msd_bb_mbid_essentia_and_melspect.py`
 
-Final, we combine the whole dataset by running: `merge_msd_bb_mbid_dataset.py`
+Final, we combine the whole dataset by running: `merge_msd_bb_mbid_datasets.py`
