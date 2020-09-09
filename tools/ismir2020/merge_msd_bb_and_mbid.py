@@ -1,4 +1,4 @@
-"""Merges the ismir2019 dataset with mbids."""
+"""Merges the ismir2020 dataset with mbids."""
 from logzero import logger
 import pandas as pd
 
@@ -80,7 +80,7 @@ matches_mbid.to_csv(data_path + '/interim/msd_bb_mbid_exact_matches.csv')
 
 logger.info('Load msd_bb_non_matches.csv')
 non_matches = pd.read_csv(
-    'data/hit_song_prediction_ismir2019/msd_bb_non_matches.csv',
+    data_path + '/raw/msd_bb_non_matches.csv',
     index_col=0,
 )[[
     'msd_id',

@@ -1,4 +1,4 @@
-"""Merges the ismir2019 dataset with mbids."""
+"""Merges the ismir2020 dataset with mbids."""
 from logzero import logger
 
 from hit_prediction_code.dataloaders import billboard
