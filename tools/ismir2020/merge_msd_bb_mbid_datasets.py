@@ -75,7 +75,7 @@ for dataset, uuids in all_uuid.items():
         )
         logger.info('Store %s %s containing %d songs' %
                     (dataset, source, len(data.index)))
-        data = data.merge(targets, on=['uuid'])
+        data = data.merge(targets, on=['uuid'], how='left')
         data = shuffle(data, random_state=42)
         if source == 'melspect':
             data.to_pickle(filename, 'xz')
