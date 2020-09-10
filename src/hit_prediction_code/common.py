@@ -1,9 +1,40 @@
+import os.path
 import re
 
 import numpy as np
+import pandas as pd
 from sklearn.preprocessing import normalize
 
 cache = {'model': None, 'X': None, 'y': None}
+
+
+def read_dataframe(path, **kwargs):
+    """Reads a pandas dataframe from a file.
+
+    It supports multiple file extensions.
+
+    Args:
+        path: the path to the file.
+        kwargs: key word arguments passed to the respective read function.
+
+    Retruns: the dataframe.
+    """
+    filename, file_ext = os.path.splitext(path)
+
+    if file_ext == '.xz':
+        _, file_ext2 = os.path.splitext(filename)
+        file_ext = file_ext2 + file_ext
+
+    if file_ext == '.pickle':
+        return pd.read_pickle(path, **kwargs)
+    if file_ext == '.pickle.xz':
+        return pd.read_pickle(path, 'xz', **kwargs)
+    elif file_ext == '.parquet':
+        return pd.read_parquet(path, **kwargs)
+    elif file_ext == '.csv':
+        return pd.read_csv(path, header=0, index_col=0, **kwargs)
+    else:
+        raise ValueError('File extension %s unknown.' % file_ext)
 
 
 def cached_model_predict(model, X):
