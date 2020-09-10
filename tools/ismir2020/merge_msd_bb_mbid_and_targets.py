@@ -55,6 +55,7 @@ pc = target_filter(
     target_col='lastfm_playcount',
     keep_lowest=False,
 ).drop_duplicates()
+lastfm_data = lc.merge(pc, on=['uuid'])
 
 logger.info('Read chart data')
 charts = pd.read_csv(
@@ -90,10 +91,9 @@ weeks = target_filter(
     target_col='weeks',
     keep_lowest=False,
 ).drop_duplicates()
+chart_data = peak.merge(weeks, on=['uuid'])
 
-data = lc.merge(pc, on=['uuid'])
-data = data.merge(peak, on=['uuid'])
-data = data.merge(weeks, on=['uuid'])
+data = lastfm_data.merge(chart_data, on=['uuid'], how='left')
 
 logger.info('Store targets')
 data.to_csv(path_prefix + 'msd_bb_mbid_targets.csv')
