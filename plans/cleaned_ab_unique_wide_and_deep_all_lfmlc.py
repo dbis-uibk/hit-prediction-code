@@ -22,7 +22,7 @@ dataloader = EssentiaLoader(
         *common.all_no_year_list(),
     ],
     label='lastfm_listener_count',
-    nan_value=None,
+    nan_value=0,
 )
 
 pipeline = Pipeline([
