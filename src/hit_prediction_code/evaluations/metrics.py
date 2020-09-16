@@ -36,7 +36,7 @@ def hit_nonhit_score(estimator, x, y, scorer):
 
 def scoring(hit_nonhit_accuracy_score=hit_nonhit_accuracy_score):
     """Returns a set of scoring functions used for evaluation."""
-    return {
+    scores = {
         'explained_variance':
             metrics.make_scorer(metrics.explained_variance_score),
         'neg_mean_absolute_error':
@@ -50,9 +50,12 @@ def scoring(hit_nonhit_accuracy_score=hit_nonhit_accuracy_score):
                                 greater_is_better=False),
         'r2':
             metrics.make_scorer(metrics.r2_score),
-        'hit_nonhit_accuracy':
-            hit_nonhit_accuracy_score,
     }
+
+    if hit_nonhit_accuracy_score is not None:
+        scores['hit_nonhit_accuracy'] = hit_nonhit_accuracy_score
+
+    return scores
 
 
 def classifier_scoring():
