@@ -33,8 +33,8 @@ def read_msd_bb_mbid(dataset):
 
 logger.info('Read msd bb mbid info')
 data = read_msd_bb_mbid('cleaned_matches')
-data = data.append(read_msd_bb_mbid('cleaned_matches'))
-data = data.append(read_msd_bb_mbid('cleaned_matches'))
+data = data.append(read_msd_bb_mbid('exact_matches'))
+data = data.append(read_msd_bb_mbid('non_matches'))
 data.drop_duplicates(inplace=True)
 
 logger.info('Read lastfm info')
