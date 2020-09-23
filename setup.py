@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """The setup script."""
 
 from glob import glob
@@ -12,7 +11,7 @@ from setuptools import setup
 with open('README.md') as readme_file:
     readme = readme_file.read()
 
-requirements = ['Click>=6.0', 'dbispipeline']
+requirements = []
 
 setup(
     author='Michael Voetter',

@@ -32,16 +32,12 @@ flake8-isort = "*"
 jupyterlab = "*"
 
 [packages]
-hit_prediction_code = {editable = true,path = "."}
-matplotlib = "*"
-scikit-learn = "*"
-pandas = "*"
+hit_prediction_code = {editable = true, path = "."}
+dbispipeline = "==0.7.1"
 gensim = "*"
 tensorflow = "==1.15.2"
 tables = "*"
-fuzzywuzzy = {extras = ["speedup"],version = "*"}
-click = "*"
-dbispipeline = "==0.7.1"
+fuzzywuzzy = {extras = ["speedup"], version = "*"}
 sparqlwrapper = "*"
 qwikidata = "*"
 billboard-py = "*"
@@ -51,8 +47,8 @@ librosa = "*"
 youtube-dl = "*"
 pyarrow = "*"
 seaborn = "*"
-logzero = "*"
 pylast = "*"
+pymorton = "*"
 
 [requires]
 python_version = "3.6"
