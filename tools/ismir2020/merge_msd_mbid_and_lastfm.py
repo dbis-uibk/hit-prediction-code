@@ -1,5 +1,6 @@
 """Merges the msd mbids with lastfm info."""
 import json
+import os.path
 
 from logzero import logger
 import pandas as pd
@@ -8,6 +9,21 @@ import pylast
 data_path = 'data/hit_song_prediction_ismir2020'
 dataset_name = '/interim/msd_mbid_lastfm.pickle'
 lastfm_file = data_path + dataset_name
+unavailable_file = data_path + '/interim/msd_mbid_lastfm_unavailable.csv'
+
+
+def _lastfm_unavailable_mbid(unavailable_file):
+    if not os.path.exists(unavailable_file):
+        return pd.DataFrame(columns=['mbid'])
+
+    try:
+        return pd.read_csv(
+            unavailable_file,
+            header=0,
+            index_col=0,
+        )
+    except FileNotFoundError:
+        return pd.DataFrame(columns=['mbid'])
 
 
 def get_api_config():
@@ -16,7 +32,10 @@ def get_api_config():
         return json.load(file)
 
 
-def download_lastfm_info(mbids, lastfm_file, only_missing=True):
+def download_lastfm_info(mbids,
+                         lastfm_file,
+                         unavailable_file,
+                         only_missing=True):
     """Downloads Last.fm info for songs in mbids.
 
     This function downloads Last.fm information for mbids contianed in the
@@ -25,6 +44,8 @@ def download_lastfm_info(mbids, lastfm_file, only_missing=True):
     Args:
         mbids: mbids to pull information from Last.fm.
         lastfm_file: the file where the information should be stored.
+        unavailable_file: the file where the information about unknown tracks
+            is stored.
         only_missing: If False, mbids already contained in the lastfm_file
             are overwritten. Otherwise, only the missing mbids are pulled
             form Last.fm.
@@ -51,15 +72,19 @@ def download_lastfm_info(mbids, lastfm_file, only_missing=True):
 
     if not only_missing:
         lastfm_info = pd.DataFrame(columns=columns)
+        unavailable_info = pd.DataFrame(columns=['mbid'])
     else:
         try:
             known_info = pd.read_pickle(lastfm_file)
-            known_mbids = set(known_info['mbid'])
-
             lastfm_info = known_info
+
+            known_mbids = set(known_info['mbid'])
             mbids -= known_mbids
         except FileNotFoundError:
-            pass
+            lastfm_info = pd.DataFrame(columns=columns)
+
+        unavailable_info = _lastfm_unavailable_mbid(unavailable_file)
+        mbids -= set(unavailable_info['mbid'])
 
     for idx, mbid in enumerate(mbids):
         try:
@@ -96,10 +121,15 @@ def download_lastfm_info(mbids, lastfm_file, only_missing=True):
             if (idx + 1) % 50 == 0:
                 logger.info('Store intermediate result with %d items' %
                             lastfm_info.shape[0])
-                lastfm_info.to_pickle(data_path + dataset_name)
+                lastfm_info.to_pickle(lastfm_file)
+                unavailable_info.to_csv(unavailable_file)
         except pylast.WSError as e:
             if e.get_id() == '6':
                 logger.warning(e)
+                unavailable_info = unavailable_info.append(
+                    {'mbid': mbid},
+                    ignore_index=True,
+                )
             else:
                 logger.error('Status: %s' % e.get_id())
                 logger.exception(e)
@@ -108,7 +138,8 @@ def download_lastfm_info(mbids, lastfm_file, only_missing=True):
             logger.exception(e)
 
     logger.info('Store Last.fm info for msd_mbid')
-    lastfm_info.to_pickle(data_path + dataset_name)
+    lastfm_info.to_pickle(lastfm_file)
+    unavailable_info.to_csv(unavailable_file)
 
 
 def download_msd_mbid_lastfm():
@@ -120,7 +151,12 @@ def download_msd_mbid_lastfm():
     )
 
     logger.info('Start Last.fm download')
-    download_lastfm_info(msd_mbid_map['mbid'], lastfm_file, only_missing=True)
+    download_lastfm_info(
+        msd_mbid_map['mbid'],
+        lastfm_file,
+        unavailable_file,
+        only_missing=True,
+    )
 
 
 if __name__ == '__main__':
