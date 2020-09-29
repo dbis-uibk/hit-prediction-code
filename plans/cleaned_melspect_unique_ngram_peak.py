@@ -5,7 +5,7 @@ from dbispipeline.evaluators import GridEvaluator
 import dbispipeline.result_handlers
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
-from sklearn.linear_model import SGDRegressor
+from sklearn.neighbors import KNeighborsRegressor
 from sklearn.pipeline import Pipeline
 
 from hit_prediction_code.dataloaders import MelSpectLoader
@@ -32,7 +32,7 @@ pipeline = Pipeline([
     ('sentence', FloatListToSentence(round_decimals=3)),
     ('vector', CountVectorizer(analyzer='word')),
     ('tf-idf', TfidfTransformer()),
-    ('model', SGDRegressor()),
+    ('model', KNeighborsRegressor()),
 ])
 
 evaluator = GridEvaluator(
@@ -42,10 +42,7 @@ evaluator = GridEvaluator(
         'vector__ngram_range': ((1, 1), (1, 4)),  # unigrams or bigrams
         # 'tf-idf__use_idf': (True, False),
         # 'tf-idf__norm': ('l1', 'l2'),
-        'model__max_iter': (20,),
-        # 'model__alpha': (0.00001, 0.000001),
-        # 'model__penalty': ('l2', 'elasticnet'),
-        # 'model__max_iter': (10, 50, 80),
+        # 'model__n_neighbors': (5, 10),
     },
     grid_parameters=evaluations.grid_parameters(),
 )
