@@ -1,6 +1,7 @@
 """Extracts features from melspects."""
 import os.path
 
+import pandas as pd
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.pipeline import Pipeline
@@ -30,7 +31,7 @@ pipeline = Pipeline([
     ('tf-idf', TfidfTransformer()),
 ])
 
-tf_idf = pipeline.fit_transform(dataloader.load()[0])
+tf_idf = pd.DataFrame(pipeline.fit_transform(dataloader.load()[0]))
 tf_idf.to_pickle(
     os.path.join(
         PATH_PREFIX,
