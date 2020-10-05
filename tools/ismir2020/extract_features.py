@@ -26,7 +26,7 @@ dataloader = MelSpectLoader(
 pipeline = Pipeline([
     ('scale', MelSpectScaler()),
     ('z-order', ZOrderTransformer()),
-    ('sentence', FloatListToSentence(round_decimals=3)),
+    ('sentence', FloatListToSentence(round_decimals=2)),
     ('vector',
      CountVectorizer(
          analyzer='word',
