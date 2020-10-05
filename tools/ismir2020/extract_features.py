@@ -31,8 +31,8 @@ pipeline = Pipeline([
     ('tf-idf', TfidfTransformer()),
 ])
 
-tf_idf = pd.DataFrame.from_records(pipeline.fit_transform(
-    dataloader.load()[0]))
+tf_idf = pd.DataFrame.sparse.from_spmatrix(
+    pipeline.fit_transform(dataloader.load()[0]))
 tf_idf.to_pickle(
     os.path.join(
         PATH_PREFIX,
