@@ -31,8 +31,9 @@ pipeline = Pipeline([
     ('tf-idf', TfidfTransformer()),
 ])
 
-tf_idf = pd.DataFrame.sparse.from_spmatrix(
-    pipeline.fit_transform(dataloader.load()[0]))
+data, labels = dataloader.load()
+tf_idf = pd.DataFrame.sparse.from_spmatrix(pipeline.fit_transform(data))
+tf_idf['label'] = labels
 tf_idf.to_pickle(
     os.path.join(
         PATH_PREFIX,
