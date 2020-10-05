@@ -30,7 +30,11 @@ pipeline = Pipeline([
     ('scale', MelSpectScaler()),
     ('z-order', ZOrderTransformer()),
     ('sentence', FloatListToSentence(round_decimals=3)),
-    ('vector', CountVectorizer(analyzer='word')),
+    ('vector',
+     CountVectorizer(
+         analyzer='word',
+         tokenizer=lambda v: v.split(' '),
+     )),
     ('tf-idf', TfidfTransformer()),
     ('model', Ridge()),
 ])
