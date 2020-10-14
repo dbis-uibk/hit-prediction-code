@@ -71,7 +71,19 @@ class RandomFeatureLoader(Loader):
         Args:
             dataloader: used dataloader.
         """
+        self._dataloader = dataloader
         self._config = {
             'dataloader': dataloader.__class__.__name__,
             'dataloader_config': dataloader.configuration,
         }
+
+    def load(self):
+        """Returns the random data as loaded by the dataloader."""
+        data, labels = self._dataloader.load()
+
+        return np.random.random(size=data.shape), labels
+
+    @property
+    def configuration(self):
+        """Returns the configuration in json serializable format."""
+        return self._config
