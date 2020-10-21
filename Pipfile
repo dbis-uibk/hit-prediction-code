@@ -33,7 +33,7 @@ gitpython = "*"
 tables = "*"
 fuzzywuzzy = {extras = ["speedup"],version = "*"}
 click = "*"
-dbispipeline = {git = "ssh://git@git.uibk.ac.at/dbis/software/dbispipeline"}
+dbispipeline = {git = "https://git.uibk.ac.at/dbis/software/dbispipeline"}
 
 [requires]
 python_version = "3.6"

@@ -7,7 +7,7 @@ Easier to user for development.
 ### Installation
 To setup your environment please make sure that you have installed [pipenv](https://github.com/kennethreitz/pipenv).
 
-After installing pipenv execute `pipenv install`. As an alternative you can used the included make file and execute `make init` to achieve the same or `make init-dev` to install packages that are only needed for development.
+After installing pipenv execute `pipenv sync`.
 
 ### Install python3.6
 `sudo dnf install python36`

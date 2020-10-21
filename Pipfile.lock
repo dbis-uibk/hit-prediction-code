@@ -86,7 +86,7 @@
             "version": "==0.10.0"
         },
         "dbispipeline": {
-            "git": "ssh://git@git.uibk.ac.at/dbis/software/dbispipeline",
+            "git": "https://git.uibk.ac.at/dbis/software/dbispipeline",
             "ref": "70129be808f969ee6b0b4a7b4757644e3c76144a"
         },
         "docutils": {
