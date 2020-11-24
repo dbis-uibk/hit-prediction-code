@@ -50,4 +50,4 @@ logger.info('Assign uuid for each song')
 matches_mbid = matcher.add_uuid_column(data=matches_mbid)
 
 logger.info('Store msd_lastfm_mbid_cleaned_matches.csv')
-matches_mbid.to_csv(data_path + '/interim/msd_lastfm_mbid_cleaned_matches.csv')
+matches_mbid.to_csv(data_path + '/interim/msd_lastfm_matches.csv')
