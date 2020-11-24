@@ -1,4 +1,4 @@
-"""loads millionsongdataset features for msd_ids in msd_bb_mbid dataset."""
+"""loads msd features for msd_ids in msd_lastfm_matches dataset."""
 import os.path
 
 from logzero import logger
@@ -6,7 +6,7 @@ import pandas as pd
 
 from hit_prediction_code.dataloaders import millionsongdataset
 
-path_prefix = 'data/hit_song_prediction_ismir2020/interim'
+path_prefix = 'data/hit_song_prediction_lastfm/interim'
 
 
 def _load_features(name, feature):

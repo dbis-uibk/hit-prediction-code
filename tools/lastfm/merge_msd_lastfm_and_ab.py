@@ -1,4 +1,4 @@
-"""loads acoustic brainz features for mbids in msd_bb_mbid dataset."""
+"""loads acoustic brainz features for mbids in msd_lastfm_matches dataset."""
 import os.path
 
 from logzero import logger
