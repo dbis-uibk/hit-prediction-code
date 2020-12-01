@@ -15,13 +15,13 @@ dataset_name = 'msd_lastfm_matches'
 for source in ['ab', 'essentia', 'melspect']:
     filename = 'msd_' + dataset_name + '_' + source
     if source == 'melspect':
-        filename += '_features.pickle.xz'
+        filename += '_features.pickle'
     else:
         filename += '_unique_features.parquet'
     filename = os.path.join(path_prefix, filename)
 
     if source == 'melspect':
-        data = pd.read_pickle(filename, 'xz')
+        data = pd.read_pickle(filename)
     else:
         data = pd.read_parquet(filename)
     current_uuid = data[['uuid']]

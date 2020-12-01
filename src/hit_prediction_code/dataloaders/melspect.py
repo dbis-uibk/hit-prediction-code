@@ -218,7 +218,8 @@ def combine_with_dataset(dataset,
                          dataset_filename,
                          processes_count=None,
                          project_home='.',
-                         output_file_prefix=None):
+                         output_file_prefix=None,
+                         compression='xz'):
     """Extracts and combines melspectrogram features with a given dataset.
 
     Args:
@@ -230,6 +231,7 @@ def combine_with_dataset(dataset,
         project_home: path to the data folder.
         output_file_prefix: If not None, the given prefix is used instead of
             the basename of the dataset_filename.
+        compression: used to store the pickle.
     """
     archive_files = glob.glob(
         os.path.join(
@@ -243,7 +245,10 @@ def combine_with_dataset(dataset,
     else:
         output_filename, _ = os.path.splitext(
             os.path.basename(dataset_filename))
-    output_filename += ('_' + OUTPUT_PREFIX + '.pickle.xz')
+    file_extention = '.pickle'
+    if compression is not None:
+        file_extention += ('.' + compression)
+    output_filename += ('_' + OUTPUT_PREFIX + file_extention)
     output_filename = os.path.join(
         project_home,
         INTERIM_PATH,
@@ -255,7 +260,7 @@ def combine_with_dataset(dataset,
     with multiprocessing.Pool(processes=processes_count) as p:
         features = pd.concat(p.map(extractor, archive_files))
         dataset = dataset.merge(features, on=['msd_id'])
-        dataset.to_pickle(output_filename, 'xz')
+        dataset.to_pickle(output_filename, compression)
 
         logger.info('Extracted features for %d samples.', dataset.shape[0])
 
