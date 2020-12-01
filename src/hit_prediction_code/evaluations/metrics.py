@@ -35,6 +35,26 @@ def hit_nonhit_score(estimator, x, y, scorer):
     return scorer(y[:, -1], estimator.predict(x)[:, -1])
 
 
+def fix_shape(y_true, y_pred, scorer):
+    """
+    Fixes the shape of the input variables for correlation coefficients.
+
+    Args:
+        y_true: Ground truth (correct) target values.
+        y_pred: Estimated targets as returned by a classifier.
+        scorer: The scorer used.
+
+    Returns: The result of the scorer.
+    """
+    if len(y_true.shape) == 2 and y_true.shape[1] == 1:
+        y_true = y_true.flatten()
+
+    if len(y_pred.shape) == 2 and y_pred.shape[1] == 1:
+        y_pred = y_pred.flatten()
+
+    return scorer(y_true, y_pred)
+
+
 def scoring(hit_nonhit_accuracy_score=hit_nonhit_accuracy_score):
     """Returns a set of scoring functions used for evaluation."""
     scores = {
@@ -52,11 +72,14 @@ def scoring(hit_nonhit_accuracy_score=hit_nonhit_accuracy_score):
         'r2':
             metrics.make_scorer(metrics.r2_score),
         'pearsonr':
-            metrics.make_scorer(scipy.stats.pearsonr),
+            metrics.make_scorer(lambda y_true, y_pred: fix_shape(
+                y_true, y_pred, scipy.stats.pearsonr)),
         'spearmanr':
-            metrics.make_scorer(scipy.stats.spearmanr),
+            metrics.make_scorer(lambda y_true, y_pred: fix_shape(
+                y_true, y_pred, scipy.stats.spearmanr)),
         'kendalltau':
-            metrics.make_scorer(scipy.stats.kendalltau),
+            metrics.make_scorer(lambda y_true, y_pred: fix_shape(
+                y_true, y_pred, scipy.stats.kendalltau)),
     }
 
     if hit_nonhit_accuracy_score is not None:
