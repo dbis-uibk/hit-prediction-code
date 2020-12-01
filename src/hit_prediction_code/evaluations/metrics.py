@@ -1,4 +1,5 @@
 """Module containing evaluation metrics."""
+import scipy.stats
 from sklearn import metrics
 
 
@@ -50,6 +51,12 @@ def scoring(hit_nonhit_accuracy_score=hit_nonhit_accuracy_score):
                                 greater_is_better=False),
         'r2':
             metrics.make_scorer(metrics.r2_score),
+        'pearsonr':
+            metrics.make_scorer(scipy.stats.pearsonr),
+        'spearmanr':
+            metrics.make_scorer(scipy.stats.spearmanr),
+        'kendalltau':
+            metrics.make_scorer(scipy.stats.kendalltau),
     }
 
     if hit_nonhit_accuracy_score is not None:
