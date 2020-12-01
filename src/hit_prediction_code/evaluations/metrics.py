@@ -52,7 +52,9 @@ def fix_shape(y_true, y_pred, scorer):
     if len(y_pred.shape) == 2 and y_pred.shape[1] == 1:
         y_pred = y_pred.flatten()
 
-    return scorer(y_true, y_pred)
+    correlation, _ = scorer(y_true, y_pred)
+
+    return correlation
 
 
 def scoring(hit_nonhit_accuracy_score=hit_nonhit_accuracy_score):
@@ -61,14 +63,20 @@ def scoring(hit_nonhit_accuracy_score=hit_nonhit_accuracy_score):
         'explained_variance':
             metrics.make_scorer(metrics.explained_variance_score),
         'neg_mean_absolute_error':
-            metrics.make_scorer(metrics.mean_absolute_error,
-                                greater_is_better=False),
+            metrics.make_scorer(
+                metrics.mean_absolute_error,
+                greater_is_better=False,
+            ),
         'neg_mean_squared_error':
-            metrics.make_scorer(metrics.mean_squared_error,
-                                greater_is_better=False),
+            metrics.make_scorer(
+                metrics.mean_squared_error,
+                greater_is_better=False,
+            ),
         'neg_median_absolute_error':
-            metrics.make_scorer(metrics.median_absolute_error,
-                                greater_is_better=False),
+            metrics.make_scorer(
+                metrics.median_absolute_error,
+                greater_is_better=False,
+            ),
         'r2':
             metrics.make_scorer(metrics.r2_score),
         'pearsonr':
