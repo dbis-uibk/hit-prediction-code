@@ -23,6 +23,12 @@ MP3_ARCHIVE_PATH = os.path.join(
 OUTPUT_PREFIX = 'melspect_features'
 TMP_PATH = tempfile.gettempdir()
 
+DATAFRAME_COLUMNS = [
+    'archive_file_name',
+    'msd_id',
+    'librosa_melspectrogram',
+]
+
 
 def use_center_window(data, window_size):
     """Extracts the center window of a given numpy array.
@@ -183,13 +189,7 @@ def extract_mel_from_mp3s_in_zipfile(zipfile_name,
                 if len(result) % 1000 == 0:
                     logger.info('Looked at %s tracks.', len(result))
 
-    dataframe_columns = [
-        'archive_file_name',
-        'msd_id',
-        'librosa_melspectrogram',
-    ]
-
-    return pd.DataFrame(result, columns=dataframe_columns)
+    return pd.DataFrame(result, columns=DATAFRAME_COLUMNS)
 
 
 def _extract_features(zipfile_name, dataset):
@@ -248,10 +248,10 @@ def combine_with_dataset(dataset,
     file_extention = '.pickle'
     if compression is not None:
         file_extention += ('.' + compression)
-    output_filename += ('_' + OUTPUT_PREFIX + file_extention)
+    output_filename += ('_' + OUTPUT_PREFIX)
     output_filename = os.path.join(
         project_home,
-        INTERIM_PATH,
+        os.path.dirname(dataset_filename),
         output_filename,
     )
 
@@ -260,8 +260,27 @@ def combine_with_dataset(dataset,
     with multiprocessing.Pool(processes=processes_count) as p:
         features = pd.concat(p.map(extractor, archive_files))
         dataset = dataset.merge(features, on=['msd_id'])
-        dataset.to_pickle(output_filename, compression)
 
+        chunk_size = 100_000
+
+        if dataset.shape[0] > chunk_size:
+            dataset[DATAFRAME_COLUMNS[:2]].to_pickle(
+                output_filename + file_extention, compression)
+            logger.info('Stored metadata for features of %d samples.',
+                        dataset.shape[0])
+
+            for count, chunk_start in enumerate(
+                    range(0, dataset.shape[0], chunk_size)):
+                chunk_end = chunk_start + chunk_size
+                chunk_name = '_' + str(count)
+
+                data = dataset[chunk_start:chunk_end]
+                data.to_pickle(output_filename + chunk_name + file_extention,
+                               compression)
+                logger.info('Stored feature chunk %d containing %d samples.',
+                            (count, data.shape[0]))
+        else:
+            dataset.to_pickle(output_filename + file_extention, compression)
         logger.info('Extracted features for %d samples.', dataset.shape[0])
 
 

@@ -23,5 +23,4 @@ melspect.combine_with_dataset(
     dataset,
     filename,
     output_file_prefix=dataset_name,
-    compression=None,
 )
