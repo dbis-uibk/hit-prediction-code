@@ -264,8 +264,12 @@ def combine_with_dataset(dataset,
         chunk_size = 50_000
 
         if dataset.shape[0] > chunk_size:
-            dataset[DATAFRAME_COLUMNS[:2]].to_pickle(
-                output_filename + file_extention, compression)
+            columns = [
+                c for c in DATAFRAME_COLUMNS
+                if 'librosa_melspectrogram' not in c
+            ]
+            dataset[columns].to_pickle(output_filename + file_extention,
+                                       compression)
             logger.info('Stored metadata for features of %d samples.',
                         dataset.shape[0])
 
