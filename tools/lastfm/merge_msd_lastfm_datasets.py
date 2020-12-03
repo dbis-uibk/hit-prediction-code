@@ -15,7 +15,7 @@ dataset_name = 'msd_lastfm_matches'
 for source in ['ab', 'essentia', 'melspect']:
     filename = dataset_name + '_' + source
     if source == 'melspect':
-        filename += '_features.pickle'
+        filename += '_features.pickle.xz'
     else:
         filename += '_unique_features.parquet'
     filename = os.path.join(path_prefix, filename)
