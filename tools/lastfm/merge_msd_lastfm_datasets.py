@@ -13,7 +13,7 @@ all_uuid = None
 dataset = {}
 dataset_name = 'msd_lastfm_matches'
 for source in ['ab', 'essentia', 'melspect']:
-    filename = 'msd_' + dataset_name + '_' + source
+    filename = dataset_name + '_' + source
     if source == 'melspect':
         filename += '_features.pickle'
     else:

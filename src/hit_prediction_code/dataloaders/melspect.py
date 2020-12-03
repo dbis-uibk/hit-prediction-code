@@ -261,7 +261,7 @@ def combine_with_dataset(dataset,
         features = pd.concat(p.map(extractor, archive_files))
         dataset = dataset.merge(features, on=['msd_id'])
 
-        chunk_size = 100_000
+        chunk_size = 50_000
 
         if dataset.shape[0] > chunk_size:
             dataset[DATAFRAME_COLUMNS[:2]].to_pickle(
