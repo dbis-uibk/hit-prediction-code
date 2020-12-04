@@ -265,7 +265,7 @@ def combine_with_dataset(dataset,
 
         if dataset.shape[0] > chunk_size:
             columns = [
-                c for c in DATAFRAME_COLUMNS
+                c for c in dataset.columns
                 if 'librosa_melspectrogram' not in c
             ]
             dataset[columns].to_pickle(output_filename + file_extention,
@@ -282,7 +282,7 @@ def combine_with_dataset(dataset,
                 data.to_pickle(output_filename + chunk_name + file_extention,
                                compression)
                 logger.info('Stored feature chunk %d containing %d samples.',
-                            (count, data.shape[0]))
+                            count, data.shape[0])
         else:
             dataset.to_pickle(output_filename + file_extention, compression)
         logger.info('Extracted features for %d samples.', dataset.shape[0])
