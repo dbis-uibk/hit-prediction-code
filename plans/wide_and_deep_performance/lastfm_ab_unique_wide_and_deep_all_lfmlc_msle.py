@@ -16,7 +16,7 @@ PATH_PREFIX = 'data/hit_song_prediction_lastfm/processed'
 dataloader = EssentiaLoader(
     dataset_path=os.path.join(
         PATH_PREFIX,
-        'msd_lastfm_cleaned_matches_ab_unique.parquet',
+        'msd_lastfm_matches_ab_unique.parquet',
     ),
     features=[
         *common.all_no_year_list(),
