@@ -55,7 +55,7 @@ for source, data in dataset.items():
 
     filename = os.path.join(
         final_prefix,
-        'msd_' + dataset_name + '_' + source + file_suffix,
+        dataset_name + '_' + source + file_suffix,
     )
     logger.info('Store %s %s containing %d songs' %
                 (dataset_name, source, len(data.index)))
