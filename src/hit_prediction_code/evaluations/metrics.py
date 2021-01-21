@@ -35,7 +35,21 @@ def hit_nonhit_score(estimator, x, y, scorer):
     return scorer(y[:, -1], estimator.predict(x)[:, -1])
 
 
-def fix_shape(y_true, y_pred, scorer):
+def fix_shape(array):
+    """Fixes the shape, if array is 2D but can be 1D.
+
+    Args:
+        array (np.array): input array.
+
+    Returns (np.array): the fixed array.
+    """
+    if len(array.shape) == 2 and array.shape[1] == 1:
+        return array.flatten()
+    else:
+        return array
+
+
+def fix_shape_and_score(y_true, y_pred, scorer):
     """
     Fixes the shape of the input variables for correlation coefficients.
 
@@ -46,13 +60,7 @@ def fix_shape(y_true, y_pred, scorer):
 
     Returns: The result of the scorer.
     """
-    if len(y_true.shape) == 2 and y_true.shape[1] == 1:
-        y_true = y_true.flatten()
-
-    if len(y_pred.shape) == 2 and y_pred.shape[1] == 1:
-        y_pred = y_pred.flatten()
-
-    return scorer(y_true, y_pred)
+    return scorer(fix_shape(y_true), fix_shape(y_pred))
 
 
 def extract_correlation(result):
@@ -106,7 +114,7 @@ def scoring(hit_nonhit_accuracy_score=hit_nonhit_accuracy_score,
         'pearsonr':
             metrics.make_scorer(
                 lambda y_true, y_pred: extract_correlation(
-                    fix_shape(
+                    fix_shape_and_score(
                         y_true,
                         y_pred,
                         scipy.stats.pearsonr,
@@ -115,7 +123,7 @@ def scoring(hit_nonhit_accuracy_score=hit_nonhit_accuracy_score,
         'spearmanr':
             metrics.make_scorer(
                 lambda y_true, y_pred: extract_correlation(
-                    fix_shape(
+                    fix_shape_and_score(
                         y_true,
                         y_pred,
                         scipy.stats.spearmanr,
@@ -124,7 +132,7 @@ def scoring(hit_nonhit_accuracy_score=hit_nonhit_accuracy_score,
         'kendalltau':
             metrics.make_scorer(
                 lambda y_true, y_pred: extract_correlation(
-                    fix_shape(
+                    fix_shape_and_score(
                         y_true,
                         y_pred,
                         scipy.stats.kendalltau,
