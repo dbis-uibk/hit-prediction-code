@@ -2,6 +2,8 @@
 from numbers import Real
 from typing import List
 
+import numpy as np
+
 
 def convert_to_closest_label(value: Real, labels: List[int]) -> int:
     """
@@ -41,3 +43,21 @@ def convert_to_closest_label(value: Real, labels: List[int]) -> int:
     # return biggest label if there is no next label and value was
     # not between two labels
     return labels[-1]
+
+
+def convert_array_to_closest_labels(array: np.array, labels: List[int]):
+    """Converts the numpy array to labels.
+
+    Args:
+        array (np.array): the array to be converted.
+        labels (List[int]): the list of target labels.
+
+    Returns (np.array): of the mapped labels.
+    """
+    if len(array.shape) != 1:
+        raise ValueError('The array needs to be 1D.')
+
+    return np.fromiter(
+        map(lambda v: convert_to_closest_label(v, labels), array),
+        dtype=np.int,
+    )

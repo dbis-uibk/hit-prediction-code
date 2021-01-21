@@ -265,8 +265,7 @@ def combine_with_dataset(dataset,
 
         if dataset.shape[0] > chunk_size:
             columns = [
-                c for c in dataset.columns
-                if 'librosa_melspectrogram' not in c
+                c for c in dataset.columns if 'librosa_melspectrogram' not in c
             ]
             dataset[columns].to_pickle(output_filename + file_extention,
                                        compression)
