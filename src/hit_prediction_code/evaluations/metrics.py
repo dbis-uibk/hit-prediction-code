@@ -52,13 +52,37 @@ def fix_shape(y_true, y_pred, scorer):
     if len(y_pred.shape) == 2 and y_pred.shape[1] == 1:
         y_pred = y_pred.flatten()
 
-    correlation, _ = scorer(y_true, y_pred)
+    return scorer(y_true, y_pred)
 
+
+def extract_correlation(result):
+    """Returns: the first entry in the tuple."""
+    correlation, _ = result
     return correlation
 
 
-def scoring(hit_nonhit_accuracy_score=hit_nonhit_accuracy_score):
-    """Returns a set of scoring functions used for evaluation."""
+def convert_labels(y_true, y_pred, scorer, converter):
+    """Converts labels before applying the scorer.
+
+    Args:
+        y_true: Ground truth (correct) target values.
+        y_pred: Estimated targets as returned by a classifier.
+        scorer: The scorer used.
+        converter: the converter used.
+
+    Returns: the result of the scorer.
+    """
+    return scorer(converter(fix_shape(y_true)), converter(fix_shape(y_pred)))
+
+
+def scoring(hit_nonhit_accuracy_score=hit_nonhit_accuracy_score,
+            label_converter=None):
+    """Returns a set of scoring functions used for evaluation.
+
+    Args:
+        hit_nonhit_accuracy_score: function returning hte hit non-hit score
+        label_converter: function converting labels
+    """
     scores = {
         'explained_variance':
             metrics.make_scorer(metrics.explained_variance_score),
@@ -80,18 +104,83 @@ def scoring(hit_nonhit_accuracy_score=hit_nonhit_accuracy_score):
         'r2':
             metrics.make_scorer(metrics.r2_score),
         'pearsonr':
-            metrics.make_scorer(lambda y_true, y_pred: fix_shape(
-                y_true, y_pred, scipy.stats.pearsonr)),
+            metrics.make_scorer(
+                lambda y_true, y_pred: extract_correlation(
+                    fix_shape(
+                        y_true,
+                        y_pred,
+                        scipy.stats.pearsonr,
+                    )),
+            ),
         'spearmanr':
-            metrics.make_scorer(lambda y_true, y_pred: fix_shape(
-                y_true, y_pred, scipy.stats.spearmanr)),
+            metrics.make_scorer(
+                lambda y_true, y_pred: extract_correlation(
+                    fix_shape(
+                        y_true,
+                        y_pred,
+                        scipy.stats.spearmanr,
+                    )),
+            ),
         'kendalltau':
-            metrics.make_scorer(lambda y_true, y_pred: fix_shape(
-                y_true, y_pred, scipy.stats.kendalltau)),
+            metrics.make_scorer(
+                lambda y_true, y_pred: extract_correlation(
+                    fix_shape(
+                        y_true,
+                        y_pred,
+                        scipy.stats.kendalltau,
+                    )),
+            ),
     }
 
     if hit_nonhit_accuracy_score is not None:
         scores['hit_nonhit_accuracy'] = hit_nonhit_accuracy_score
+
+    if label_converter is not None:
+        scores['neg_mean_absolute_error_labels'] = metrics.make_scorer(
+            lambda y_true, y_pred: convert_labels(
+                y_true,
+                y_pred,
+                metrics.mean_absolute_error,
+                label_converter,
+            ),
+            greater_is_better=False,
+        )
+        scores['neg_mean_squared_error_labels'] = metrics.make_scorer(
+            lambda y_true, y_pred: convert_labels(
+                y_true,
+                y_pred,
+                metrics.mean_squared_error,
+                label_converter,
+            ),
+            greater_is_better=False,
+        )
+        scores['pearsonr_labels'] = metrics.make_scorer(
+            lambda y_true, y_pred: extract_correlation(
+                convert_labels(
+                    y_true,
+                    y_pred,
+                    scipy.stats.pearsonr,
+                    label_converter,
+                )),
+        )
+        scores['spearmanr_labels'] = metrics.make_scorer(
+            lambda y_true, y_pred: extract_correlation(
+                convert_labels(
+                    y_true,
+                    y_pred,
+                    scipy.stats.spearmanr,
+                    label_converter,
+                )),
+        )
+        scores['kendalltau_labels'] = metrics.make_scorer(
+            lambda y_true, y_pred: extract_correlation(
+                convert_labels(
+                    y_true,
+                    y_pred,
+                    scipy.stats.kendalltau,
+                    label_converter,
+                )),
+        )
 
     return scores
 

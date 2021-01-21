@@ -30,6 +30,7 @@ yapf = "*"
 isort = "*"
 flake8-isort = "*"
 jupyterlab = "*"
+pytest-cov = "*"
 
 [packages]
 hit_prediction_code = {editable = true, path = "."}
