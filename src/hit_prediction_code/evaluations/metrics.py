@@ -1,7 +1,6 @@
 """Module containing evaluation metrics."""
 import scipy.stats
 from sklearn import metrics
-from sklearn.preprocessing import OneHotEncoder
 
 from ..transformers.label import convert_array_to_closest_labels
 
@@ -86,20 +85,12 @@ def convert_labels(y_true, y_pred, scorer, converter):
     return scorer(converter(fix_shape(y_true)), converter(fix_shape(y_pred)))
 
 
-def _convert_to_category(y_true, y_pred, categories, scorer):
+def _confusion_matrix(y_true, y_pred, categories):
 
     y_true = convert_array_to_closest_labels(fix_shape(y_true), categories)
     y_pred = convert_array_to_closest_labels(fix_shape(y_pred), categories)
 
-    y_true = y_true.reshape(len(y_true), 1)
-    y_pred = y_true.reshape(len(y_pred), 1)
-
-    encoder = OneHotEncoder(categories=[categories])
-
-    y_true = encoder.fit_transform(y_true)
-    y_pred = encoder.transform(y_pred)
-
-    return scorer(y_true, y_pred)
+    return metrics.confusion_matrix(y_true, y_pred, labels=categories)
 
 
 def scoring(hit_nonhit_accuracy_score=hit_nonhit_accuracy_score,
@@ -214,11 +205,10 @@ def scoring(hit_nonhit_accuracy_score=hit_nonhit_accuracy_score,
         )
 
         scores['confusion_matrix'] = metrics.make_scorer(
-            lambda y_true, y_pred: _convert_to_category(
+            lambda y_true, y_pred: _confusion_matrix(
                 y_true,
                 y_pred,
                 categories,
-                metrics.confusion_matrix,
             ),
         )
 
