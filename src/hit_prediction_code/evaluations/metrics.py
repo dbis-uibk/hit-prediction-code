@@ -1,6 +1,9 @@
 """Module containing evaluation metrics."""
 import scipy.stats
 from sklearn import metrics
+from sklearn.preprocessing import OneHotEncoder
+
+from ..transformers.label import convert_array_to_closest_labels
 
 
 def hit_nonhit_accuracy_score(estimator,
@@ -83,13 +86,29 @@ def convert_labels(y_true, y_pred, scorer, converter):
     return scorer(converter(fix_shape(y_true)), converter(fix_shape(y_pred)))
 
 
+def _convert_to_category(y_true, y_pred, categories, scorer):
+
+    y_true = convert_array_to_closest_labels(fix_shape(y_true), categories)
+    y_pred = convert_array_to_closest_labels(fix_shape(y_pred), categories)
+
+    y_true = y_true.reshape(len(y_true), 1)
+    y_pred = y_true.reshape(len(y_pred), 1)
+
+    encoder = OneHotEncoder(categories=categories)
+
+    y_true = encoder.fit_transform(y_true)
+    y_pred = encoder.transform(y_pred)
+
+    return scorer(y_true, y_pred)
+
+
 def scoring(hit_nonhit_accuracy_score=hit_nonhit_accuracy_score,
-            label_converter=None):
+            categories=None):
     """Returns a set of scoring functions used for evaluation.
 
     Args:
         hit_nonhit_accuracy_score: function returning hte hit non-hit score
-        label_converter: function converting labels
+        categories: list of labelscategoreis
     """
     scores = {
         'explained_variance':
@@ -143,7 +162,11 @@ def scoring(hit_nonhit_accuracy_score=hit_nonhit_accuracy_score,
     if hit_nonhit_accuracy_score is not None:
         scores['hit_nonhit_accuracy'] = hit_nonhit_accuracy_score
 
-    if label_converter is not None:
+    if categories is not None:
+
+        def label_converter(arr):
+            return convert_array_to_closest_labels(arr, categories)
+
         scores['neg_mean_absolute_error_labels'] = metrics.make_scorer(
             lambda y_true, y_pred: convert_labels(
                 y_true,
@@ -188,6 +211,15 @@ def scoring(hit_nonhit_accuracy_score=hit_nonhit_accuracy_score,
                     scipy.stats.kendalltau,
                     label_converter,
                 )),
+        )
+
+        scores['confusion_matrix'] = metrics.make_scorer(
+            lambda y_true, y_pred: _convert_to_category(
+                y_true,
+                y_pred,
+                categories,
+                metrics.confusion_matrix,
+            ),
         )
 
     return scores

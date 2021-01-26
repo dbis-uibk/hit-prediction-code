@@ -10,8 +10,6 @@ import hit_prediction_code.common as common
 from hit_prediction_code.dataloaders import EssentiaLoader
 import hit_prediction_code.evaluations as evaluations
 from hit_prediction_code.models.wide_and_deep import WideAndDeep
-from hit_prediction_code.transformers.label import \
-    convert_array_to_closest_labels
 
 PATH_PREFIX = 'data/hit_song_prediction_ismir2020/processed'
 
@@ -44,11 +42,7 @@ pipeline = Pipeline([
 
 evaluator = CvEpochEvaluator(
     cv=evaluations.cv(),
-    scoring=evaluations.metrics.scoring(
-        label_converter=lambda arr: convert_array_to_closest_labels(
-            arr,
-            labels,
-        )),
+    scoring=evaluations.metrics.scoring(categories=labels),
     scoring_step_size=10,
 )
 
