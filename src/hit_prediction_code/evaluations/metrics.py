@@ -94,7 +94,7 @@ def _convert_to_category(y_true, y_pred, categories, scorer):
     y_true = y_true.reshape(len(y_true), 1)
     y_pred = y_true.reshape(len(y_pred), 1)
 
-    encoder = OneHotEncoder(categories=categories)
+    encoder = OneHotEncoder(categories=[categories])
 
     y_true = encoder.fit_transform(y_true)
     y_pred = encoder.transform(y_pred)
