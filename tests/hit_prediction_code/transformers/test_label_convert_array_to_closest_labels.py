@@ -16,9 +16,9 @@ def test_array_shape_check():
 
 def test_mapping_values_to_labels():
     """Tests if the values are mapped correctly."""
-    arr = np.array([1.5, -1, 6, 2.25, 10, 15])
+    arr = np.array([1.5, -1, 6, 0, 2.25, 10, 15])
     labels = [0, 5, 10]
 
-    expected_arr = np.array([0, 0, 5, 0, 10, 10])
+    expected_arr = np.array([0, 0, 5, 0, 0, 10, 10])
 
     assert (convert_array_to_closest_labels(arr, labels) == expected_arr).all()

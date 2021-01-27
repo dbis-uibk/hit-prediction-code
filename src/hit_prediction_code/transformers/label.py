@@ -24,7 +24,7 @@ def convert_to_closest_label(value: Real, labels: List[int]) -> int:
 
     previous_label: int = labels[0]
 
-    if value < previous_label:
+    if value <= previous_label:
         return previous_label
 
     for next_label in labels[1:]:
@@ -32,7 +32,6 @@ def convert_to_closest_label(value: Real, labels: List[int]) -> int:
             diff_to_previous = value - previous_label
             diff_to_next = next_label - value
 
-            print(value, diff_to_previous, diff_to_next)
             if diff_to_previous < diff_to_next:
                 return previous_label
             else:

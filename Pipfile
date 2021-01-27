@@ -50,6 +50,7 @@ pyarrow = "*"
 seaborn = "*"
 pylast = "*"
 pymorton = "*"
+tabulate = "*"
 
 [requires]
 python_version = "3.6"
