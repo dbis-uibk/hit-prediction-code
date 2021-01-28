@@ -29,7 +29,7 @@ pipeline = Pipeline([
     ('scale', MinMaxScaler()),
     ('model',
      WideAndDeep(
-         epochs=1000,
+         epochs=common.wide_and_deep_epochs(),
          features=dataloader.feature_indices,
          batch_normalization=False,
          deep_activation='elu',
@@ -41,7 +41,10 @@ pipeline = Pipeline([
 
 evaluator = CvEpochEvaluator(
     cv=evaluations.cv(),
-    scoring=evaluations.metrics.scoring(hit_nonhit_accuracy_score=None),
+    scoring=evaluations.metrics.scoring(
+        hit_nonhit_accuracy_score=None,
+        categories=common.lfmpc_labels(),
+    ),
     scoring_step_size=10,
 )
 
