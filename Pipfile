@@ -34,7 +34,7 @@ pytest-cov = "*"
 
 [packages]
 hit_prediction_code = {editable = true, path = "."}
-dbispipeline = "==0.7.1"
+dbispipeline = "==0.8.14"
 gensim = "*"
 tensorflow = "==1.15.2"
 tables = "*"
