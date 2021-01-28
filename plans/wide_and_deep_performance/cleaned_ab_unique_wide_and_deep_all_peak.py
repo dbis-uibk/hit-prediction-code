@@ -22,7 +22,7 @@ dataloader = EssentiaLoader(
         *common.all_no_year_list(),
     ],
     label='peakPos',
-    nan_value=150,
+    nan_value=101,
 )
 
 labels = list(range(1, 102))
