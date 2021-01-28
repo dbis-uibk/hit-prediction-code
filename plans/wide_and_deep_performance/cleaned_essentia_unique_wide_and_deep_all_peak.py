@@ -22,14 +22,14 @@ dataloader = EssentiaLoader(
         *common.all_no_year_list(),
     ],
     label='peakPos',
-    nan_value=150,
+    nan_value=common.peak_pos_non_hit_value(),
 )
 
 pipeline = Pipeline([
     ('scale', MinMaxScaler()),
     ('model',
      WideAndDeep(
-         epochs=1000,
+         epochs=common.wide_and_deep_epochs(),
          features=dataloader.feature_indices,
          batch_normalization=False,
          deep_activation='elu',
@@ -40,7 +40,8 @@ pipeline = Pipeline([
 
 evaluator = CvEpochEvaluator(
     cv=evaluations.cv(),
-    scoring=evaluations.metrics.scoring(),
+    scoring=evaluations.metrics.scoring(
+        categories=common.peak_position_labels()),
     scoring_step_size=10,
 )
 

@@ -22,14 +22,14 @@ dataloader = EssentiaLoader(
         *common.all_no_year_list(),
     ],
     label='weeks',
-    nan_value=0,
+    nan_value=common.weeks_non_hit_value(),
 )
 
 pipeline = Pipeline([
     ('scale', MinMaxScaler()),
     ('model',
      WideAndDeep(
-         epochs=1000,
+         epochs=common.wide_and_deep_epochs(),
          features=dataloader.feature_indices,
          batch_normalization=False,
          deep_activation='elu',
@@ -47,7 +47,9 @@ evaluator = CvEpochEvaluator(
             x,
             y,
             threshold=0.5,
-        )),
+        ),
+        categories=common.weeks_labels(),
+    ),
     scoring_step_size=10,
 )
 

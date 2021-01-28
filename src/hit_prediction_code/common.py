@@ -8,6 +8,39 @@ from sklearn.preprocessing import normalize
 cache = {'model': None, 'X': None, 'y': None}
 
 
+def peak_pos_non_hit_value():
+    """Returns: the value used for non-hits when predicting peak pos."""
+    return 101
+
+
+def peak_position_labels():
+    """Returns: the labels used to map regression values."""
+    return list(range(1, 102))
+
+
+def weeks_non_hit_value():
+    """Returns: the value used for non-hits when predicting weeks."""
+    return 0
+
+
+def weeks_labels():
+    """
+    The range is chosen based on the fact, that billboard removes songs form
+    hot 100 after 20 weeks if the song is below position 50.
+    See:
+    Music Popularity: Metrics, Characteristics, and Audio-Based Prediction
+    Junghyuk Lee and Jong-Seok Lee , Senior Member, IEEE
+
+    Returns: the labels used to map regression values.
+    """
+    return list(range(0, 21))
+
+
+def wide_and_deep_epochs():
+    """Returns: the number of epochs used to train wide and deep."""
+    return 500
+
+
 def read_dataframe(path, **kwargs):
     """Reads a pandas dataframe from a file.
 
