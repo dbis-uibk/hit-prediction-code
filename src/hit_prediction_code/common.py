@@ -1,9 +1,9 @@
+"""This module contains common functions and settings."""
 import os.path
 import re
 
 import numpy as np
 import pandas as pd
-from sklearn.preprocessing import normalize
 
 cache = {'model': None, 'X': None, 'y': None}
 
@@ -34,6 +34,24 @@ def weeks_labels():
     Returns: the labels used to map regression values.
     """
     return list(range(0, 21))
+
+
+def lfmlc_labels():
+    """
+    The range is chosen to be base two logarithmic.
+
+    Maximum listener count is approximately 2M.
+    """
+    return list(np.logspace(0, 20, num=21, base=2).astype(np.int))
+
+
+def lfmpc_labels():
+    """
+    The range is chosen to be base two logarithmic.
+
+    Maximum play count is approximately 20M.
+    """
+    return list(np.logspace(0, 24, num=25, base=2).astype(np.int))
 
 
 def wide_and_deep_epochs():
