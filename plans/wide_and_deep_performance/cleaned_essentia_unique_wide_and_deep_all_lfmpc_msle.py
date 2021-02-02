@@ -2,7 +2,6 @@
 import os.path
 
 from dbispipeline.evaluators import CvEpochEvaluator
-import dbispipeline.result_handlers
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import MinMaxScaler
 
@@ -10,6 +9,7 @@ import hit_prediction_code.common as common
 from hit_prediction_code.dataloaders import EssentiaLoader
 import hit_prediction_code.evaluations as evaluations
 from hit_prediction_code.models.wide_and_deep import WideAndDeep
+from hit_prediction_code.result_handlers import print_results_as_json
 
 PATH_PREFIX = 'data/hit_song_prediction_ismir2020/processed'
 
@@ -49,5 +49,5 @@ evaluator = CvEpochEvaluator(
 )
 
 result_handlers = [
-    dbispipeline.result_handlers.print_gridsearch_results,
+    print_results_as_json,
 ]

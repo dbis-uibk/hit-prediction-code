@@ -51,6 +51,7 @@ seaborn = "*"
 pylast = "*"
 pymorton = "*"
 tabulate = "*"
+logzero = "*"
 
 [requires]
 python_version = "3.6"
