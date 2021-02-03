@@ -2,7 +2,9 @@
 import os.path
 from typing import Dict, List
 
+from matplotlib import pyplot
 import pandas as pd
+import seaborn as sns
 
 
 def _splits_from_outcome(outcome: pd.Series) -> List[str]:
@@ -131,3 +133,44 @@ def add_approach_to_df(df: pd.DataFrame) -> None:
     df['approach'] = df['sourcefile'].apply(
         lambda v: os.path.splitext(os.path.basename(v))[0].replace(
             'unique_', '').replace('wide_and_deep', 'wd'))
+
+
+def plot_epochs_confution_matrix(
+        plot_title: str,
+        data: List,
+        columns: List,
+        plot_shape=(2, 2),
+        figsize=(16, 14),
+) -> None:
+    """Plots selected epoch confusion matrix as heatmaps.
+
+    The epochs are selected by chunking the entries evenly.
+
+    Args:
+        plot_title (str): the title of the plot.
+        data (List): the data used for ploting.
+        columns (List): columns used to name the subplots.
+        plot_shape (tuple, optional): the shape used to generate the subplots.
+        figsize (tuple, optional): the figure size.
+    """
+    num_plots = plot_shape[0] * plot_shape[1]
+
+    step = int(len(data) / num_plots)
+    idx = list(range(step, len(data), step))
+    idx[-1] = len(data) - 1
+
+    fig = pyplot.figure(figsize=figsize)
+    fig.suptitle(plot_title)
+
+    max_value = float('-inf')
+    for data_idx in idx:
+        max_value = max(max_value, data[data_idx].max())
+
+    for i, data_idx in enumerate(idx):
+        plot = pyplot.subplot(*plot_shape, i + 1)
+        sns.heatmap(data[data_idx], vmin=0, vmax=max_value)
+        plot.set_title('%s Epoches' % columns[data_idx])
+        plot.set_xlabel('predicted')
+        plot.set_ylabel('actual')
+
+    pyplot.show()
