@@ -173,6 +173,8 @@ def plot_epochs_confution_matrix(
         plot.set_title('%s Epoches' % columns[data_idx])
         plot.set_xlabel('predicted')
         plot.set_ylabel('actual')
+        plot.xaxis.set_ticks_position('top')
+        plot.xaxis.set_label_position('top')
 
     pyplot.show()
 
