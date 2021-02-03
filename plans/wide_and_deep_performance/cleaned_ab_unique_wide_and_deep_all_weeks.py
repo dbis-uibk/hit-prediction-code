@@ -50,7 +50,7 @@ evaluator = CvEpochEvaluator(
         ),
         categories=common.weeks_labels(),
     ),
-    scoring_step_size=10,
+    scoring_step_size=evaluations.scoring_step_size(),
 )
 
 result_handlers = [

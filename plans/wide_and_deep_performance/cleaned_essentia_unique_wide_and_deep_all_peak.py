@@ -42,7 +42,7 @@ evaluator = CvEpochEvaluator(
     cv=evaluations.cv(),
     scoring=evaluations.metrics.scoring(
         categories=common.peak_position_labels()),
-    scoring_step_size=10,
+    scoring_step_size=evaluations.scoring_step_size(),
 )
 
 result_handlers = [

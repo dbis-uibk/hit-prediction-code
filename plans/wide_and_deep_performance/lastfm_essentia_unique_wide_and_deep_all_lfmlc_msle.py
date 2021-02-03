@@ -45,7 +45,7 @@ evaluator = CvEpochEvaluator(
         hit_nonhit_accuracy_score=None,
         categories=common.lfmlc_labels(),
     ),
-    scoring_step_size=10,
+    scoring_step_size=evaluations.scoring_step_size(),
 )
 
 result_handlers = [

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Evaluation packages providing evaluation utils."""
 from sklearn.model_selection import KFold
 
@@ -19,3 +18,8 @@ def grid_parameters():
         'scoring': metrics.scoring(),
         'return_train_score': True,
     }
+
+
+def scoring_step_size():
+    """Returns: the step size used for scoring."""
+    return 10
