@@ -3,6 +3,7 @@ import os.path
 from typing import Dict, List
 
 from matplotlib import pyplot
+import numpy as np
 import pandas as pd
 import seaborn as sns
 
@@ -174,3 +175,35 @@ def plot_epochs_confution_matrix(
         plot.set_ylabel('actual')
 
     pyplot.show()
+
+
+def group_confusion_matrix(matrix: np.array, num_classes: int) -> np.array:
+    """Groups classes in confusion matrix.
+
+    Args:
+        matrix (np.array): the confusion matrix that should be grouped.
+        num_classes (int): number of resulting classes.
+
+    Raises:
+        ValueError: if the number of classes present in the input matrix can
+            not be evenly divided by the number of grouped classes.
+
+    Returns:
+        np.array: the array with grouped input classes.
+    """
+    assert len(matrix.shape) == 2
+    assert matrix.shape[0] == matrix.shape[1]
+
+    if (matrix.shape[0] % num_classes) != 0:
+        raise ValueError('Confution matrix can not be grouped to %d classes' %
+                         num_classes)
+
+    for axis in [0, 1]:
+        grouped_matrix = []
+
+        for col_group in np.split(matrix, num_classes, axis=axis):
+            grouped_matrix.append(np.sum(col_group, axis=axis))
+
+        matrix = np.array(grouped_matrix)
+
+    return np.transpose(matrix)
