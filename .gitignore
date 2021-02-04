@@ -112,3 +112,5 @@ ENV/
 results/
 
 /lastfm_api_info.json
+
+notebooks/*.html
