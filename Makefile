@@ -95,6 +95,10 @@ format: ## formats the code
 	yapf -i -r src
 	yapf -i -r tests
 	yapf -i -r tools
+	isort plans
+	isort src
+	isort tests
+	isort tools
 
 bandit: ## static code checking to find security issues in code
 	bandit -r plans

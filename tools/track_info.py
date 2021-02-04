@@ -1,14 +1,11 @@
 import json
 
 import click
-
-import requests
-
-import pandas as pd
-
+from dataset_creation import join
+from dataset_creation import read_hits
 import musicbrainzngs
-
-from dataset_creation import join, read_hits
+import pandas as pd
+import requests
 
 RESULT_PATH = '.'
 

@@ -10,7 +10,8 @@ import hit_prediction_code.evaluations as evaluations
 from hit_prediction_code.models.wide_and_deep import WideAndDeep
 
 dataloader = EssentiaLoader(
-    dataset_path='data/hit_song_prediction_ismir2020/processed/msd_bb_balanced_essentia.pickle',
+    dataset_path=
+    'data/hit_song_prediction_ismir2020/processed/msd_bb_balanced_essentia.pickle',
     features=[
         *common.ll_list(),
     ],

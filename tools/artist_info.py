@@ -1,20 +1,22 @@
+from socket import timeout
 from urllib import parse
 
+from SPARQLWrapper import JSON
+from SPARQLWrapper import SPARQLExceptions
+from SPARQLWrapper import SPARQLWrapper
 import click
-
+from dataset_creation import join
+from dataset_creation import read_hits
+from dataset_creation import read_msd_unique_artists
+from dataset_creation import read_non_hits
 import matplotlib.pyplot as plt
-
 import pandas as pd
-
-from socket import timeout
-
-from SPARQLWrapper import SPARQLExceptions, SPARQLWrapper, JSON
-
-from qwikidata.entity import WikidataItem, WikidataProperty
-from qwikidata.linked_data_interface import get_entity_dict_from_api, LdiResponseNotOk, InvalidEntityId
+from qwikidata.entity import WikidataItem
+from qwikidata.entity import WikidataProperty
 from qwikidata.json_dump import WikidataJsonDump
-
-from dataset_creation import join, read_hits, read_msd_unique_artists, read_non_hits
+from qwikidata.linked_data_interface import InvalidEntityId
+from qwikidata.linked_data_interface import LdiResponseNotOk
+from qwikidata.linked_data_interface import get_entity_dict_from_api
 
 RESULT_PATH = '.'
 
@@ -129,7 +131,7 @@ def dbpedia(get_all):
 
 
 def get_artist_from_dbpedia(artist):
-    sparql = SPARQLWrapper("http://dbpedia.org/sparql")
+    sparql = SPARQLWrapper('http://dbpedia.org/sparql')
     sparql.setTimeout(300)
     sparql.setQuery("""
         PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -164,7 +166,7 @@ def get_artist_from_dbpedia(artist):
     try:
         results = sparql.query()
         info = results.info()
-        results = results.convert()["results"]["bindings"]
+        results = results.convert()['results']['bindings']
     except Exception as ex:
         info = ex
         results = []

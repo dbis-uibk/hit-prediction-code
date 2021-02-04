@@ -1,12 +1,11 @@
-# -*- coding: utf-8 -*-
 """CRNN model for hit song prediction."""
 import logging
 
 import tensorflow.compat.v2.keras.backend as keras_backend
-from tensorflow.keras.layers import GRU
 from tensorflow.keras.layers import Activation
 from tensorflow.keras.layers import Dense
 from tensorflow.keras.layers import Flatten
+from tensorflow.keras.layers import GRU
 from tensorflow.keras.layers import Input
 from tensorflow.keras.layers import Lambda
 from tensorflow.keras.layers import Multiply

@@ -1,7 +1,5 @@
 import billboard
-
 import click
-
 import pandas as pd
 
 RESULT_PATH = '.'
