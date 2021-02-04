@@ -239,6 +239,7 @@ def normalize_confusion_matrix(
         np.array: the normalized confusion matrix.
     """
     cm = np.array(cm)
+
     assert cm.shape[0] == cm.shape[1]
 
     with np.errstate(all='ignore'):
@@ -253,3 +254,36 @@ def normalize_confusion_matrix(
         cm = np.nan_to_num(cm)
 
     return cm
+
+
+def confusion_matrix_to_multilabel_confusion_matrix(cm: any) -> np.array:
+    """Transforms a confusion matrix into the multi-label version.
+
+    Args:
+        cm (any): confusion matrix to transform.
+
+    Returns:
+        np.array: the multi-label confusion matrix. Where index 0 in dimension
+            0 represents the class 0. The 2x2 matrix for that class has the
+            shape as the sklearn matrix. Meaning index 0 is the Negative class
+            and index 1 the positive class.
+    """
+    cm = np.array(cm)
+
+    assert cm.shape[0] == cm.shape[1]
+
+    def _tn_fp_fn_tp_from_matrix(cm):
+        tp = cm[0, 0]
+        fn = np.sum(cm[0, 1:])
+        fp = np.sum(cm[1:, 0])
+        tn = np.sum(cm[1:, 1:])
+
+        return tn, fp, fn, tp
+
+    mcm = []
+    for _ in range(cm.shape[0]):
+        label_cm = np.array(_tn_fp_fn_tp_from_matrix(cm)).reshape(2, 2)
+        mcm.append(label_cm)
+        cm = np.roll(np.roll(cm, -1, axis=1), -1, axis=0)
+
+    return np.array(mcm)
