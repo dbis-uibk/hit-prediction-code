@@ -1,6 +1,6 @@
 """Analytics code used to process results."""
 import os.path
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 from matplotlib import pyplot
 import numpy as np
@@ -221,10 +221,7 @@ def group_confusion_matrix(matrix: np.array, num_classes: int) -> np.array:
     return np.transpose(matrix)
 
 
-def normalize_confusion_matrix(
-    cm: any,
-    method: str,
-) -> np.array:
+def normalize_confusion_matrix(cm: any, method: str) -> np.array:
     """Normalizes the confusion matrix.
 
     Args:
@@ -287,3 +284,53 @@ def confusion_matrix_to_multilabel_confusion_matrix(cm: any) -> np.array:
         cm = np.roll(np.roll(cm, -1, axis=1), -1, axis=0)
 
     return np.array(mcm)
+
+
+def _divide(numerator, denominator):
+    denominator = denominator.copy()
+    denominator[denominator == 0.] = 1  # avoid division by 0
+
+    return numerator / denominator
+
+
+def precision_recall_fscore(mcm: np.array,
+                            average='macro') -> Tuple[float, float, float]:
+    """Calculates precision, recall and f1 score.
+
+    Args:
+        mcm (np.array): the multilabel confusion matrix used to compute the
+            scores.
+        average (str, optional): the average method used. Currently 'micro'
+            and 'macro' are supported.
+
+    Raises:
+        ValueError: if the average method is unknown.
+
+    Returns:
+        Tuple[float, float, float]: tuple containing the results for
+            precision, recall and f1 score.
+    """
+    assert len(mcm.shape) == 3
+    assert mcm.shape[1] == mcm.shape[2] == 2
+
+    tp_sum = mcm[:, 1, 1]
+    pred_sum = tp_sum + mcm[:, 0, 1]
+    true_sum = tp_sum + mcm[:, 1, 0]
+
+    if average == 'micro':
+        tp_sum = np.array([tp_sum.sum()])
+        pred_sum = np.array([pred_sum.sum()])
+        true_sum = np.array([true_sum.sum()])
+
+    precision = _divide(tp_sum, pred_sum)
+    recall = _divide(tp_sum, true_sum)
+    f_score = _divide(2 * precision * recall, precision + recall)
+
+    if average == 'macro':
+        precision = np.average(precision)
+        recall = np.average(recall)
+        f_score = np.average(f_score)
+    elif not average == 'micro':
+        raise ValueError('Unknown average %s' % average)
+
+    return precision, recall, f_score
