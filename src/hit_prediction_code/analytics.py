@@ -156,9 +156,19 @@ def plot_epochs_confution_matrix(
     """
     num_plots = plot_shape[0] * plot_shape[1]
 
-    step = int(len(data) / num_plots)
+    step = int(round(len(data) / num_plots, 0))
     idx = list(range(step, len(data), step))
-    idx[-1] = len(data) - 1
+
+    if len(idx) < num_plots:
+        if len(idx) < num_plots - 1:
+            idx.insert(0, 0)
+
+        idx.append(len(data) - 1)
+    else:
+        idx = idx[:num_plots]
+        idx[-1] = len(data) - 1
+
+    assert num_plots == len(idx)
 
     fig = pyplot.figure(figsize=figsize)
     fig.suptitle(plot_title)
