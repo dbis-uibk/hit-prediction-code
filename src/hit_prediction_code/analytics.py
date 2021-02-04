@@ -219,3 +219,37 @@ def group_confusion_matrix(matrix: np.array, num_classes: int) -> np.array:
         matrix = np.array(grouped_matrix)
 
     return np.transpose(matrix)
+
+
+def normalize_confusion_matrix(
+    cm: any,
+    method: str,
+) -> np.array:
+    """Normalizes the confusion matrix.
+
+    Args:
+        cm (any): the confusion matrix that should be normalized
+        method (str): the normalization method. Currently 'true', 'pred' and
+            'all' is supported.
+
+    Raises:
+        ValueError: if an unknown mehtod is used.
+
+    Returns:
+        np.array: the normalized confusion matrix.
+    """
+    cm = np.array(cm)
+    assert cm.shape[0] == cm.shape[1]
+
+    with np.errstate(all='ignore'):
+        if method == 'true':
+            cm = cm / cm.sum(axis=1, keepdims=True)
+        elif method == 'pred':
+            cm = cm / cm.sum(axis=0, keepdims=True)
+        elif method == 'all':
+            cm = cm / cm.sum()
+        else:
+            raise ValueError('Method %s unknown' % method)
+        cm = np.nan_to_num(cm)
+
+    return cm
