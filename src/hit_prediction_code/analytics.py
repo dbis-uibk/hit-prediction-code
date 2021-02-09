@@ -2,10 +2,67 @@
 import os.path
 from typing import Dict, List, Tuple
 
+from dbispipeline.db import DB
 from matplotlib import pyplot
 import numpy as np
 import pandas as pd
 import seaborn as sns
+
+
+def get_results_as_dataframe(project_name: str,
+                             table_name='results',
+                             filter_git_dirty=True,
+                             date_filter: str = None,
+                             id_filter: str = None,
+                             filters: List[str] = None,
+                             columns: List[str] = None) -> pd.DataFrame:
+    """Returns the results stored in the database as a pandas dataframe.
+
+    Args:
+        project_name (str): the project name to fetch results.
+        table_name (str, optional): the name of the result table.
+        filter_git_dirty (bool, optional): defines if dirty commits are
+            filtered.
+        date_filter (str, optional): filter by date as a string.
+            E.g. "> '2021-01-01'"
+        id_filter (str, optional): filter by id. E.g. "= 42"
+        filters (List[str], optional): a list of strings that gets added to
+            the WHERE clause using AND to combine it with other filters.
+        columns (List[str], optional): a list of columns that should be
+            returned. None equals to all.
+
+    Returns:
+        pd.DataFrame: the result as a dataframe.
+    """
+    if columns is None:
+        columns = '*'
+    else:
+        columns = ', '.join(columns)
+
+    sql = 'SELECT %s FROM %s' % (columns, table_name)
+
+    conditions = []
+    if project_name:
+        conditions.append('project_name LIKE \'%s\'' % project_name)
+
+    if id_filter:
+        conditions.append('id %s' % id_filter)
+    if filter_git_dirty:
+        conditions.append('git_is_dirty = FALSE')
+    if date_filter:
+        conditions.append('"date" %s' % date_filter)
+    if filters:
+        conditions = conditions + filters
+
+    if len(conditions) > 1:
+        conditions = ' AND '.join(conditions)
+    else:
+        conditions = conditions[0]
+
+    if len(conditions) > 0:
+        sql = sql + ' WHERE ' + conditions
+
+    return pd.read_sql_query(sql, con=DB.engine)
 
 
 def _splits_from_outcome(outcome: pd.Series) -> List[str]:
