@@ -50,6 +50,21 @@ def test_micro_average_score():
     assert actual_outcome[2] == expected_outcome[2]
 
 
+def test_micro_average_score_type():
+    """Tests if the micro results have the correct type."""
+    y_true = ['cat', 'ant', 'cat', 'cat', 'ant', 'bird']
+    y_pred = ['ant', 'ant', 'cat', 'cat', 'ant', 'cat']
+    cm = confusion_matrix(y_true, y_pred, labels=['ant', 'bird', 'cat'])
+    mcm = confusion_matrix_to_multilabel_confusion_matrix(cm)
+
+    actual_outcome = precision_recall_fscore(mcm, average='micro')
+
+    assert len(actual_outcome) == 3
+
+    for elem in actual_outcome:
+        assert (type(elem)) == np.float64
+
+
 def test_macro_average_score():
     """Tests if the macro average scores are correct."""
     y_true = ['cat', 'ant', 'cat', 'cat', 'ant', 'bird']
@@ -71,3 +86,18 @@ def test_macro_average_score():
     assert actual_outcome[1] == expected_outcome[1]
     # f1
     assert actual_outcome[2] == expected_outcome[2]
+
+
+def test_macro_average_score_type():
+    """Tests if the macro results have the correct type."""
+    y_true = ['cat', 'ant', 'cat', 'cat', 'ant', 'bird']
+    y_pred = ['ant', 'ant', 'cat', 'cat', 'ant', 'cat']
+    cm = confusion_matrix(y_true, y_pred, labels=['ant', 'bird', 'cat'])
+    mcm = confusion_matrix_to_multilabel_confusion_matrix(cm)
+
+    actual_outcome = precision_recall_fscore(mcm, average='macro')
+
+    assert len(actual_outcome) == 3
+
+    for elem in actual_outcome:
+        assert (type(elem)) == np.float64

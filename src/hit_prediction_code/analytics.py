@@ -330,7 +330,52 @@ def precision_recall_fscore(mcm: np.array,
         precision = np.average(precision)
         recall = np.average(recall)
         f_score = np.average(f_score)
+    elif average == 'micro':
+        precision = precision[0]
+        recall = recall[0]
+        f_score = f_score[0]
     elif not average == 'micro':
         raise ValueError('Unknown average %s' % average)
 
     return precision, recall, f_score
+
+
+def scores_from_confusion_matrices(
+    cms: List[np.array],
+    epochs: List[int],
+) -> pd.DataFrame:
+    """Calculates known score on each confusion matrix.
+
+    Args:
+        cms (List[np.array]): list of confusion matrices.
+        epochs (List[int]): list of number of epochs for each confusion
+            matrix.
+
+    Returns:
+        pd.DataFrame: containing the scores for each epoch (row) and metric
+            (columns).
+    """
+    assert len(cms) == len(epochs)
+
+    scores = []
+    for epoch, cm in zip(epochs, cms):
+        mcm = confusion_matrix_to_multilabel_confusion_matrix(cm)
+        macro_p, macro_r, macro_f1 = precision_recall_fscore(
+            mcm,
+            average='macro',
+        )
+        micro_p, micro_r, micro_f1 = precision_recall_fscore(
+            mcm,
+            average='micro',
+        )
+        scores.append({
+            'epochs': epoch,
+            'macro_precision': macro_p,
+            'micro_precision': micro_p,
+            'macro_recall': macro_r,
+            'micro_recall': micro_r,
+            'macro_f1': macro_f1,
+            'micro_f1': micro_f1,
+        })
+
+    return pd.DataFrame(scores)
