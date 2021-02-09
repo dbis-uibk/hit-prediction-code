@@ -51,7 +51,7 @@ def lfmpc_labels():
 
     Maximum play count is approximately 20M.
     """
-    return list(np.logspace(13, 24, num=101, base=2).astype(np.int))
+    return list(np.logspace(13, 23, num=101, base=2).astype(np.int))
 
 
 def wide_and_deep_epochs():
