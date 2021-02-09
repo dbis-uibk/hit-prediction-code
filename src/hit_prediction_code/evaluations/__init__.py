@@ -22,4 +22,4 @@ def grid_parameters():
 
 def scoring_step_size():
     """Returns: the step size used for scoring."""
-    return 10
+    return 100
