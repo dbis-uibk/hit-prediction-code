@@ -191,6 +191,7 @@ def add_approach_to_df(df: pd.DataFrame) -> None:
     df['approach'] = df['sourcefile'].apply(
         lambda v: os.path.splitext(os.path.basename(v))[0].replace(
             'unique_', '').replace('wide_and_deep', 'wd'))
+    df['approach'] = df['id'].map(str) + ' ' + df['approach']
 
 
 def plot_epochs_confution_matrix(
