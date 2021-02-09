@@ -42,7 +42,7 @@ def lfmlc_labels():
 
     Maximum listener count is approximately 2M.
     """
-    return list(np.logspace(0, 20, num=101, base=2).astype(np.int))
+    return list(np.logspace(12, 20, num=101, base=2).astype(np.int))
 
 
 def lfmpc_labels():
@@ -51,7 +51,7 @@ def lfmpc_labels():
 
     Maximum play count is approximately 20M.
     """
-    return list(np.logspace(0, 24, num=101, base=2).astype(np.int))
+    return list(np.logspace(14, 24, num=101, base=2).astype(np.int))
 
 
 def wide_and_deep_epochs():
