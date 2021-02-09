@@ -45,6 +45,19 @@ def lfmlc_labels():
     return list(np.logspace(12, 20, num=101, base=2).astype(np.int))
 
 
+def linear_lfmlc_labels():
+    """
+    The range is chosen to be linear.
+
+    Maximum listener count is approximately 2M.
+    """
+    min_value = 2**12
+    max_value = 2**20
+    step_size = int((max_value - min_value) / 100)
+
+    return list(range(min_value, max_value, step_size))
+
+
 def lfmpc_labels():
     """
     The range is chosen to be base two logarithmic.
@@ -52,6 +65,19 @@ def lfmpc_labels():
     Maximum play count is approximately 20M.
     """
     return list(np.logspace(13, 23, num=101, base=2).astype(np.int))
+
+
+def linear_lfmpc_labels():
+    """
+    The range is chosen to be linear.
+
+    Maximum play count is approximately 20M.
+    """
+    min_value = 2**13
+    max_value = 2**23
+    step_size = int((max_value - min_value) / 100)
+
+    return list(range(min_value, max_value, step_size))
 
 
 def wide_and_deep_epochs():
