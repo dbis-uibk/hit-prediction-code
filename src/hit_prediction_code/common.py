@@ -36,13 +36,35 @@ def weeks_labels():
     return list(range(0, 21))
 
 
+def _exp_labels(exp_min, exp_max, steps, base=2):
+    return list(
+        np.logspace(
+            exp_min,
+            exp_max,
+            num=steps,
+            base=base,
+        ).astype(np.int))
+
+
+def _linear_labels(exp_min, exp_max, steps, base=2):
+    min_value = base**exp_min
+    max_value = base**exp_max
+    step_size = int((max_value - min_value) / (steps + 1))
+
+    return list(range(min_value, max_value, step_size))
+
+
+def _lfmlc_exps_and_steps():
+    return (6, 20, 101, 2)
+
+
 def lfmlc_labels():
     """
     The range is chosen to be base two logarithmic.
 
     Maximum listener count is approximately 2M.
     """
-    return list(np.logspace(12, 20, num=101, base=2).astype(np.int))
+    return _exp_labels(*_lfmlc_exps_and_steps())
 
 
 def linear_lfmlc_labels():
@@ -51,11 +73,11 @@ def linear_lfmlc_labels():
 
     Maximum listener count is approximately 2M.
     """
-    min_value = 2**12
-    max_value = 2**20
-    step_size = int((max_value - min_value) / 100)
+    return _linear_labels(*_lfmlc_exps_and_steps())
 
-    return list(range(min_value, max_value, step_size))
+
+def _lfmpc_exps_and_steps():
+    return (8, 23, 101, 2)
 
 
 def lfmpc_labels():
@@ -64,7 +86,7 @@ def lfmpc_labels():
 
     Maximum play count is approximately 20M.
     """
-    return list(np.logspace(13, 23, num=101, base=2).astype(np.int))
+    return _exp_labels(*_lfmpc_exps_and_steps())
 
 
 def linear_lfmpc_labels():
@@ -73,16 +95,12 @@ def linear_lfmpc_labels():
 
     Maximum play count is approximately 20M.
     """
-    min_value = 2**13
-    max_value = 2**23
-    step_size = int((max_value - min_value) / 100)
-
-    return list(range(min_value, max_value, step_size))
+    return _linear_labels(*_lfmpc_exps_and_steps())
 
 
 def wide_and_deep_epochs():
     """Returns: the number of epochs used to train wide and deep."""
-    return 500
+    return 2500
 
 
 def read_dataframe(path, **kwargs):
