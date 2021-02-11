@@ -1,7 +1,7 @@
 """Wide and deep model evaluation plan using all features."""
 import os.path
 
-from dbispipeline.evaluators import CvEpochEvaluator
+from dbispipeline.evaluators import GridEvaluator
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.tree import ExtraTreeClassifier
@@ -39,7 +39,7 @@ pipeline = Pipeline([
      )),
 ])
 
-evaluator = CvEpochEvaluator(
+evaluator = GridEvaluator(
     cv=evaluations.cv(),
     scoring=evaluations.metrics.scoring(
         hit_nonhit_accuracy_score=lambda evaluator, x, y: evaluations.metrics.
@@ -51,7 +51,6 @@ evaluator = CvEpochEvaluator(
         ),
         categories=labels,
     ),
-    scoring_step_size=evaluations.scoring_step_size(),
 )
 
 result_handlers = [
