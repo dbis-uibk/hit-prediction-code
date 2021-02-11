@@ -19,8 +19,9 @@ class OrdinalClassifier():
         self.clf = clf
         self.clfs = {}
         self.label_mapper = label_mapper
+        self.epochs = 1
 
-    def fit(self, data, labels):
+    def fit(self, data, labels, epochs=None):
         """Fits the classifier."""
         labels = self.label_mapper(labels)
         self.unique_class = np.sort(np.unique(labels))

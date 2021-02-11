@@ -1,10 +1,10 @@
 """Wide and deep model evaluation plan using all features."""
 import os.path
 
-from dbispipeline.evaluators import GridEvaluator
+from dbispipeline.evaluators import CvEpochEvaluator
+from sklearn.ensemble import ExtraTreesClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import MinMaxScaler
-from sklearn.tree import ExtraTreeClassifier
 
 import hit_prediction_code.common as common
 from hit_prediction_code.dataloaders import EssentiaLoader
@@ -34,34 +34,18 @@ pipeline = Pipeline([
     ('scale', MinMaxScaler()),
     ('model',
      OrdinalClassifier(
-         ExtraTreeClassifier,
+         ExtraTreesClassifier(),
          lambda y: convert_array_to_closest_labels(y, labels=labels),
      )),
 ])
 
-evaluator = GridEvaluator(
-    grid_parameters={
-        'verbose':
-            3,
-        'refit':
-            False,
-        'return_train_score':
-            True,
-        'cv':
-            evaluations.cv(),
-        'scoring':
-            evaluations.metrics.scoring(
-                hit_nonhit_accuracy_score=lambda evaluator, x, y: evaluations.
-                metrics.hit_nonhit_accuracy_score(
-                    evaluator,
-                    x,
-                    y,
-                    threshold=0.5,
-                ),
-                categories=labels,
-            ),
-    },
-    parameters={},
+evaluator = CvEpochEvaluator(
+    cv=evaluations.cv(),
+    scoring=evaluations.metrics.scoring(
+        hit_nonhit_accuracy_score=None,
+        categories=labels,
+    ),
+    scoring_step_size=1,
 )
 
 result_handlers = [
