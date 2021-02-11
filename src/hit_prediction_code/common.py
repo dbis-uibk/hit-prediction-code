@@ -49,7 +49,7 @@ def _exp_labels(exp_min, exp_max, steps, base=2):
 def _linear_labels(exp_min, exp_max, steps, base=2):
     min_value = base**exp_min
     max_value = base**exp_max
-    step_size = int((max_value - min_value) / (steps + 1))
+    step_size = int((max_value - min_value) / (steps - 1))
 
     return list(range(min_value, max_value, step_size))
 
