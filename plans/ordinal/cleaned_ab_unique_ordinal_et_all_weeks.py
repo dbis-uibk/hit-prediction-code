@@ -40,17 +40,28 @@ pipeline = Pipeline([
 ])
 
 evaluator = GridEvaluator(
-    cv=evaluations.cv(),
-    scoring=evaluations.metrics.scoring(
-        hit_nonhit_accuracy_score=lambda evaluator, x, y: evaluations.metrics.
-        hit_nonhit_accuracy_score(
-            evaluator,
-            x,
-            y,
-            threshold=0.5,
-        ),
-        categories=labels,
-    ),
+    grid_parameters={
+        'verbose':
+            3,
+        'refit':
+            False,
+        'return_train_score':
+            True,
+        'cv':
+            evaluations.cv(),
+        'scoring':
+            evaluations.metrics.scoring(
+                hit_nonhit_accuracy_score=lambda evaluator, x, y: evaluations.
+                metrics.hit_nonhit_accuracy_score(
+                    evaluator,
+                    x,
+                    y,
+                    threshold=0.5,
+                ),
+                categories=labels,
+            ),
+    },
+    parameters={},
 )
 
 result_handlers = [
