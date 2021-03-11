@@ -44,19 +44,58 @@ def convert_to_closest_label(value: Real, labels: List[int]) -> int:
     return labels[-1]
 
 
-def convert_array_to_closest_labels(array: np.array, labels: List[int]):
+def convert_array_to_closest_labels(array: np.array,
+                                    labels: List[int]) -> np.array:
     """Converts the numpy array to labels.
 
     Args:
         array (np.array): the array to be converted.
         labels (List[int]): the list of target labels.
+            vector.
 
     Returns (np.array): of the mapped labels.
     """
     if len(array.shape) != 1:
-        raise ValueError('The array needs to be 1D.')
+        raise ValueError('The array needs to be 1D shape.')
 
     return np.fromiter(
         map(lambda v: convert_to_closest_label(v, labels), array),
         dtype=np.int,
+    )
+
+
+def _convert_label_to_vector(label: int, strategy, label_count) -> List[int]:
+    if strategy == 'fill':
+        return [1 if elem <= label else 0 for elem in range(label_count)]
+    elif strategy == 'one_hot':
+        return [1 if elem == label else 0 for elem in range(label_count)]
+    else:
+        raise ValueError(f'Strategy {strategy} unknown.')
+
+
+def convert_array_to_class_vector(array: np.array,
+                                  labels: List[int],
+                                  strategy='fill') -> np.array:
+    """Converts the numpy array to a label vector.
+
+    Args:
+        array (np.array): the array to be converted.
+        labels (List[int]): the list of target labels.
+        strategy (str): the converting strategie used to create the class
+
+    Returns:
+        np.array: an array containing the class vectors.
+    """
+    array = convert_array_to_closest_labels(array=array, labels=labels)
+    if len(array.shape) <= 1:
+        array = array.reshape(len(array), 1)
+
+    return np.apply_along_axis(
+        lambda v: _convert_label_to_vector(
+            v[0],
+            strategy=strategy,
+            label_count=len(labels),
+        ),
+        1,
+        array,
     )

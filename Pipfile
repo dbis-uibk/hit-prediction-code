@@ -31,6 +31,7 @@ tox = "==3.21.3"
 watchdog = "*"
 wheel = "*"
 yapf = "==0.30.0"
+pytest-mock = "==3.5.1"
 
 [packages]
 hit_prediction_code = {editable = true, path = "."}

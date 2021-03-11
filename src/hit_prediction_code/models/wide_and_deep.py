@@ -1,9 +1,11 @@
 """Module containing implementations of the wide and deep model."""
+import numpy as np
 from tensorflow.keras.layers import Concatenate
 from tensorflow.keras.layers import Dense
 from tensorflow.keras.layers import Input
 from tensorflow.keras.models import Model
 
+from ..transformers.label import convert_array_to_class_vector
 from .building_blocks import HitPredictionModel
 from .building_blocks import dense_layers
 from .building_blocks import get_initializer
@@ -164,3 +166,103 @@ class WideAndDeep(HitPredictionModel):
             feature = data[..., index]
             features.append(feature)
         return features
+
+
+class WideAndDeepOrdinal(WideAndDeep):
+    """WideAndDeep model trained on ordinal encoded classes."""
+
+    def __init__(self,
+                 labels,
+                 loss='binary_crossentropy',
+                 optimizer='adam',
+                 metrics=None,
+                 deep_activation='sigmoid',
+                 dense_activation='relu',
+                 output_activation=None,
+                 epochs=1,
+                 batch_size=None,
+                 features=None,
+                 batch_normalization=False,
+                 dropout_rate=None,
+                 dense_output_size=None,
+                 num_dense_layer=2,
+                 label_output=True,
+                 **kwargs):
+        """Initializes the model.
+
+        Args:
+            labels (list): labels used to encode the input labels.
+            loss: the loss function used to train the network.
+            optimizer: the optimizer used to train the model.
+            metrics: a list of metrics used to evaluate the model during
+                training. If set to None, MAE is used.
+            deep_activation: the activation function used for the deep part of
+                the network.
+            dense_activation: the activation function used for the dense part.
+            output_activation: the activation function used for the output.
+            epochs: the number of epochs used during training.
+            batch_size: the batch size used to train the model.
+            features: a list of tuples describing the features used for
+                training and the network part (wide or deep) that is used to
+                handle them.
+            batch_normalization: configures if batch normalization is used for
+                the dense network part.
+            dropout_rate: the dropout rate used for the dense part.
+            dense_output_size: the output width of the dense layers.
+            num_dense_layer: the number of dense layers in the dense part.
+            label_output: ignored; predictions are always single labels.
+            kwargs: key-value arguments passed to the super constructor.
+        """
+        super().__init__(**kwargs)
+
+        self.labels = labels
+        if metrics is None:
+            self.metrics = ['binary_crossentropy']
+        else:
+            self.metrics = metrics
+        self.label_output = False
+
+        self.input_list = []
+        self.loss = loss
+        self.optimizer = optimizer
+
+        self.deep_activation = deep_activation
+        self.dense_activation = dense_activation
+        self.output_activation = output_activation
+        self.epochs = epochs
+        self.batch_size = batch_size
+        self.features = features
+        self.batch_normalization = batch_normalization
+        self.dropout_rate = dropout_rate
+        self.dense_output_size = dense_output_size
+        self.num_dense_layer = num_dense_layer
+
+    @property
+    def labels(self):
+        """Property specifying the used labels."""
+        return self._config.get('labels')
+
+    @labels.setter
+    def labels(self, value):
+        self._config['labels'] = value
+
+    def fit(self, data, target, epochs=None):
+        """Converts the target labels to class vectors before fitting."""
+        target = convert_array_to_class_vector(target, self.labels)
+
+        super().fit(data, target, epochs=epochs)
+
+    def predict(self, data):
+        """Predicts an ordinal value."""
+        proba = super().predict(data)
+
+        predicted = []
+        for i in range(len(self.labels)):
+            if i < len(self.labels) - 1:  # all except the last
+                predicted.append(proba[:, i] - proba[:, i + 1])
+            else:  # the last
+                predicted.append(proba[:, i])
+
+        predicted = np.vstack(predicted).T
+
+        return np.argmax(predicted, axis=1)
