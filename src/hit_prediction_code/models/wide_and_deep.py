@@ -178,7 +178,7 @@ class WideAndDeepOrdinal(WideAndDeep):
                  metrics=None,
                  deep_activation='sigmoid',
                  dense_activation='relu',
-                 output_activation=None,
+                 output_activation='sigmoid',
                  epochs=1,
                  batch_size=None,
                  features=None,

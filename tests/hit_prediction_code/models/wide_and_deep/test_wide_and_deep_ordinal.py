@@ -24,7 +24,7 @@ def test_default_init_arg_passing(cloning):
     assert model.metrics == ['binary_crossentropy']
     assert model.deep_activation == 'sigmoid'
     assert model.dense_activation == 'relu'
-    assert model.output_activation is None
+    assert model.output_activation == 'sigmoid'
     assert model.epochs == 1
     assert model.batch_size is None
     assert model.features is None
@@ -52,7 +52,7 @@ def test_init_args_passing(cloning):
     assert model.metrics == ['binary_crossentropy']
     assert model.deep_activation == 'sigmoid'
     assert model.dense_activation == 'relu'
-    assert model.output_activation is None
+    assert model.output_activation == 'sigmoid'
     assert model.epochs == 100
     assert model.batch_size is None
     assert model.features is None
