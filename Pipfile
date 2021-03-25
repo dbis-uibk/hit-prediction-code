@@ -36,7 +36,7 @@ pytest-mock = "==3.5.1"
 [packages]
 hit_prediction_code = {editable = true, path = "."}
 billboard-py = "==6.2.1"
-dbispipeline = "==0.8.15"
+dbispipeline = "==0.8.20"
 fuzzywuzzy = {extras = ["speedup"], version = "==0.18.0"}
 gensim = "==3.8.3"
 librosa = "==0.8.0"
