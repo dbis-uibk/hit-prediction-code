@@ -35,6 +35,7 @@ pipeline = Pipeline([
          deep_activation='elu',
          dense_activation='elu',
          dropout_rate=0.1,
+         predict_strategy='class_distribution',
          labels=common.linear_lfmlc_labels(),
      )),
 ])

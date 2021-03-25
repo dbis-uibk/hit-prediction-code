@@ -187,6 +187,7 @@ class WideAndDeepOrdinal(WideAndDeep):
                  dense_output_size=None,
                  num_dense_layer=2,
                  label_output=True,
+                 predict_strategy='relative',
                  **kwargs):
         """Initializes the model.
 
@@ -211,6 +212,12 @@ class WideAndDeepOrdinal(WideAndDeep):
             dense_output_size: the output width of the dense layers.
             num_dense_layer: the number of dense layers in the dense part.
             label_output: ignored; predictions are always single labels.
+            predict_strategy: defines how the prediction gets selected.
+                * 'relative': is the default and selects the class based on
+                  the propability gain between two classes. For this strategy
+                  the labels need to use a 'fill' strategy.
+                * 'class_distribution' computes the difference between the
+                  expected probability and the learned label distribution.
             kwargs: key-value arguments passed to the super constructor.
         """
         super().__init__(**kwargs)
@@ -236,6 +243,10 @@ class WideAndDeepOrdinal(WideAndDeep):
         self.dropout_rate = dropout_rate
         self.dense_output_size = dense_output_size
         self.num_dense_layer = num_dense_layer
+        self.predict_strategy = predict_strategy
+
+        self._sample_count = 0
+        self._class_count = 0
 
     @property
     def labels(self):
@@ -246,23 +257,52 @@ class WideAndDeepOrdinal(WideAndDeep):
     def labels(self, value):
         self._config['labels'] = value
 
+    @property
+    def predict_strategy(self):
+        """Property specifying the used prediction strategy."""
+        return self._config['predict_strategy']
+
+    @predict_strategy.setter
+    def predict_strategy(self, value):
+        if value in ['relative', 'class_distribution']:
+            self._config['predict_strategy'] = value
+        else:
+            raise ValueError(f'Predict strategy \'{value}\' unknown.')
+
     def fit(self, data, target, epochs=None):
         """Converts the target labels to class vectors before fitting."""
         target = convert_array_to_class_vector(target, self.labels)
+
+        self._sample_count += len(target)
+        self._class_count += np.sum(target, axis=0)
 
         super().fit(data, target, epochs=epochs)
 
     def predict(self, data):
         """Predicts an ordinal value."""
-        proba = super().predict(data)
+        prediction = super().predict(data)
 
-        predicted = []
-        for i in range(len(self.labels)):
-            if i < len(self.labels) - 1:  # all except the last
-                predicted.append(proba[:, i] - proba[:, i + 1])
-            else:  # the last
-                predicted.append(proba[:, i])
-
-        predicted = np.vstack(predicted).T
+        if self.predict_strategy == 'relative':
+            predicted = self._get_relative_proba(prediction)
+        elif self.predict_strategy == 'class_distribution':
+            predicted = self._get_class_distribution_proba(prediction)
+        else:
+            raise ValueError(
+                f'Strategy \'{self.predict_strategy}\' not implemented.')
 
         return np.argmax(predicted, axis=1)
+
+    def _get_relative_proba(self, prediction):
+        relative = []
+        for i in range(len(self.labels)):
+            if i < len(self.labels) - 1:  # all except the last
+                relative.append(prediction[:, i] - prediction[:, i + 1])
+            else:  # the last
+                relative.append(prediction[:, i])
+
+        return np.vstack(relative).T
+
+    def _get_class_distribution_proba(self, prediction):
+        class_proba = self._class_count / self._sample_count
+
+        return prediction - class_proba
