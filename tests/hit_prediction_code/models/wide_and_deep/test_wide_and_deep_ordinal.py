@@ -19,7 +19,7 @@ def test_default_init_arg_passing(cloning):
         model = clone(model)
 
     assert model.labels == test_labels
-    assert model.loss == 'binary_crossentropy'
+    assert model.loss == 'mse'
     assert model.optimizer == 'adam'
     assert model.metrics == ['binary_crossentropy']
     assert model.deep_activation == 'sigmoid'
@@ -49,7 +49,7 @@ def test_init_args_passing(cloning):
         model = clone(model)
 
     assert model.labels == test_labels
-    assert model.loss == 'binary_crossentropy'
+    assert model.loss == 'mse'
     assert model.optimizer == 'adam'
     assert model.metrics == ['binary_crossentropy']
     assert model.deep_activation == 'sigmoid'
