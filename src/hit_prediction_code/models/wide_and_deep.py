@@ -173,7 +173,7 @@ class WideAndDeepOrdinal(WideAndDeep):
 
     def __init__(self,
                  labels,
-                 loss='binary_crossentropy',
+                 loss='mse',
                  optimizer='adam',
                  metrics=None,
                  deep_activation='sigmoid',
