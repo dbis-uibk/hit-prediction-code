@@ -38,7 +38,7 @@ pipeline = Pipeline([
          predict_strategy='argmax',
          vectorization_strategy='one_hot',
          loss='categorical_crossentropy',
-         output_activation='soft_max',
+         output_activation='softmax',
          labels=common.weeks_labels(),
      )),
 ])
