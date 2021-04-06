@@ -34,6 +34,7 @@ def test_default_init_arg_passing(cloning):
     assert model.num_dense_layer == 2
     assert model.label_output is False
     assert model.predict_strategy == 'relative'
+    assert model.vectorization_strategy == 'fill'
 
 
 @pytest.mark.parametrize('cloning', [True, False])
@@ -43,7 +44,8 @@ def test_init_args_passing(cloning):
     model = WideAndDeepOrdinal(epochs=100,
                                labels=test_labels,
                                label_output=False,
-                               predict_strategy='class_distribution')
+                               predict_strategy='class_distribution',
+                               vectorization_strategy='one_hot')
 
     if cloning:
         model = clone(model)
@@ -64,6 +66,7 @@ def test_init_args_passing(cloning):
     assert model.num_dense_layer == 2
     assert model.label_output is False
     assert model.predict_strategy == 'class_distribution'
+    assert model.vectorization_strategy == 'one_hot'
 
 
 def test_init_predict_strategy_checks():

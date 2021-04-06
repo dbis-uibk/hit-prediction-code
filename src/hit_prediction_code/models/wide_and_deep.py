@@ -188,6 +188,7 @@ class WideAndDeepOrdinal(WideAndDeep):
                  num_dense_layer=2,
                  label_output=True,
                  predict_strategy='relative',
+                 vectorization_strategy='fill',
                  **kwargs):
         """Initializes the model.
 
@@ -218,6 +219,9 @@ class WideAndDeepOrdinal(WideAndDeep):
                   the labels need to use a 'fill' strategy.
                 * 'class_distribution' computes the difference between the
                   expected probability and the learned label distribution.
+                * 'argmax' returns the class with the max probability.
+            vectorization_strategy (str): the strategie used to convert
+                regression values to class labels.
             kwargs: key-value arguments passed to the super constructor.
         """
         super().__init__(**kwargs)
@@ -227,7 +231,12 @@ class WideAndDeepOrdinal(WideAndDeep):
             self.metrics = ['binary_crossentropy']
         else:
             self.metrics = metrics
-        self.label_output = False
+
+        # the base model already supports that by setting label_output to True.
+        if predict_strategy == 'argmax':
+            self.label_output = True
+        else:
+            self.label_output = False
 
         self.input_list = []
         self.loss = loss
@@ -244,6 +253,7 @@ class WideAndDeepOrdinal(WideAndDeep):
         self.dense_output_size = dense_output_size
         self.num_dense_layer = num_dense_layer
         self.predict_strategy = predict_strategy
+        self.vectorization_strategy = vectorization_strategy
 
         self._sample_count = 0
         self._class_count = 0
@@ -264,14 +274,27 @@ class WideAndDeepOrdinal(WideAndDeep):
 
     @predict_strategy.setter
     def predict_strategy(self, value):
-        if value in ['relative', 'class_distribution']:
+        if value in ['relative', 'class_distribution', 'argmax']:
             self._config['predict_strategy'] = value
         else:
             raise ValueError(f'Predict strategy \'{value}\' unknown.')
 
+    @property
+    def vectorization_strategy(self):
+        """Property specifying the used vectorization strategy."""
+        return self._config['vectorization_strategy']
+
+    @vectorization_strategy.setter
+    def vectorization_strategy(self, value):
+        self._config['vectorization_strategy'] = value
+
     def fit(self, data, target, epochs=None):
         """Converts the target labels to class vectors before fitting."""
-        target = convert_array_to_class_vector(target, self.labels)
+        target = convert_array_to_class_vector(
+            target,
+            self.labels,
+            strategy=self.vectorization_strategy,
+        )
 
         self._sample_count += len(target)
         self._class_count += np.sum(target, axis=0)
@@ -282,7 +305,9 @@ class WideAndDeepOrdinal(WideAndDeep):
         """Predicts an ordinal value."""
         prediction = super().predict(data)
 
-        if self.predict_strategy == 'relative':
+        if self.predict_strategy == 'argmax':
+            return prediction
+        elif self.predict_strategy == 'relative':
             predicted = self._get_relative_proba(prediction)
         elif self.predict_strategy == 'class_distribution':
             predicted = self._get_class_distribution_proba(prediction)
