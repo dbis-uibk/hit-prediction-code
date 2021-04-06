@@ -306,7 +306,7 @@ class WideAndDeepOrdinal(WideAndDeep):
         prediction = super().predict(data)
 
         if self.predict_strategy == 'argmax':
-            return prediction
+            predicted = prediction
         elif self.predict_strategy == 'relative':
             predicted = self._get_relative_proba(prediction)
         elif self.predict_strategy == 'class_distribution':
