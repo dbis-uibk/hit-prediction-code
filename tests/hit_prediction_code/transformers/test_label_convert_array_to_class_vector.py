@@ -25,7 +25,7 @@ def test_fill_strategy():
     """Tests the fill strategy."""
     strategy = 'fill'
 
-    labels = list(range(8))
+    labels = list(range(0, 16, 2))
     arr = np.array(2 * labels)
 
     expected_arr = []

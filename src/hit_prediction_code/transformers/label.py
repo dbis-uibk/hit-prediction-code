@@ -65,13 +65,10 @@ def convert_array_to_closest_labels(array: np.array,
 
 
 def _convert_label_to_vector(label: int, strategy, labels) -> List[int]:
-    label_count = len(labels)
     if strategy == 'fill':
-        return [1 if elem <= label else 0 for elem in range(label_count)]
+        return [1 if elem <= label else 0 for elem in labels]
     elif strategy == 'one_hot':
-        return [
-            1 if labels[elem] == label else 0 for elem in range(label_count)
-        ]
+        return [1 if elem == label else 0 for elem in labels]
     else:
         raise ValueError(f'Strategy {strategy} unknown.')
 
