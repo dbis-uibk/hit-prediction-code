@@ -315,7 +315,9 @@ class WideAndDeepOrdinal(WideAndDeep):
             raise ValueError(
                 f'Strategy \'{self.predict_strategy}\' not implemented.')
 
-        return np.argmax(predicted, axis=1)
+        predicted = np.argmax(predicted, axis=1)
+
+        return self._classes_to_labels(predicted)
 
     def _get_relative_proba(self, prediction):
         relative = []
@@ -331,3 +333,8 @@ class WideAndDeepOrdinal(WideAndDeep):
         class_proba = self._class_count / self._sample_count
 
         return prediction - class_proba
+
+    def _classes_to_labels(self, classes):
+        classes = classes.reshape(len(classes), 1)
+
+        return np.apply_along_axis(lambda l: self.labels[l[0]], 1, classes)
