@@ -42,7 +42,7 @@ def test_one_hot_strategy():
     """Tests the one_hot strategy."""
     strategy = 'one_hot'
 
-    labels = list(range(8))
+    labels = list(range(0, 16, 2))
     arr = np.array(2 * labels)
 
     expected_arr = []
