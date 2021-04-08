@@ -232,11 +232,7 @@ class WideAndDeepOrdinal(WideAndDeep):
         else:
             self.metrics = metrics
 
-        # the base model already supports that by setting label_output to True.
-        if predict_strategy == 'argmax':
-            self.label_output = True
-        else:
-            self.label_output = False
+        self.label_output = False
 
         self.input_list = []
         self.loss = loss
