@@ -247,6 +247,29 @@ def plot_epochs_confution_matrix(
     pyplot.show()
 
 
+def plot_reg(data):
+    """Plots data confusion matrix as regression plot."""
+    sns.jointplot(
+        x='predicted',
+        y='actual',
+        data=_cm_to_plot(data),
+        kind='reg',
+        xlim=(0, data.shape[1]),
+        ylim=(0, data.shape[0]),
+    )
+    pyplot.show()
+
+
+def _cm_to_plot(data):
+    df = []
+    for row in range(data.shape[0]):
+        for col in range(data.shape[1]):
+            for _ in range(int(data[row, col])):
+                df.append({'actual': row, 'predicted': col})
+
+    return pd.DataFrame(df)
+
+
 def group_confusion_matrix(matrix: np.array, num_classes: int) -> np.array:
     """Groups classes in confusion matrix.
 
