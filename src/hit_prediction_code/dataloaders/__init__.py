@@ -2,6 +2,7 @@
 import json
 import logging
 import os.path
+from typing import List
 
 from dbispipeline.base import Loader
 import numpy as np
@@ -9,6 +10,7 @@ import pandas as pd
 from sklearn import preprocessing
 
 from ..common import feature_columns
+from ..transformers.label import convert_array_to_class_vector
 
 LOGGER = logging.getLogger(__name__)
 
@@ -298,6 +300,69 @@ class EssentiaLoader(Loader):
     def feature_indices(self):
         """Returns the mapping between features and indeces."""
         return self._features_index_list
+
+    @property
+    def configuration(self):
+        """Returns the configuration in json serializable format."""
+        return self._config
+
+
+class ClassLoaderWrapper(Loader):
+    """Wraps a loader for regression targets and converts them to classes."""
+
+    def __init__(self, wrapped_loader: Loader, labels: List[int]):
+        """Creates the wrapper for the loader."""
+        self.wrapped_loader = wrapped_loader
+        self._labels = labels
+
+        self._config = {
+            'warpped_loader': wrapped_loader.configuration,
+            'labels': labels,
+        }
+
+    def load(self):
+        """Returns the data loaded by the dataloader."""
+        labels = convert_array_to_class_vector(
+            self.wrapped_loader.labels,
+            self._labels,
+            strategy='one_hot',
+        )
+
+        return self.wrapped_loader.data.values, labels
+
+    @property
+    def configuration(self):
+        """Returns the configuration in json serializable format."""
+        return self._config
+
+
+class BinaryClassLoaderWrapper(Loader):
+    """Wraps a loader for regression targets and converts them to classes.
+
+    The median ob the labels is used to split the labels into two classes.
+    """
+
+    def __init__(self, wrapped_loader: Loader):
+        """Creates the wrapper for the loader."""
+        self.wrapped_loader = wrapped_loader
+
+        median = np.median(wrapped_loader.labels)
+        self._labels = [median - 0.5, median + 0.5]
+
+        self._config = {
+            'warpped_loader': wrapped_loader.configuration,
+            'labels': self._labels,
+        }
+
+    def load(self):
+        """Returns the data loaded by the dataloader."""
+        labels = convert_array_to_class_vector(
+            self.wrapped_loader.labels,
+            self._labels,
+            strategy='one_hot',
+        )
+
+        return self.wrapped_loader.data.values, labels
 
     @property
     def configuration(self):

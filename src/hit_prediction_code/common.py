@@ -18,6 +18,11 @@ def peak_position_labels():
     return list(range(1, 102))
 
 
+def peak_position_binary_labels():
+    """Returns: the binary labels used to map regression values."""
+    return [100, 101]
+
+
 def weeks_non_hit_value():
     """Returns: the value used for non-hits when predicting weeks."""
     return 0
@@ -34,6 +39,11 @@ def weeks_labels():
     Returns: the labels used to map regression values.
     """
     return list(range(0, 21))
+
+
+def weeks_binary_labels():
+    """Returns: the binary labels used to map regression values."""
+    return [0, 1]
 
 
 def _exp_labels(exp_min, exp_max, steps, base=2):
