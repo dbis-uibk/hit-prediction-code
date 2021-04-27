@@ -347,7 +347,7 @@ class BinaryClassLoaderWrapper(Loader):
         self.wrapped_loader = wrapped_loader
 
         median = np.median(wrapped_loader.labels)
-        self._labels = [median - 0.5, median + 0.5]
+        self._labels = [int(median - 0.5), int(median + 0.5)]
 
         self._config = {
             'warpped_loader': wrapped_loader.configuration,
