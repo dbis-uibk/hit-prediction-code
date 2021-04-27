@@ -12,6 +12,12 @@ def test_to_short_label_list():
         convert_to_closest_label(42, [1])
 
 
+def test_non_int_label_list():
+    """Tests if an error is raised for a non int label list."""
+    with pytest.raises(AssertionError):
+        convert_to_closest_label(42, [1, 1.5])
+
+
 def test_value_smaller_than_first_class():
     """Tests if the smallest class is returned correctly."""
     assert convert_to_closest_label(-EPSILON, [0, 1, 2, 4]) == 0

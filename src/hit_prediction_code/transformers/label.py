@@ -1,4 +1,5 @@
 """Tansformers for labels."""
+import numbers
 from numbers import Real
 from typing import List
 
@@ -17,6 +18,9 @@ def convert_to_closest_label(value: Real, labels: List[int]) -> int:
     Returns:
         The closest label.
     """
+    for elem in labels:
+        assert type(elem) is int, 'at least one label is not type int'
+
     labels = sorted(labels)
 
     if len(labels) < 2:
@@ -64,7 +68,11 @@ def convert_array_to_closest_labels(array: np.array,
     )
 
 
-def _convert_label_to_vector(label: int, strategy, labels) -> List[int]:
+def _convert_label_to_vector(label: numbers.Integral, strategy,
+                             labels) -> List[int]:
+    assert isinstance(label,
+                      numbers.Integral), 'label argument has to be of type int'
+
     if strategy == 'fill':
         return [1 if elem <= label else 0 for elem in labels]
     elif strategy == 'one_hot':
