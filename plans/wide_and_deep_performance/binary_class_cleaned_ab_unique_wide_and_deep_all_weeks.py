@@ -39,6 +39,9 @@ pipeline = Pipeline([
          deep_activation='elu',
          dense_activation='elu',
          dropout_rate=0.1,
+         loss='categorical_crossentropy',
+         metrics=['mae', 'mse', 'categorical_crossentropy'],
+         output_activation='softmax',
          label_output=True,
      )),
 ])
