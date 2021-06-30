@@ -397,7 +397,12 @@ class HitPredictionModel(BaseEstimator, RegressorMixin, metaclass=ABCMeta):
         data = self._reshape_data(data)
         prediction = cached_model_predict(self.model, data)
         if self.label_output:
-            return prediction >= prediction[np.argmax(prediction, axis=1)]
+            max_idx = np.argmax(prediction, axis=1)
+            pred = np.zeros_like(prediction)
+            for i, j in enumerate(max_idx):
+                pred[i, j] = 1
+
+            return pred.astype(bool)
         else:
             return prediction
 
