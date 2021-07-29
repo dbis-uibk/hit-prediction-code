@@ -5,6 +5,8 @@ import re
 import numpy as np
 import pandas as pd
 
+from .transformers.label import yang_hit_score
+
 cache = {'model': None, 'X': None, 'y': None}
 
 
@@ -106,6 +108,32 @@ def linear_lfmpc_labels():
     Maximum play count is approximately 20M.
     """
     return _linear_labels(*_lfmpc_exps_and_steps())
+
+
+def yang_hit_score_labels():
+    """The range is linear and based on the LC and PC classes.
+
+    We compute the upper bound using the value assigned to the highest class
+    found for lfmpc_labels and lfmlc_labels. Similarly, we compute the lower
+    bound by using the lowest class found in both.
+    """
+    pc_bounds = lfmpc_labels()[0], lfmpc_labels()[-1]
+    lc_bounds = lfmlc_labels()[0], lfmlc_labels()[-1]
+
+    score_bounds = yang_hit_score(pc_bounds, lc_bounds)
+
+    min_value = score_bounds[0]
+    max_value = score_bounds[1]
+    steps = 101
+    step_size = (max_value - min_value) / (steps - 1)
+
+    labels = [min_value]
+    value = min_value + step_size
+    while value < max_value:
+        labels.append(value)
+        value += step_size
+
+    return list(map(lambda x: int(round(x)), labels))
 
 
 def wide_and_deep_epochs():
