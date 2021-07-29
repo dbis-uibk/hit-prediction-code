@@ -120,7 +120,7 @@ def yang_hit_score(play_count: np.array, listener_count: np.array) -> np.array:
     Returns:
         np.array: the hit score.
     """
-    return np.log(play_count) * np.log(listener_count)
+    return np.log1p(play_count) * np.log1p(listener_count)
 
 
 def compute_hit_score_on_df(df: pd.DataFrame,
@@ -135,4 +135,4 @@ def compute_hit_score_on_df(df: pd.DataFrame,
         lc_column (str): column name of the listener count column.
         hit_score_column (str, optional): column name of the hit score.
     """
-    df[hit_score_column] = yang_hit_score(df[[pc_column]], df[[lc_column]])
+    df[hit_score_column] = yang_hit_score(df[pc_column], df[lc_column])

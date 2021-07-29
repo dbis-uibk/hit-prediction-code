@@ -26,7 +26,7 @@ dataloader = EssentiaLoader(
     nan_value=0,
     data_modifier=lambda df: compute_hit_score_on_df(
         df,
-        pc_column='lastfm_play_count',
+        pc_column='lastfm_playcount',
         lc_column='lastfm_listener_count',
         hit_score_column='yang_hit_score',
     ),
