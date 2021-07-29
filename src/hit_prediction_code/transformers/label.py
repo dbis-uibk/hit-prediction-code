@@ -110,7 +110,7 @@ def convert_array_to_class_vector(array: np.array,
     )
 
 
-def yang_hit_score(play_count: np.array, listener_count: np.arrya) -> np.array:
+def yang_hit_score(play_count: np.array, listener_count: np.array) -> np.array:
     """Computes the hit score as defined by Yang et al.
 
     Args:
