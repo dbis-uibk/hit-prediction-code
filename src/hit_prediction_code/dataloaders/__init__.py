@@ -232,7 +232,8 @@ class EssentiaLoader(Loader):
                  label=None,
                  nan_value=0,
                  label_modifier=None,
-                 binarize_labels=False):
+                 binarize_labels=False,
+                 data_modifier=None):
         """Initializes the essentia loader.
 
         Args:
@@ -243,6 +244,7 @@ class EssentiaLoader(Loader):
             label_modifier: function applied to each label.
             binarize_labels: specifies if sklearns LabelBinarizer is applied to
                 the target values.
+            data_modifier: modify the data before they are used.
         """
         self._config = {
             'dataset_path': dataset_path,
@@ -260,6 +262,8 @@ class EssentiaLoader(Loader):
         else:
             raise ValueError('\'%s\' is in an unknown format' % dataset_path)
         data = _key_mapping(data)
+
+        data_modifier(data)
 
         self.labels = np.ravel(data[[label]])
         nan_values = pd.isnull(self.labels)

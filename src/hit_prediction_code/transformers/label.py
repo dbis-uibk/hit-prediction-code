@@ -4,6 +4,7 @@ from numbers import Real
 from typing import List
 
 import numpy as np
+import pandas as pd
 
 
 def convert_to_closest_label(value: Real, labels: List[int]) -> int:
@@ -107,3 +108,31 @@ def convert_array_to_class_vector(array: np.array,
         1,
         array,
     )
+
+
+def yang_hit_score(play_count: np.array, listener_count: np.arrya) -> np.array:
+    """Computes the hit score as defined by Yang et al.
+
+    Args:
+        play_count (np.array): the play count.
+        listener_count (np.array): the play count.
+
+    Returns:
+        np.array: the hit score.
+    """
+    return np.log(play_count) * np.log(listener_count)
+
+
+def compute_hit_score_on_df(df: pd.DataFrame,
+                            pc_column: str,
+                            lc_column: str,
+                            hit_score_column='yang_hit_score') -> pd.DataFrame:
+    """Computes the hits core on a dataframe.
+
+    Args:
+        df (pd.DataFrame): dataframe that gets modified.
+        pc_column (str): column name of the play count column.
+        lc_column (str): column name of the listener count column.
+        hit_score_column (str, optional): column name of the hit score.
+    """
+    df[hit_score_column] = yang_hit_score(df[[pc_column]], df[[lc_column]])
