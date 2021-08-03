@@ -20,7 +20,10 @@ def convert_to_closest_label(value: Real, labels: List[int]) -> int:
         The closest label.
     """
     for elem in labels:
-        assert type(elem) is int, 'at least one label is not type int'
+        assert np.issubdtype(
+            type(elem),
+            int,
+        ), 'at least one label is not type int'
 
     labels = sorted(labels)
 
