@@ -1,6 +1,7 @@
 """Wrapper implementations of tree based models."""
 import numpy as np
 from sklearn import ensemble
+from sklearn import tree
 
 from ..transformers.label import convert_array_to_class_vector
 
@@ -66,3 +67,57 @@ class RandomForestClassifier(ensemble.RandomForestClassifier):
             labels=list(range(self._num_classes)),
             strategy='one_hot',
         )
+
+
+class DecissionTreeRegressor(tree.DecisionTreeRegressor):
+    """Wrapper class for the sklearn decission tree regressor."""
+
+    def __init__(self):
+        """Creates the wrapped regressor."""
+        super().__init__(verbose=True)
+        self.epochs = 1
+
+    def fit(self, data, target, epochs=1):
+        """Wraps the fit of the super class.
+
+        This allows to use this class in an epoch evaluator. Keep in mind that
+        the number of epochs is ignored. Hence, it should only be used with 1
+        epoch.
+
+        Args:
+            data (array-like): the features.
+            target (array-like): the targets.
+            epochs (int, optional): required to fit the api used for
+                evaluation. The value is ignored and it is always trained for 1
+                epoch.
+        """
+        super().fit(data, target)
+
+
+class DecisionTreeClassifier(tree.DecisionTreeClassifier):
+    """Wrapper class for the sklearn decission tree classifier."""
+
+    def __init__(self):
+        """Creates the wrapped classifier."""
+        super().__init__(verbose=True)
+        self.epochs = 1
+
+    def fit(self, data, target, epochs=1):
+        """Wraps the fit of the super class.
+
+        This allows to use this class in an epoch evaluator. Keep in mind that
+        the number of epochs is ignored. Hence, it should only be used with 1
+        epoch.
+
+        Args:
+            data (array-like): the features.
+            target (array-like): the targets.
+            epochs (int, optional): required to fit the api used for
+                evaluation. The value is ignored and it is always trained for 1
+                epoch.
+        """
+        super().fit(data, target)
+
+    def predict(self, x):
+        """Wraps the predict and converts integers to classes."""
+        return super().predict(x)
