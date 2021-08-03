@@ -74,7 +74,7 @@ class DecissionTreeRegressor(tree.DecisionTreeRegressor):
 
     def __init__(self):
         """Creates the wrapped regressor."""
-        super().__init__(verbose=True)
+        super().__init__()
         self.epochs = 1
 
     def fit(self, data, target, epochs=1):
@@ -99,7 +99,7 @@ class DecisionTreeClassifier(tree.DecisionTreeClassifier):
 
     def __init__(self):
         """Creates the wrapped classifier."""
-        super().__init__(verbose=True)
+        super().__init__()
         self.epochs = 1
 
     def fit(self, data, target, epochs=1):
