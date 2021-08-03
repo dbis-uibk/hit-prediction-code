@@ -1,15 +1,15 @@
-"""Wrapper implementation for SVM."""
+"""Wrapper implementations of tree based models."""
 import numpy as np
-from sklearn import svm
+from sklearn import ensemble
 
 from ..transformers.label import convert_array_to_class_vector
 
 
-class SVR(svm.SVR):
-    """Wrapper class for the sklearn SVR."""
+class RandomForestRegressor(ensemble.RandomForestRegressor):
+    """Wrapper class for the sklearn random forest regressor."""
 
     def __init__(self):
-        """Creates the wrapped SVR."""
+        """Creates the wrapped random forest regressor."""
         super().__init__(verbose=True)
         self.epochs = 1
 
@@ -30,11 +30,11 @@ class SVR(svm.SVR):
         super().fit(data, target)
 
 
-class SVC(svm.SVC):
-    """Wrapper class for the sklearn SVC."""
+class RandomForestClassifier(ensemble.RandomForestClassifier):
+    """Wrapper class for the sklearn random forest classifier."""
 
     def __init__(self):
-        """Creates the wrapped SVC."""
+        """Creates the wrapped random forest classifier."""
         super().__init__(verbose=True)
         self._num_classes = 0
         self.epochs = 1
