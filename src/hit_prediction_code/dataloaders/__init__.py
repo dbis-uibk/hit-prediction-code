@@ -263,7 +263,8 @@ class EssentiaLoader(Loader):
             raise ValueError('\'%s\' is in an unknown format' % dataset_path)
         data = _key_mapping(data)
 
-        data_modifier(data)
+        if data_modifier:
+            data_modifier(data)
 
         self.labels = np.ravel(data[[label]])
         nan_values = pd.isnull(self.labels)
