@@ -57,10 +57,12 @@ for source, data in dataset.items():
         final_prefix,
         dataset_name + '_' + source + file_suffix,
     )
-    logger.info('Store %s %s containing %d songs' %
+    logger.info('Add targests to %s %s containing %d songs' %
                 (dataset_name, source, len(data.index)))
     data = data.merge(targets, on=['uuid'], how='left')
     data = shuffle(data, random_state=42)
+    logger.info('Store %s %s containing %d songs' %
+                (dataset_name, source, len(data.index)))
     if source == 'melspect':
         data.to_pickle(filename, 'xz')
     else:
