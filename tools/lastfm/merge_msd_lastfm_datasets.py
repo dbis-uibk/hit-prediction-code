@@ -46,7 +46,7 @@ targets = pd.read_csv(
 )
 targets = targets[['uuid', 'lastfm_listener_count', 'lastfm_playcount']]
 targets.drop_duplicates(inplace=True)
-assert len(targets) == len(set(targets['uuid'])) % 'uuid not unique'
+assert len(targets) == len(set(targets['uuid'])), 'uuid not unique'
 
 for source, data in dataset.items():
     data = data.merge(all_uuid, on=['uuid'])
@@ -67,7 +67,7 @@ for source, data in dataset.items():
     logger.info('Store %s %s containing %d songs' %
                 (dataset_name, source, len(data.index)))
 
-    assert len(targets) == len(set(targets['uuid'])) % 'uuid not unique'
+    assert len(targets) == len(set(targets['uuid'])), 'uuid not unique'
 
     if source == 'melspect':
         data.to_pickle(filename, 'xz')
