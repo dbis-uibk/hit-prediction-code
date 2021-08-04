@@ -66,6 +66,9 @@ for source, data in dataset.items():
     data = shuffle(data, random_state=42)
     logger.info('Store %s %s containing %d songs' %
                 (dataset_name, source, len(data.index)))
+
+    assert len(targets) == len(set(targets['uuid'])) % 'uuid not unique'
+
     if source == 'melspect':
         data.to_pickle(filename, 'xz')
     else:
