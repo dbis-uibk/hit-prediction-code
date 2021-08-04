@@ -67,7 +67,7 @@ for source, data in dataset.items():
     logger.info('Store %s %s containing %d songs' %
                 (dataset_name, source, len(data.index)))
 
-    assert len(targets) == len(set(targets['uuid'])), 'uuid not unique'
+    assert len(data) == len(set(data['uuid'])), 'uuid not unique'
 
     if source == 'melspect':
         data.to_pickle(filename, 'xz')

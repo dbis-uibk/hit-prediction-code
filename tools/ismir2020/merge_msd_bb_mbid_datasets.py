@@ -77,6 +77,9 @@ for dataset, uuids in all_uuid.items():
                     (dataset, source, len(data.index)))
         data = data.merge(targets, on=['uuid'], how='left')
         data = shuffle(data, random_state=42)
+
+        assert len(data) == len(set(data['uuid'])), 'uuid not unique'
+
         if source == 'melspect':
             data.to_pickle(filename, 'xz')
         else:
