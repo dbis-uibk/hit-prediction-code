@@ -44,6 +44,9 @@ targets = pd.read_csv(
     header=0,
     index_col=0,
 )
+targets = targets[['uuid', 'lastfm_listener_count', 'lastfm_playcount']]
+targets.drop_duplicates(inplace=True)
+assert len(targets) == len(set(targets['uuid'])) % 'uuid not unique'
 
 for source, data in dataset.items():
     data = data.merge(all_uuid, on=['uuid'])
