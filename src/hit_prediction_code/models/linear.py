@@ -10,7 +10,7 @@ class LinearRegression(linear_model.LinearRegression):
 
     def __init__(self):
         """Creates the wrapped regressor."""
-        super().__init__(verbose=True)
+        super().__init__()
         self.epochs = 1
 
     def fit(self, data, target, epochs=1):
