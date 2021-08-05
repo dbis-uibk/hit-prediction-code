@@ -9,3 +9,4 @@ python ${SCRIPT_DIR}/merge_msd_lastfm_and_targets.py
 python ${SCRIPT_DIR}/select_unique_features.py
 python ${SCRIPT_DIR}/merge_msd_lastfm_essentia_and_melspect.py
 python ${SCRIPT_DIR}/merge_msd_lastfm_datasets.py
+python ${SCRIPT_DIR}/merge_msd_lastfm_dataset_melspects.py
