@@ -171,7 +171,9 @@ class MelSpectLoader(Loader):
                  features='librosa_melspectrogram',
                  label=None,
                  nan_value=0,
-                 binarize_labels=False):
+                 label_modifier=None,
+                 binarize_labels=False,
+                 data_modifier=None):
         """Initializes the mel spect loader.
 
         Args:
@@ -179,9 +181,10 @@ class MelSpectLoader(Loader):
             features: a column or a list of selected columns used as features.
             label: the column selected as the target variable.
             nan_value: the values used for NaN values in the dataset.
+            label_modifier: function applied to each label.
             binarize_labels: specifies if sklearns LabelBinarizer is applied to
                 the target values.
-
+            data_modifier: modify the data before they are used.
         """
         self._config = {
             'dataset_path': dataset_path,
@@ -193,6 +196,9 @@ class MelSpectLoader(Loader):
 
         data = pd.read_pickle(dataset_path)
 
+        if data_modifier:
+            data_modifier(data)
+
         self.labels = np.ravel(data[[label]])
         nan_values = pd.isnull(self.labels)
         self.labels[nan_values] = nan_value
@@ -200,6 +206,9 @@ class MelSpectLoader(Loader):
         # ensure that the array is at least 2d
         if len(self.labels.shape) == 1:
             self.labels = self.labels.reshape((*self.labels.shape, 1))
+
+        if label_modifier is not None:
+            self.labels = label_modifier(self.labels)
 
         if self._config['binarize_labels']:
             label_binarizer = preprocessing.LabelBinarizer()
@@ -234,7 +243,9 @@ class MelSpectMeanStdLoader(Loader):
                  features='librosa_melspectrogram',
                  label=None,
                  nan_value=0,
-                 binarize_labels=False):
+                 label_modifier=None,
+                 binarize_labels=False,
+                 data_modifier=None):
         """Initializes the mel spect loader.
 
         Args:
@@ -242,16 +253,19 @@ class MelSpectMeanStdLoader(Loader):
             features: a column or a list of selected columns used as features.
             label: the column selected as the target variable.
             nan_value: the values used for NaN values in the dataset.
+            label_modifier: function applied to each label.
             binarize_labels: specifies if sklearns LabelBinarizer is applied to
                 the target values.
-
+            data_modifier: modify the data before they are used.
         """
         self._mel_loader = MelSpectLoader(
             dataset_path=dataset_path,
             features=features,
             label=label,
+            label_modifier=label_modifier,
             nan_value=nan_value,
             binarize_labels=binarize_labels,
+            data_modifier=data_modifier,
         )
 
     def load(self):
