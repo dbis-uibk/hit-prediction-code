@@ -285,6 +285,11 @@ class MelSpectMeanStdLoader(Loader):
         """Returns the configuration in json serializable format."""
         return self._mel_loader.configuration
 
+    @property
+    def labels(self):
+        """Gives access to the labels of the underlaying loader."""
+        return self._mel_loader.labels
+
 
 class EssentiaLoader(Loader):
     """Essentia feature loader."""
