@@ -223,6 +223,55 @@ class MelSpectLoader(Loader):
         return self._config
 
 
+class MelSpectMeanStdLoader(Loader):
+    """Loads the features from mel-spect as mean and std.
+
+    This is proposed by Yang et al.
+    """
+
+    def __init__(self,
+                 dataset_path,
+                 features='librosa_melspectrogram',
+                 label=None,
+                 nan_value=0,
+                 binarize_labels=False):
+        """Initializes the mel spect loader.
+
+        Args:
+            dataset_path: the path to the pickeled dataset.
+            features: a column or a list of selected columns used as features.
+            label: the column selected as the target variable.
+            nan_value: the values used for NaN values in the dataset.
+            binarize_labels: specifies if sklearns LabelBinarizer is applied to
+                the target values.
+
+        """
+        self._mel_loader = MelSpectLoader(
+            dataset_path=dataset_path,
+            features=features,
+            label=label,
+            nan_value=nan_value,
+            binarize_labels=binarize_labels,
+        )
+
+    def load(self):
+        """Returns the data loaded by the dataloader."""
+        features, target = self._mel_loader.load()
+
+        time_axis = 2
+        features = np.hstack((
+            features.mean(axis=time_axis),
+            features.std(axis=time_axis),
+        ))
+
+        return features, target
+
+    @property
+    def configuration(self):
+        """Returns the configuration in json serializable format."""
+        return self._mel_loader.configuration
+
+
 class EssentiaLoader(Loader):
     """Essentia feature loader."""
 
