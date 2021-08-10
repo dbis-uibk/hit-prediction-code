@@ -440,7 +440,10 @@ class BinaryClassLoaderWrapper(Loader):
             strategy='one_hot',
         )
 
-        return self.wrapped_loader.data.values, labels
+        try:
+            return self.wrapped_loader.data.values, labels
+        except AttributeError:
+            return self.wrapped_loader.data, labels
 
     @property
     def configuration(self):
