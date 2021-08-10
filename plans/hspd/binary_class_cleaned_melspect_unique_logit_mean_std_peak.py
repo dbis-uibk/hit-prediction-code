@@ -21,7 +21,6 @@ dataloader = ClassLoaderWrapper(
             'msd_bb_mbid_cleaned_matches_melspect_unique.pickle.xz',
         ),
         features='librosa_melspectrogram',
-        *common.all_no_year_list(),
         nan_value=common.peak_pos_non_hit_value(),
     ),
     labels=common.peak_position_binary_labels(),
