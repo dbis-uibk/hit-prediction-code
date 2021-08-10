@@ -264,6 +264,14 @@ class MelSpectMeanStdLoader(Loader):
             data_modifier=data_modifier,
         )
 
+        self.data, self.labels = self._mel_loader.load()
+
+        time_axis = 2
+        self.data = np.hstack((
+            self.data.mean(axis=time_axis),
+            self.data.std(axis=time_axis),
+        ))
+
     def load(self):
         """Returns the data loaded by the dataloader."""
         features, target = self._mel_loader.load()
@@ -280,16 +288,6 @@ class MelSpectMeanStdLoader(Loader):
     def configuration(self):
         """Returns the configuration in json serializable format."""
         return self._mel_loader.configuration
-
-    @property
-    def data(self):
-        """Gives access to the data of the underlaying loader."""
-        return self._mel_loader.data
-
-    @property
-    def labels(self):
-        """Gives access to the labels of the underlaying loader."""
-        return self._mel_loader.labels
 
 
 class EssentiaLoader(Loader):
