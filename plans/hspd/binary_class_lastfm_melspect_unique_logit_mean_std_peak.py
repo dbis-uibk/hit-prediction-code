@@ -21,6 +21,7 @@ dataloader = ClassLoaderWrapper(
             'msd_lastfm_matches_melspect_features_unique.pickle.xz',
         ),
         features='librosa_melspectrogram',
+        label='peakPos',
         nan_value=common.peak_pos_non_hit_value(),
     ),
     labels=common.peak_position_binary_labels(),
