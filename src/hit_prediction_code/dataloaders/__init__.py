@@ -203,10 +203,6 @@ class MelSpectLoader(Loader):
         nan_values = pd.isnull(self.labels)
         self.labels[nan_values] = nan_value
 
-        # ensure that the array is at least 2d
-        if len(self.labels.shape) == 1:
-            self.labels = self.labels.reshape((*self.labels.shape, 1))
-
         if label_modifier is not None:
             self.labels = label_modifier(self.labels)
 
@@ -284,6 +280,11 @@ class MelSpectMeanStdLoader(Loader):
     def configuration(self):
         """Returns the configuration in json serializable format."""
         return self._mel_loader.configuration
+
+    @property
+    def data(self):
+        """Gives access to the data of the underlaying loader."""
+        return self._mel_loader.data
 
     @property
     def labels(self):
