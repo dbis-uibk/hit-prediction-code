@@ -39,4 +39,8 @@ for feature_file in feature_files:
 
 logger.info('Store dataset with features containing %d songs' %
             len(dataset.index))
-dataset.to_pickle(dataset_prefix + 'features_unique.pickle.xz', 'xz')
+dataset.to_pickle(
+    os.path.join(
+        final_prefix,
+        dataset_prefix + 'features_unique.pickle.xz',
+    ), 'xz')
