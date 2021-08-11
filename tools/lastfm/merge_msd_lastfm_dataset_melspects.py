@@ -23,24 +23,28 @@ dataset = pd.read_pickle(
         final_prefix,
         dataset_prefix + 'unique.pickle.xz',
     ))
+assert len(dataset) == len(set(dataset['uuid'])), 'Duplicates in dataset.'
 
+columns = ['uuid', 'librosa_melspectrogram']
+
+features = pd.DataFrame(columns=columns)
 for feature_file in feature_files:
     logger.info(f'Load partial feature file: \'{feature_file}\'')
-    features = pd.read_pickle(feature_file)[[
-        'uuid',
-        'librosa_melspectrogram',
-    ]]
+    features = pd.concat([features, pd.read_pickle(feature_file)[columns]])
 
-    logger.info('Merge partial features with final dataset')
-    dataset = dataset.merge(features, on=['uuid'], how='left')
+assert len(features) == len(set(features['uuid'])), 'Duplicates in features.'
 
-    # free memory
-    del features
+logger.info('Merge partial features with final dataset')
+dataset = dataset.merge(features, on=['uuid'])
+
+if len(dataset) != len(features):
+    logger.warning('There are %d features for %d songs.' %
+                   (len(features), len(dataset)))
 
 logger.info('Store dataset with features containing %d songs' %
             len(dataset.index))
 dataset.to_pickle(
     os.path.join(
         final_prefix,
-        dataset_prefix + 'features_unique.pickle.xz',
-    ), 'xz')
+        dataset_prefix + 'features_unique.pickle',
+    ))
