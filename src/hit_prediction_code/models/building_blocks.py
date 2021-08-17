@@ -66,7 +66,7 @@ def add_conv_dropout_block(config, hidden):
 
       1. A Conv2D layer
       2. A BatchNormalization layer (optional)
-      3. An Activation layer
+      3. An Activation layer (optional)
       4. A MaxPooling2D layer (optional)
       6. A Dropout layer (optional)
     """
@@ -89,7 +89,8 @@ def add_conv_dropout_block(config, hidden):
     if config['batch_normalization'] is True:
         hidden = BatchNormalization(axis=channel_axis, name='bn1')(hidden)
 
-    hidden = Activation(config['activation'])(hidden)
+    if config['activation']:
+        hidden = Activation(config['activation'])(hidden)
 
     if config['pool_size']:
         hidden = MaxPooling2D(
