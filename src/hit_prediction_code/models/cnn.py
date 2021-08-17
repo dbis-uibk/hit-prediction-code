@@ -307,6 +307,11 @@ class FCN(HitPredictionModel):
 
         # create conv blocks
         for block in range(1, len(filter_size.keys()) + 1):
+            if block < len(filter_size.keys()):
+                activation = self.cnn_activation
+            else:
+                activation = self.output_activation
+
             block = str(block)
 
             hidden = add_conv_dropout_block(
@@ -320,7 +325,7 @@ class FCN(HitPredictionModel):
                     'pool_size': pool_size['pool' + block],
                     'pool_stride': pool_strides['pool' + block],
                     'dropout_rate': self.dropout_rate,
-                    'activation': self.cnn_activation,
+                    'activation': activation,
                 },
                 hidden=hidden,
             )
