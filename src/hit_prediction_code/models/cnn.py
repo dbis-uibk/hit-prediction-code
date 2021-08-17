@@ -172,7 +172,11 @@ class CNNModel(HitPredictionModel):
         if data.shape[2] > self.network_input_width:
             raise ValueError('window_size > ' + str(self.network_input_width))
         input_shape = (data.shape[1], data.shape[2], data.shape[3])
-        output_shape = labels.shape[1]
+
+        if len(labels.shape) == 2:
+            output_shape = labels.shape[1]
+        else:
+            output_shape = 1
 
         return input_shape, output_shape
 
@@ -274,7 +278,7 @@ class FCN(HitPredictionModel):
         filter_size = {
             'conv1': 32,
             'conv2': 32,
-            'conv3': 512,
+            'conv3': 256,
             'conv4': 1,
         }
 
@@ -286,17 +290,17 @@ class FCN(HitPredictionModel):
         }
 
         pool_size = {
-            'conv1': (1, 2),
-            'conv2': (1, 2),
-            'conv3': (1, 2),
-            'conv4': (1, 2),
+            'pool1': (1, 2),
+            'pool2': (1, 2),
+            'pool3': (1, 2),
+            'pool4': (1, 2),
         }
 
         pool_strides = {
-            'conv1': (1, 1),
-            'conv2': (1, 1),
-            'conv3': (1, 1),
-            'conv4': (1, 1),
+            'pool1': (1, 1),
+            'pool2': (1, 1),
+            'pool3': (1, 1),
+            'pool4': (1, 1),
         }
 
         # create 4 conv blocks
@@ -334,7 +338,11 @@ class FCN(HitPredictionModel):
         if data.shape[2] > self.network_input_width:
             raise ValueError('window_size > ' + str(self.network_input_width))
         input_shape = (data.shape[1], data.shape[2], data.shape[3])
-        output_shape = labels.shape[1]
+
+        if len(labels.shape) == 2:
+            output_shape = labels.shape[1]
+        else:
+            output_shape = 1
 
         return input_shape, output_shape
 

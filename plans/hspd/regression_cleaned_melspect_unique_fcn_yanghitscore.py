@@ -3,8 +3,8 @@ import os.path
 
 from dbispipeline.evaluators import CvEpochEvaluator
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import MinMaxScaler
 
+from hit_prediction_code.common import common
 from hit_prediction_code.dataloaders import MelSpectLoader
 import hit_prediction_code.evaluations as evaluations
 from hit_prediction_code.models.cnn import FCN
@@ -30,8 +30,7 @@ dataloader = MelSpectLoader(
 )
 
 pipeline = Pipeline([
-    ('scale', MinMaxScaler()),
-    ('model', FCN(epochs=100)),
+    ('model', FCN(epochs=common.fcn_epochs())),
 ])
 
 evaluator = CvEpochEvaluator(
@@ -40,7 +39,7 @@ evaluator = CvEpochEvaluator(
         hit_nonhit_accuracy_score=None,
         categories=None,
     ),
-    scoring_step_size=evaluations.scoring_step_size(),
+    scoring_step_size=evaluations.fcn_scoring_step_size(),
 )
 
 result_handlers = [

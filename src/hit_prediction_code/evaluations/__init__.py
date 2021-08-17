@@ -23,3 +23,8 @@ def grid_parameters():
 def scoring_step_size():
     """Returns: the step size used for scoring."""
     return 100
+
+
+def fcn_scoring_step_size():
+    """Returns: the step size used for scoring."""
+    return 25

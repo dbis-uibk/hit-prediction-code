@@ -136,6 +136,11 @@ def yang_hit_score_labels():
     return list(map(lambda x: int(round(x)), labels))
 
 
+def fcn_epochs():
+    """Returns: the number of epochs used to train fcn."""
+    return 250
+
+
 def wide_and_deep_epochs():
     """Returns: the number of epochs used to train wide and deep."""
     return 2500
