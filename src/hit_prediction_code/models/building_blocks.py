@@ -91,7 +91,7 @@ def add_conv_dropout_block(config, hidden):
 
     hidden = Activation(config['activation'])(hidden)
 
-    if config['pool_size'] and config['pool_stride']:
+    if config['pool_size']:
         hidden = MaxPooling2D(
             pool_size=config['pool_size'],
             strides=config['pool_stride'],

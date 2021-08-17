@@ -192,11 +192,11 @@ class FCN(HitPredictionModel):
                  batch_size=64,
                  epochs=100,
                  batch_normalization=False,
-                 cnn_activation='selu',
+                 cnn_activation='relu',
                  cnn_batch_normalization=True,
                  dropout_rate=None,
                  output_activation=None,
-                 loss='mean_absolute_error',
+                 loss='mean_squared_error',
                  input_normalization=False):
         """Initializes the CNN Model object.
 
@@ -273,8 +273,6 @@ class FCN(HitPredictionModel):
                 name='input-bn',
             )(hidden)
 
-        dropout_rate = 0.1
-
         filter_size = {
             'conv1': 32,
             'conv2': 32,
@@ -297,10 +295,10 @@ class FCN(HitPredictionModel):
         }
 
         pool_strides = {
-            'pool1': (1, 1),
-            'pool2': (1, 1),
-            'pool3': (1, 1),
-            'pool4': (1, 1),
+            'pool1': None,
+            'pool2': None,
+            'pool3': None,
+            'pool4': None,
         }
 
         # create 4 conv blocks
@@ -317,20 +315,13 @@ class FCN(HitPredictionModel):
                     'batch_normalization': self.batch_normalization,
                     'pool_size': pool_size['pool' + block],
                     'pool_stride': pool_strides['pool' + block],
-                    'dropout_rate': dropout_rate,
+                    'dropout_rate': self.dropout_rate,
                     'activation': self.cnn_activation,
                 },
                 hidden=hidden,
             )
 
-        hidden = Flatten()(hidden)
-
-        output = Dense(
-            output_shape,
-            activation=self.output_activation,
-            kernel_initializer=get_initializer(self.output_activation),
-            name='output',
-        )(hidden)
+        output = Flatten()(hidden)
 
         self.model = Model(inputs=melgram_input, outputs=output)
 
