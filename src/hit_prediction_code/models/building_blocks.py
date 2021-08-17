@@ -59,13 +59,28 @@ def get_initializer(activation):
         return 'glorot_uniform'  # the default from keras
 
 
-def _add_conv_dropout_block(config, hidden):
+def add_conv_dropout_block(config, hidden):
+    """A block containing multiple layers.
+
+    The block has the following structure.
+
+      1. A Conv2D layer
+      2. A BatchNormalization layer (optional)
+      3. An Activation layer
+      4. A MaxPooling2D layer (optional)
+      6. A Dropout layer (optional)
+    """
     channel_axis = 3
 
     initializer = get_initializer(config['activation'])
+    if config['conv_stride']:
+        strides = config['conv_stride']
+    else:
+        strides = (1, 1)
     hidden = Conv2D(
         filters=config['filter_size'],
         kernel_size=config['kernel_size'],
+        strides=strides,
         padding=config['padding'],
         kernel_initializer=initializer,
         name='conv' + config['name_suffix'],
@@ -73,21 +88,27 @@ def _add_conv_dropout_block(config, hidden):
 
     if config['batch_normalization'] is True:
         hidden = BatchNormalization(axis=channel_axis, name='bn1')(hidden)
+
     hidden = Activation(config['activation'])(hidden)
 
-    hidden = MaxPooling2D(pool_size=config['pool_size'],
-                          strides=config['pool_stride'],
-                          name='pool' + config['name_suffix'])(hidden)
-    if config['activation'] == 'selu':
-        hidden = AlphaDropout(
-            config['dropout_rate'],
-            name='alpha_dropout' + config['name_suffix'],
+    if config['pool_size'] and config['pool_stride']:
+        hidden = MaxPooling2D(
+            pool_size=config['pool_size'],
+            strides=config['pool_stride'],
+            name='pool' + config['name_suffix'],
         )(hidden)
-    else:
-        hidden = Dropout(
-            config['dropout_rate'],
-            name='dropout' + config['name_suffix'],
-        )(hidden)
+
+    if config['dropout_rate']:
+        if config['activation'] == 'selu':
+            hidden = AlphaDropout(
+                config['dropout_rate'],
+                name='alpha_dropout' + config['name_suffix'],
+            )(hidden)
+        else:
+            hidden = Dropout(
+                config['dropout_rate'],
+                name='dropout' + config['name_suffix'],
+            )(hidden)
 
     return hidden
 
@@ -147,7 +168,7 @@ def mel_cnn_layers(layer_sizes,
     for block in range(1, 5):
         block = str(block)
 
-        hidden = _add_conv_dropout_block(
+        hidden = add_conv_dropout_block(
             config={
                 'name_suffix': block,
                 'filter_size': layer_sizes['conv' + block],
