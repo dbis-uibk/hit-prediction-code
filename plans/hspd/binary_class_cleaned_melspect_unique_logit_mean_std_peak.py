@@ -18,7 +18,7 @@ dataloader = ClassLoaderWrapper(
     wrapped_loader=MelSpectMeanStdLoader(
         dataset_path=os.path.join(
             PATH_PREFIX,
-            'msd_bb_mbid_cleaned_matches_melspect_unique.pickle.xz',
+            'msd_bb_mbid_cleaned_matches_melspect_unique.pickle',
         ),
         features='librosa_melspectrogram',
         label='peakPos',
