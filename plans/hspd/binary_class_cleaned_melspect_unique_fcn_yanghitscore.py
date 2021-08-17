@@ -44,7 +44,7 @@ pipeline = Pipeline([
 evaluator = CvEpochEvaluator(
     cv=evaluations.cv(),
     scoring=evaluations.metrics.classifier_scoring(),
-    scoring_step_size=evaluations.scoring_step_size(),
+    scoring_step_size=evaluations.fcn_scoring_step_size(),
 )
 
 result_handlers = [
