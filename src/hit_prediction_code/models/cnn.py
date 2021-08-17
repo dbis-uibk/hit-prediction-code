@@ -314,9 +314,9 @@ class FCN(HitPredictionModel):
         # create conv blocks
         for block in range(1, len(filter_size.keys()) + 1):
             if block < len(filter_size.keys()):
-                dropout_rate = None
-            else:
                 dropout_rate = self.dropout_rate
+            else:
+                dropout_rate = None
 
             block = str(block)
 
