@@ -197,7 +197,9 @@ class FCN(HitPredictionModel):
                  dropout_rate=0.1,
                  output_activation=None,
                  loss='mean_squared_error',
-                 input_normalization=False):
+                 input_normalization=False,
+                 metrics=None,
+                 label_output=False):
         """Initializes the CNN Model object.
 
         Args:
@@ -213,11 +215,14 @@ class FCN(HitPredictionModel):
             loss: the loss function used to train the network.
             input_normalization: Applies a BN layer directly after the input.
         """
-        super().__init__(
-            metrics=['mean_absolute_error'],
-            optimizer='adam',
-        )
+        super().__init__(optimizer='adam')
 
+        if metrics is None:
+            self.metrics = ['mean_absolute_error']
+        else:
+            self.metrics = metrics
+
+        self.label_output = label_output
         self.batch_size = batch_size
         self.epochs = epochs
         self.batch_normalization = batch_normalization
