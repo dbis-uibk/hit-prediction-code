@@ -277,7 +277,7 @@ class FCN(HitPredictionModel):
             'conv1': 32,
             'conv2': 32,
             'conv3': 256,
-            'conv4': 1,
+            'conv4': output_shape,
         }
 
         kernel_size = conv_stride = {
