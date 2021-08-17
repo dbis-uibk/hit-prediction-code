@@ -9,6 +9,7 @@ from tensorflow.keras.layers import Input
 from tensorflow.keras.layers import MaxPooling1D
 from tensorflow.keras.layers import Reshape
 from tensorflow.keras.models import Model
+from tensorflow.python.keras.layers.core import Activation
 
 from .building_blocks import HitPredictionModel
 from .building_blocks import add_conv_dropout_block
@@ -313,9 +314,9 @@ class FCN(HitPredictionModel):
         # create conv blocks
         for block in range(1, len(filter_size.keys()) + 1):
             if block < len(filter_size.keys()):
-                activation = self.cnn_activation
+                dropout_rate = None
             else:
-                activation = self.output_activation
+                dropout_rate = self.dropout_rate
 
             block = str(block)
 
@@ -329,13 +330,16 @@ class FCN(HitPredictionModel):
                     'batch_normalization': self.batch_normalization,
                     'pool_size': pool_size['pool' + block],
                     'pool_stride': pool_strides['pool' + block],
-                    'dropout_rate': self.dropout_rate,
-                    'activation': activation,
+                    'dropout_rate': dropout_rate,
+                    'activation': self.cnn_activation,
                 },
                 hidden=hidden,
             )
 
         output = Flatten()(hidden)
+
+        if self.output_activation:
+            output = Activation(self.output_activation)(output)
 
         self.model = Model(inputs=melgram_input, outputs=output)
 
