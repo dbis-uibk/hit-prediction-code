@@ -276,22 +276,25 @@ class FCN(HitPredictionModel):
         filter_size = {
             'conv1': 32,
             'conv2': 32,
-            'conv3': 256,
-            'conv4': output_shape,
+            'conv3': 512,
+            'conv4': 512,
+            'conv5': output_shape,
         }
 
         kernel_size = conv_stride = {
-            'conv1': (128, 4),
-            'conv2': (1, 4),
-            'conv3': (1, 4),
+            'conv1': (128, 8),
+            'conv2': (1, 8),
+            'conv3': (1, 1),
             'conv4': (1, 1),
+            'conv5': (1, 1),
         }
 
         pool_size = {
-            'pool1': (1, 2),
-            'pool2': (1, 2),
-            'pool3': (1, 2),
-            'pool4': (1, 2),
+            'pool1': (1, 4),
+            'pool2': (1, 4),
+            'pool3': None,
+            'pool4': None,
+            'pool5': None,
         }
 
         pool_strides = {
@@ -299,10 +302,11 @@ class FCN(HitPredictionModel):
             'pool2': None,
             'pool3': None,
             'pool4': None,
+            'pool5': None,
         }
 
-        # create 4 conv blocks
-        for block in range(1, 5):
+        # create conv blocks
+        for block in range(1, len(filter_size.keys()) + 1):
             block = str(block)
 
             hidden = add_conv_dropout_block(
