@@ -5,7 +5,7 @@ from dbispipeline.evaluators import CvEpochEvaluator
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import MinMaxScaler
 
-from hit_prediction_code.dataloaders import MelSpectMeanStdLoader
+from hit_prediction_code.dataloaders import MelSpectLoader
 import hit_prediction_code.evaluations as evaluations
 from hit_prediction_code.models.cnn import FCN
 from hit_prediction_code.result_handlers import print_results_as_json
@@ -13,10 +13,10 @@ from hit_prediction_code.transformers.label import compute_hit_score_on_df
 
 PATH_PREFIX = 'data/hit_song_prediction_ismir2020/processed'
 
-dataloader = MelSpectMeanStdLoader(
+dataloader = MelSpectLoader(
     dataset_path=os.path.join(
         PATH_PREFIX,
-        'msd_bb_mbid_cleaned_matches_melspect_unique.pickle.xz',
+        'msd_bb_mbid_cleaned_matches_melspect_unique.pickle',
     ),
     features='librosa_melspectrogram',
     label='yang_hit_score',

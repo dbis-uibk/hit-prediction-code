@@ -209,6 +209,11 @@ class FCN(HitPredictionModel):
             loss: the loss function used to train the network.
             input_normalization: Applies a BN layer directly after the input.
         """
+        super().__init__(
+            metrics=['mean_absolute_error'],
+            optimizer='adam',
+        )
+
         self.batch_size = batch_size
         self.epochs = epochs
         self.batch_normalization = batch_normalization
