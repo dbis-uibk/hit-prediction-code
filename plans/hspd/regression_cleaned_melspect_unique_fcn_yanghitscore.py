@@ -4,7 +4,7 @@ import os.path
 from dbispipeline.evaluators import CvEpochEvaluator
 from sklearn.pipeline import Pipeline
 
-from hit_prediction_code.common import common
+import hit_prediction_code.common as common
 from hit_prediction_code.dataloaders import MelSpectLoader
 import hit_prediction_code.evaluations as evaluations
 from hit_prediction_code.models.cnn import FCN
