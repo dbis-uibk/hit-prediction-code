@@ -194,7 +194,7 @@ class FCN(HitPredictionModel):
                  batch_normalization=False,
                  cnn_activation=None,
                  cnn_batch_normalization=False,
-                 dropout_rate=None,
+                 dropout_rate=0.1,
                  output_activation=None,
                  loss='mean_squared_error',
                  input_normalization=False):
