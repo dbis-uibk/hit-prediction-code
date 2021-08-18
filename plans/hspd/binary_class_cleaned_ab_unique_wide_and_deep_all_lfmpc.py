@@ -1,4 +1,4 @@
-"""Wide and deep model evaluation plan using all features."""
+"""Wide and deep plan using all features."""
 import os.path
 
 from dbispipeline.evaluators import CvEpochEvaluator

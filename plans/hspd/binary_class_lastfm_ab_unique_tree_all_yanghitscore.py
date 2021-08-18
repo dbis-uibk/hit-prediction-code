@@ -1,4 +1,4 @@
-"""DecissionTreeClassifier model evaluation plan using all features."""
+"""DecissionTreeClassifier plan using all features."""
 import os.path
 
 from dbispipeline.evaluators import CvEpochEvaluator

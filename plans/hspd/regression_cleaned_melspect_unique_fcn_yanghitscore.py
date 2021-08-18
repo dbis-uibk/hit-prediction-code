@@ -1,4 +1,4 @@
-"""FCN model plan using mean and std mel-spect features."""
+"""FCN plan using mel-spect features."""
 import os.path
 
 from dbispipeline.evaluators import CvEpochEvaluator

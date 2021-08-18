@@ -1,4 +1,4 @@
-"""RandomForestClassifier model evaluation plan using all features."""
+"""RandomForestClassifier plan using all features."""
 import os.path
 
 from dbispipeline.evaluators import CvEpochEvaluator

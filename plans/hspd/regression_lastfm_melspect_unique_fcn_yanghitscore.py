@@ -1,27 +1,24 @@
-"""SVR plan using all features."""
+"""FCN plan using mel-spect features."""
 import os.path
 
 from dbispipeline.evaluators import CvEpochEvaluator
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import MinMaxScaler
 
 import hit_prediction_code.common as common
-from hit_prediction_code.dataloaders import EssentiaLoader
+from hit_prediction_code.dataloaders import MelSpectLoader
 import hit_prediction_code.evaluations as evaluations
-from hit_prediction_code.models.svm import SVR
+from hit_prediction_code.models.cnn import FCN
 from hit_prediction_code.result_handlers import print_results_as_json
 from hit_prediction_code.transformers.label import compute_hit_score_on_df
 
 PATH_PREFIX = 'data/hit_song_prediction_lastfm/processed'
 
-dataloader = EssentiaLoader(
+dataloader = MelSpectLoader(
     dataset_path=os.path.join(
         PATH_PREFIX,
-        'msd_lastfm_matches_ab_unique.parquet',
+        'msd_lastfm_matches_melspect_features_unique.pickle',
     ),
-    features=[
-        *common.all_no_year_list(),
-    ],
+    features='librosa_melspectrogram',
     label='yang_hit_score',
     nan_value=0,
     data_modifier=lambda df: compute_hit_score_on_df(
@@ -33,8 +30,7 @@ dataloader = EssentiaLoader(
 )
 
 pipeline = Pipeline([
-    ('scale', MinMaxScaler()),
-    ('model', SVR()),
+    ('model', FCN(epochs=common.fcn_epochs())),
 ])
 
 evaluator = CvEpochEvaluator(
@@ -43,7 +39,7 @@ evaluator = CvEpochEvaluator(
         hit_nonhit_accuracy_score=None,
         categories=None,
     ),
-    scoring_step_size=1,
+    scoring_step_size=evaluations.fcn_scoring_step_size(),
 )
 
 result_handlers = [
