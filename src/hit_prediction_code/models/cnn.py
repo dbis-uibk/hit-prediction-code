@@ -10,6 +10,7 @@ from tensorflow.keras.layers import MaxPooling1D
 from tensorflow.keras.layers import Reshape
 from tensorflow.keras.models import Model
 from tensorflow.python.keras.layers.core import Activation
+from tensorflow.python.keras.layers.core import Dropout
 
 from .building_blocks import HitPredictionModel
 from .building_blocks import add_conv_dropout_block
@@ -193,9 +194,9 @@ class FCN(HitPredictionModel):
                  batch_size=64,
                  epochs=100,
                  batch_normalization=False,
-                 cnn_activation=None,
+                 cnn_activation='relu',
                  cnn_batch_normalization=True,
-                 dropout_rate=None,
+                 dropout_rate=0.5,
                  output_activation=None,
                  loss='mean_squared_error',
                  input_normalization=True,
@@ -322,11 +323,6 @@ class FCN(HitPredictionModel):
 
         # create conv blocks
         for block in range(1, len(filter_size.keys()) + 1):
-            if block < len(filter_size.keys()):
-                dropout_rate = self.dropout_rate
-            else:
-                dropout_rate = None
-
             block = str(block)
 
             if kernel_size['conv' + block] == 'auto':
@@ -346,13 +342,15 @@ class FCN(HitPredictionModel):
                     'batch_normalization': self.cnn_batch_normalization,
                     'pool_size': pool_size['pool' + block],
                     'pool_stride': pool_strides['pool' + block],
-                    'dropout_rate': dropout_rate,
+                    'dropout_rate': None,
                     'activation': self.cnn_activation,
                 },
                 hidden=hidden,
             )
 
         hidden = Flatten()(hidden)
+        if self.dropout_rate:
+            hidden = Dropout(self.dropout_rate)
         output = Dense(output_shape)(hidden)
 
         if self.output_activation:
