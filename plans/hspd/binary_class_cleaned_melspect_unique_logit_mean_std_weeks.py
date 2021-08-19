@@ -18,7 +18,7 @@ dataloader = ClassLoaderWrapper(
     wrapped_loader=MelSpectMeanStdLoader(
         dataset_path=os.path.join(
             PATH_PREFIX,
-            'msd_bb_mbid_cleaned_matches_melspect_unique.pickle',
+            'msd_bb_mbid_cleaned_matches_melspect_db_unique.pickle',
         ),
         features='librosa_melspectrogram',
         label='weeks',

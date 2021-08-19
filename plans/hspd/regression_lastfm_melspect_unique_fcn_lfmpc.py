@@ -15,7 +15,7 @@ PATH_PREFIX = 'data/hit_song_prediction_lastfm/processed'
 dataloader = MelSpectLoader(
     dataset_path=os.path.join(
         PATH_PREFIX,
-        'msd_lastfm_matches_melspect_features_unique.pickle',
+        'msd_lastfm_matches_melspect_db_features_unique.pickle',
     ),
     features='librosa_melspectrogram',
     label='lastfm_playcount',

@@ -16,7 +16,7 @@ PATH_PREFIX = 'data/hit_song_prediction_ismir2020/processed'
 dataloader = BinaryClassLoaderWrapper(wrapped_loader=MelSpectMeanStdLoader(
     dataset_path=os.path.join(
         PATH_PREFIX,
-        'msd_bb_mbid_cleaned_matches_melspect_unique.pickle',
+        'msd_bb_mbid_cleaned_matches_melspect_db_unique.pickle',
     ),
     features='librosa_melspectrogram',
     label='lastfm_playcount',
