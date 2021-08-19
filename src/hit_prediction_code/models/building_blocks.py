@@ -87,7 +87,10 @@ def add_conv_dropout_block(config, hidden):
     )(hidden)
 
     if config['batch_normalization'] is True:
-        hidden = BatchNormalization(axis=channel_axis, name='bn1')(hidden)
+        hidden = BatchNormalization(
+            axis=channel_axis,
+            name='bn' + config['name_suffix'],
+        )(hidden)
 
     if config['activation']:
         hidden = Activation(config['activation'])(hidden)

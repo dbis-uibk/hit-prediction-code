@@ -235,7 +235,7 @@ class FCN(HitPredictionModel):
         self.loss = loss
         self.input_normalization = input_normalization
 
-        self.network_input_width = 1200
+        self.network_input_width = 1296
         self.model = None
 
     @property
@@ -309,7 +309,7 @@ class FCN(HitPredictionModel):
             'pool2': (2, 4),
             'pool3': (2, 4),
             'pool4': (3, 5),
-            'pool5': (3, 5),
+            'pool5': (4, 4),
         }
 
         pool_strides = {
@@ -342,8 +342,8 @@ class FCN(HitPredictionModel):
                     'filter_size': filter_size['conv' + block],
                     'kernel_size': ksize,
                     'conv_stride': ssize,
-                    'padding': 'valid',
-                    'batch_normalization': self.batch_normalization,
+                    'padding': self.padding,
+                    'batch_normalization': self.cnn_batch_normalization,
                     'pool_size': pool_size['pool' + block],
                     'pool_stride': pool_strides['pool' + block],
                     'dropout_rate': dropout_rate,
