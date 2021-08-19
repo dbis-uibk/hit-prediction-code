@@ -194,11 +194,11 @@ class FCN(HitPredictionModel):
                  epochs=100,
                  batch_normalization=False,
                  cnn_activation=None,
-                 cnn_batch_normalization=False,
-                 dropout_rate=0.1,
+                 cnn_batch_normalization=True,
+                 dropout_rate=None,
                  output_activation=None,
                  loss='mean_squared_error',
-                 input_normalization=False,
+                 input_normalization=True,
                  metrics=None,
                  label_output=False):
         """Initializes the CNN Model object.
@@ -223,6 +223,7 @@ class FCN(HitPredictionModel):
         else:
             self.metrics = metrics
 
+        self.padding = 'same'
         self.label_output = label_output
         self.batch_size = batch_size
         self.epochs = epochs
@@ -280,35 +281,35 @@ class FCN(HitPredictionModel):
             )(hidden)
 
         filter_size = {
-            'conv1': 32,
-            'conv2': 32,
-            'conv3': 512,
-            'conv4': 512,
-            'conv5': output_shape,
+            'conv1': 64,
+            'conv2': 128,
+            'conv3': 128,
+            'conv4': 128,
+            'conv5': 64,
         }
 
         kernel_size = {
-            'conv1': (128, 4),
-            'conv2': (1, 4),
-            'conv3': 'auto',
-            'conv4': (1, 1),
-            'conv5': (1, 1),
+            'conv1': (3, 3),
+            'conv2': (3, 3),
+            'conv3': (3, 3),
+            'conv4': (3, 3),
+            'conv5': (3, 3),
         }
 
         conv_stride = {
             'conv1': (1, 1),
             'conv2': (1, 1),
-            'conv3': 'auto',
+            'conv3': (1, 1),
             'conv4': (1, 1),
             'conv5': (1, 1),
         }
 
         pool_size = {
-            'pool1': (1, 4),
-            'pool2': (1, 4),
-            'pool3': None,
-            'pool4': None,
-            'pool5': None,
+            'pool1': (2, 4),
+            'pool2': (2, 4),
+            'pool3': (2, 4),
+            'pool4': (3, 5),
+            'pool5': (3, 5),
         }
 
         pool_strides = {
@@ -351,7 +352,8 @@ class FCN(HitPredictionModel):
                 hidden=hidden,
             )
 
-        output = Flatten()(hidden)
+        hidden = Flatten()(hidden)
+        output = Dense(output_shape)(hidden)
 
         if self.output_activation:
             output = Activation(self.output_activation)(output)
