@@ -18,7 +18,7 @@ dataloader = BinaryClassLoaderWrapper(wrapped_loader=MelSpectLoader(
         PATH_PREFIX,
         'msd_bb_mbid_cleaned_matches_melspect_db_unique.pickle',
     ),
-    features='librosa_melspectrogram',
+    features='librosa_melspectrogram_db',
     label='lastfm_playcount',
     nan_value=0,
 ))

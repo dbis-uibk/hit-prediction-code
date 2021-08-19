@@ -18,7 +18,7 @@ dataloader = MelSpectMeanStdLoader(
         PATH_PREFIX,
         'msd_bb_mbid_cleaned_matches_melspect_db_unique.pickle',
     ),
-    features='librosa_melspectrogram',
+    features='librosa_melspectrogram_db',
     label='peakPos',
     nan_value=common.peak_pos_non_hit_value(),
 )

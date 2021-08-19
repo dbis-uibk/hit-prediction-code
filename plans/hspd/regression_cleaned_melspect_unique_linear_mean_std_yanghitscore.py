@@ -18,7 +18,7 @@ dataloader = MelSpectMeanStdLoader(
         PATH_PREFIX,
         'msd_bb_mbid_cleaned_matches_melspect_db_unique.pickle',
     ),
-    features='librosa_melspectrogram',
+    features='librosa_melspectrogram_db',
     label='yang_hit_score',
     nan_value=0,
     data_modifier=lambda df: compute_hit_score_on_df(

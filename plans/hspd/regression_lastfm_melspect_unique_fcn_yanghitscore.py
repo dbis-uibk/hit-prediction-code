@@ -18,7 +18,7 @@ dataloader = MelSpectLoader(
         PATH_PREFIX,
         'msd_lastfm_matches_melspect_db_features_unique.pickle',
     ),
-    features='librosa_melspectrogram',
+    features='librosa_melspectrogram_db',
     label='yang_hit_score',
     nan_value=0,
     data_modifier=lambda df: compute_hit_score_on_df(

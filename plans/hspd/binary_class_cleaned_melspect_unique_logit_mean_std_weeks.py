@@ -20,7 +20,7 @@ dataloader = ClassLoaderWrapper(
             PATH_PREFIX,
             'msd_bb_mbid_cleaned_matches_melspect_db_unique.pickle',
         ),
-        features='librosa_melspectrogram',
+        features='librosa_melspectrogram_db',
         label='weeks',
         nan_value=common.weeks_non_hit_value(),
     ),
