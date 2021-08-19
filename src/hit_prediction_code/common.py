@@ -138,7 +138,7 @@ def yang_hit_score_labels():
 
 def fcn_epochs():
     """Returns: the number of epochs used to train fcn."""
-    return 250
+    return 50
 
 
 def wide_and_deep_epochs():

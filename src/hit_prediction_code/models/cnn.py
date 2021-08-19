@@ -287,10 +287,18 @@ class FCN(HitPredictionModel):
             'conv5': output_shape,
         }
 
-        kernel_size = conv_stride = {
-            'conv1': (128, 8),
-            'conv2': (1, 8),
-            'conv3': (1, 1),
+        kernel_size = {
+            'conv1': (128, 4),
+            'conv2': (1, 4),
+            'conv3': 'auto',
+            'conv4': (1, 1),
+            'conv5': (1, 1),
+        }
+
+        conv_stride = {
+            'conv1': (1, 1),
+            'conv2': (1, 1),
+            'conv3': 'auto',
             'conv4': (1, 1),
             'conv5': (1, 1),
         }
@@ -320,12 +328,19 @@ class FCN(HitPredictionModel):
 
             block = str(block)
 
+            if kernel_size['conv' + block] == 'auto':
+                ksize = hidden.shape[1:3]
+                ssize = ksize
+            else:
+                ksize = kernel_size['conv' + block]
+                ssize = conv_stride['conv' + block]
+
             hidden = add_conv_dropout_block(
                 config={
                     'name_suffix': block,
                     'filter_size': filter_size['conv' + block],
-                    'kernel_size': kernel_size['conv' + block],
-                    'conv_stride': conv_stride['conv' + block],
+                    'kernel_size': ksize,
+                    'conv_stride': ssize,
                     'padding': 'valid',
                     'batch_normalization': self.batch_normalization,
                     'pool_size': pool_size['pool' + block],

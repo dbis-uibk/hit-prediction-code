@@ -27,4 +27,4 @@ def scoring_step_size():
 
 def fcn_scoring_step_size():
     """Returns: the step size used for scoring."""
-    return 25
+    return 5
