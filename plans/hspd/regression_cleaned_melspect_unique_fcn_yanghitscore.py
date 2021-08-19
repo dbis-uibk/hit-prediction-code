@@ -2,9 +2,7 @@
 import os.path
 
 from dbispipeline.evaluators import CvEpochEvaluator
-from librosa import power_to_db
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import FunctionTransformer
 
 import hit_prediction_code.common as common
 from hit_prediction_code.dataloaders import MelSpectLoader
@@ -18,9 +16,9 @@ PATH_PREFIX = 'data/hit_song_prediction_ismir2020/processed'
 dataloader = MelSpectLoader(
     dataset_path=os.path.join(
         PATH_PREFIX,
-        'msd_bb_mbid_cleaned_matches_melspect_unique.pickle',
+        'msd_bb_mbid_cleaned_matches_melspect_db_unique.pickle',
     ),
-    features='librosa_melspectrogram',
+    features='librosa_melspectrogram_db',
     label='yang_hit_score',
     nan_value=0,
     data_modifier=lambda df: compute_hit_score_on_df(
@@ -32,7 +30,6 @@ dataloader = MelSpectLoader(
 )
 
 pipeline = Pipeline([
-    ('power_to_db', FunctionTransformer(power_to_db)),
     ('model', FCN(epochs=common.fcn_epochs())),
 ])
 
