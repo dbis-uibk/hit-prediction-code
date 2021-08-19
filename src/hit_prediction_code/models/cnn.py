@@ -350,7 +350,7 @@ class FCN(HitPredictionModel):
 
         hidden = Flatten()(hidden)
         if self.dropout_rate:
-            hidden = Dropout(self.dropout_rate)
+            hidden = Dropout(self.dropout_rate)(hidden)
         output = Dense(output_shape)(hidden)
 
         if self.output_activation:
