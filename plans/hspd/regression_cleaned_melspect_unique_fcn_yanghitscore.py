@@ -2,7 +2,9 @@
 import os.path
 
 from dbispipeline.evaluators import CvEpochEvaluator
+from librosa import power_to_db
 from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import FunctionTransformer
 
 import hit_prediction_code.common as common
 from hit_prediction_code.dataloaders import MelSpectLoader
@@ -30,6 +32,7 @@ dataloader = MelSpectLoader(
 )
 
 pipeline = Pipeline([
+    ('power_to_db', FunctionTransformer(power_to_db)),
     ('model', FCN(epochs=common.fcn_epochs())),
 ])
 
