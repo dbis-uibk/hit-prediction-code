@@ -26,8 +26,6 @@ uuid_msd_mapping = pd.concat([
     matches_exact,
     non_matches,
 ]).drop_duplicates()
-assert len(uuid_msd_mapping) == len(
-    uuid_msd_mapping['msd_id'].drop_duplicates()), 'msd_ids not unique'
 
 logger.info('load msd year info')
 msd_year = pd.read_csv(
