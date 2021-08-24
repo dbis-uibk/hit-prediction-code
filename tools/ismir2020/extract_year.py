@@ -34,6 +34,7 @@ msd_year = pd.read_csv(
     os.path.join(msd_prefix, 'tracks_per_year.txt'),
     sep='<SEP>',
     names=['year', 'msd_id', 'artist', 'title'],
+    engine='python',
 )[['year', 'msd_id']].drop_duplicates()
 assert len(msd_year) == len(
     msd_year['msd_id'].drop_duplicates()), 'msd_ids year mapping not unique'
@@ -42,7 +43,7 @@ logger.info('compute year mapping')
 year_mapping = uuid_msd_mapping.merge(
     msd_year,
     on=['msd_id'],
-)[['uuid', 'year']]
+)[['uuid', 'year']].drop_duplicates()
 
 logger.info('get uuids with known year')
 uuid_year = year_mapping.groupby(by='uuid').agg(lambda x: x.max() == x.min())
@@ -54,6 +55,7 @@ uuid_year_mapping = uuid_year.merge(year_mapping, on=['uuid'])
 assert len(uuid_year_mapping) == len(uuid_year_mapping['uuid'].drop_duplicates(
 )), 'UUIDs year mapping not unique'
 
+logger.info('Store uuid -> year mapping for %d songs' % len(uuid_year_mapping))
 uuid_year_mapping.to_csv(
     os.path.join(
         final_prefix,
