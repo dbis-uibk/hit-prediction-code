@@ -12,13 +12,13 @@ import hit_prediction_code.evaluations as evaluations
 from hit_prediction_code.models.wide_and_deep import WideAndDeep
 from hit_prediction_code.result_handlers import print_results_as_json
 
-PATH_PREFIX = 'data/hit_song_prediction_ismir2020/processed'
+PATH_PREFIX = 'data/hit_song_prediction_msd_bb_lfm_ab/processed'
 
 dataloader = ClassLoaderWrapper(
     wrapped_loader=EssentiaLoader(
         dataset_path=os.path.join(
             PATH_PREFIX,
-            'msd_bb_mbid_cleaned_matches_ab_unique.parquet',
+            'hsp-s_acousticbrainz.parquet',
         ),
         features=[
             *common.all_no_year_list(),

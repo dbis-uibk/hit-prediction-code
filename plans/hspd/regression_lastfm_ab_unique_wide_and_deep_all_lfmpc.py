@@ -11,12 +11,12 @@ import hit_prediction_code.evaluations as evaluations
 from hit_prediction_code.models.wide_and_deep import WideAndDeep
 from hit_prediction_code.result_handlers import print_results_as_json
 
-PATH_PREFIX = 'data/hit_song_prediction_lastfm/processed'
+PATH_PREFIX = 'data/hit_song_prediction_msd_bb_lfm_ab/processed'
 
 dataloader = EssentiaLoader(
     dataset_path=os.path.join(
         PATH_PREFIX,
-        'msd_lastfm_matches_ab_unique.parquet',
+        'hsp-l_acousticbrainz.parquet',
     ),
     features=[
         *common.all_no_year_list(),

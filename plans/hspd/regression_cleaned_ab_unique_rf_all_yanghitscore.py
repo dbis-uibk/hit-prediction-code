@@ -12,12 +12,12 @@ from hit_prediction_code.models.tree import RandomForestRegressor
 from hit_prediction_code.result_handlers import print_results_as_json
 from hit_prediction_code.transformers.label import compute_hit_score_on_df
 
-PATH_PREFIX = 'data/hit_song_prediction_ismir2020/processed'
+PATH_PREFIX = 'data/hit_song_prediction_msd_bb_lfm_ab/processed'
 
 dataloader = EssentiaLoader(
     dataset_path=os.path.join(
         PATH_PREFIX,
-        'msd_bb_mbid_cleaned_matches_ab_unique.parquet',
+        'hsp-s_acousticbrainz.parquet',
     ),
     features=[
         *common.all_no_year_list(),

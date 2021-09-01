@@ -11,12 +11,12 @@ from hit_prediction_code.models.linear import LinearRegression
 from hit_prediction_code.result_handlers import print_results_as_json
 from hit_prediction_code.transformers.label import compute_hit_score_on_df
 
-PATH_PREFIX = 'data/hit_song_prediction_lastfm/processed'
+PATH_PREFIX = 'data/hit_song_prediction_msd_bb_lfm_ab/processed'
 
 dataloader = MelSpectMeanStdLoader(
     dataset_path=os.path.join(
         PATH_PREFIX,
-        'msd_lastfm_matches_melspect_db_features_unique.pickle',
+        'hsp-l_melspect.pickle',
     ),
     features='librosa_melspectrogram_db',
     label='yang_hit_score',

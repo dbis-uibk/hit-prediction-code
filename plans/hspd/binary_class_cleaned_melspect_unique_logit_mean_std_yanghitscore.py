@@ -12,12 +12,12 @@ from hit_prediction_code.models.linear import LogisticRegressionClassifier
 from hit_prediction_code.result_handlers import print_results_as_json
 from hit_prediction_code.transformers.label import compute_hit_score_on_df
 
-PATH_PREFIX = 'data/hit_song_prediction_ismir2020/processed'
+PATH_PREFIX = 'data/hit_song_prediction_msd_bb_lfm_ab/processed'
 
 dataloader = BinaryClassLoaderWrapper(wrapped_loader=MelSpectMeanStdLoader(
     dataset_path=os.path.join(
         PATH_PREFIX,
-        'msd_bb_mbid_cleaned_matches_melspect_db_unique.pickle',
+        'hsp-s_melspect.pickle',
     ),
     features='librosa_melspectrogram_db',
     label='yang_hit_score',

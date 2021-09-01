@@ -11,12 +11,12 @@ import hit_prediction_code.evaluations as evaluations
 from hit_prediction_code.models.linear import LinearRegression
 from hit_prediction_code.result_handlers import print_results_as_json
 
-PATH_PREFIX = 'data/hit_song_prediction_ismir2020/processed'
+PATH_PREFIX = 'data/hit_song_prediction_msd_bb_lfm_ab/processed'
 
 dataloader = MelSpectMeanStdLoader(
     dataset_path=os.path.join(
         PATH_PREFIX,
-        'msd_bb_mbid_cleaned_matches_melspect_db_unique.pickle',
+        'hsp-s_melspect.pickle',
     ),
     features='librosa_melspectrogram_db',
     label='peakPos',
