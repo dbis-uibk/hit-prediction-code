@@ -1,29 +1,99 @@
-init:
-	pipenv install
+.PHONY: clean clean-test clean-pyc clean-build help format bandit requirements #docker-image
+.DEFAULT_GOAL := help
 
-init-dev:
-	pipenv install --dev
+define BROWSER_PYSCRIPT
+import os, webbrowser, sys
 
-docs:
-	pipenv run sphinx-build -b html docs/source/ docs/build/html/
+try:
+	from urllib import pathname2url
+except:
+	from urllib.request import pathname2url
 
-tests:
-	pipenv run python tests.py
+webbrowser.open("file://" + pathname2url(os.path.abspath(sys.argv[1])))
+endef
+export BROWSER_PYSCRIPT
 
-requirements:
-	pipenv lock -r | tail -n +2 > requirements.txt
-	pipenv lock -r -d | tail -n +2 > requirements-dev.txt
+define PRINT_HELP_PYSCRIPT
+import re, sys
 
-docker-image: requirements
-	docker build -t dbispipeline .
+for line in sys.stdin:
+	match = re.match(r'^([a-zA-Z_-]+):.*?## (.*)$$', line)
+	if match:
+		target, help = match.groups()
+		print("%-20s %s" % (target, help))
+endef
+export PRINT_HELP_PYSCRIPT
 
-format:
-	pipenv run yapf -i -r .
+BROWSER := python -c "$$BROWSER_PYSCRIPT"
 
-check-format:
-	pipenv run flake8
+help:
+	@python -c "$$PRINT_HELP_PYSCRIPT" < $(MAKEFILE_LIST)
 
-bandit:
-	pipenv run bandit -r .
+clean: clean-build clean-pyc clean-test ## remove all build, test, coverage and Python artifacts
 
-.PHONY: init init-dev docs tests requirements docker-image format check-format bandit
+clean-build: ## remove build artifacts
+	rm -fr build/
+	rm -fr dist/
+	rm -fr .eggs/
+	find . \( -path ./env -o -path ./venv -o -path ./.env -o -path ./.venv \) -prune -o -name '*.egg-info' -exec rm -fr {} +
+	find . \( -path ./env -o -path ./venv -o -path ./.env -o -path ./.venv \) -prune -o -name '*.egg' -exec rm -f {} +
+
+clean-pyc: ## remove Python file artifacts
+	find . -name '*.pyc' -exec rm -f {} +
+	find . -name '*.pyo' -exec rm -f {} +
+	find . -name '*~' -exec rm -f {} +
+	find . -name '__pycache__' -exec rm -fr {} +
+
+clean-test: ## remove test and coverage artifacts
+	rm -fr .tox/
+	rm -f .coverage
+	rm -fr htmlcov/
+	rm -fr .pytest_cache
+
+lint: ## check style with flake8
+	flake8 plans src tests tools
+
+test: ## run tests quickly with the default Python
+	pytest -v --cov=hit_prediction_code --cov-report html tests
+
+test-all: ## run tests on every Python version with tox
+	tox
+
+coverage: ## check code coverage quickly with the default Python
+	coverage run --source src -m pytest
+	coverage report -m
+	coverage html
+	$(BROWSER) htmlcov/index.html
+
+
+executable:
+	pyinstaller --name hit_prediction_code hit_prediction_code/cli.py
+
+#dist: clean ## builds source and wheel package
+#	python setup.py sdist
+#	python setup.py bdist_wheel
+#	ls -l dist
+
+install: clean ## install the package to the active Python's site-packages
+	python setup.py install
+
+format: ## formats the code
+	yapf -i -r plans
+	yapf -i -r src
+	yapf -i -r tests
+	yapf -i -r tools
+	isort plans
+	isort src
+	isort tests
+	isort tools
+
+bandit: ## static code checking to find security issues in code
+	bandit -r plans
+	bandit -r src
+	bandit -r tests
+	bandit -r tools
+
+pytype:
+	pytype plans
+	pytype src
+	pytype tests

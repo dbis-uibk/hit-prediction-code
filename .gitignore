@@ -8,6 +8,7 @@ __pycache__/
 
 # Distribution / packaging
 .Python
+env/
 build/
 develop-eggs/
 dist/
@@ -20,11 +21,9 @@ parts/
 sdist/
 var/
 wheels/
-share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
-MANIFEST
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -39,7 +38,6 @@ pip-delete-this-directory.txt
 # Unit test / coverage reports
 htmlcov/
 .tox/
-.nox/
 .coverage
 .coverage.*
 .cache
@@ -56,7 +54,6 @@ coverage.xml
 # Django stuff:
 *.log
 local_settings.py
-db.sqlite3
 
 # Flask stuff:
 instance/
@@ -66,17 +63,15 @@ instance/
 .scrapy
 
 # Sphinx documentation
-docs/_build/
+docs/build/
+docs/source/hit_prediction_code.*rst
+docs/source/modules.rst
 
 # PyBuilder
 target/
 
 # Jupyter Notebook
 .ipynb_checkpoints
-
-# IPython
-profile_default/
-ipython_config.py
 
 # pyenv
 .python-version
@@ -87,14 +82,16 @@ celerybeat-schedule
 # SageMath parsed files
 *.sage.py
 
-# Environments
+# dotenv
 .env
+
+# virtualenv
 .venv
-env/
 venv/
+.env/
+env/
 ENV/
-env.bak/
-venv.bak/
+
 
 # Spyder project settings
 .spyderproject
@@ -108,14 +105,12 @@ venv.bak/
 
 # mypy
 .mypy_cache/
-.dmypy.json
-dmypy.json
 
-# Pyre type checker
-.pyre/
+.pytype/
+.vscode/
 
+results/
 
+/lastfm_api_info.json
 
-.vscode/*
-.mypy_cache/*
-
+notebooks/*.html
