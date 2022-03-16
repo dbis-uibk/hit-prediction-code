@@ -31,19 +31,25 @@ def test_strategy_assert():
 def test_strategy_random():
     """Tests random combination of pairs."""
     number_of_pairs = 12
+    number_of_samples = 10
 
-    data = np.arange(10)
+    data = np.arange(number_of_samples)
+    data = np.column_stack((data, data))
+    data = np.concatenate((data, data), axis=0)
+
+    labels = np.identity(number_of_samples)
+    labels = np.concatenate((labels, labels), axis=0)
 
     transformer = PairwiseTransformer(number_of_pairs, strategy='random')
 
     # labels and data need to be the same to fullfil the assumption of the
     # _assert_label_computation()
     transformed_data, transformed_labels = transformer.fit_transform_data(
-        np.column_stack((data, data)),
         data,
+        labels,
     )
 
-    assert transformed_data.shape == (number_of_pairs, 4)
+    assert transformed_data.shape == (number_of_pairs, data.shape[1] * 2)
     assert transformed_labels.shape == (number_of_pairs, 1)
 
     _assert_label_computation(transformed_data, transformed_labels)
@@ -52,19 +58,25 @@ def test_strategy_random():
 def test_strategy_balanced():
     """Tests balanced combination of pairs."""
     number_of_pairs = 12
+    number_of_samples = 10
 
-    data = np.arange(10)
+    data = np.arange(number_of_samples)
+    data = np.column_stack((data, data))
+    data = np.concatenate((data, data), axis=0)
+
+    labels = np.identity(number_of_samples)
+    labels = np.concatenate((labels, labels), axis=0)
 
     transformer = PairwiseTransformer(number_of_pairs, strategy='balanced')
 
     # labels and data need to be the same to fullfil the assumption of the
     # _assert_label_computation()
     transformed_data, transformed_labels = transformer.fit_transform_data(
-        np.column_stack((data, data)),
         data,
+        labels,
     )
 
-    assert transformed_data.shape == (number_of_pairs, 4)
+    assert transformed_data.shape == (number_of_pairs, data.shape[1] * 2)
     assert transformed_labels.shape == (number_of_pairs, 1)
 
     _assert_label_computation(transformed_data, transformed_labels)

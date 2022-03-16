@@ -30,18 +30,32 @@ class PairwiseTransformer(object):
         self._num_of_pairs = num_of_pairs
         self._strategy = strategy
 
+        self._fitted_data_shape = None
+        self._fitted_labels_shape = None
+
     def fit(self, data: ArrayLike, labels: List[int], **fit_params) -> Any:
         """Fits the transformer.
 
         Args:
             data (ArrayLike): the data to fit.
-            labels (List[int]): the labels to fit.
+            labels (List[int]): the labels to fit. Needs to be 2D where rows
+                contain samples and columns represent classes.
 
         Returns:
             PairwiseTransformer: the fitted transformer.
         """
-        assert len(data) * len(
-            data) >= self._num_of_pairs, 'Not enough possible combinations.'
+        num_samples = len(data)
+        num_labels = len(labels)
+        assert num_samples == num_labels, 'Data and labels need same length.'
+
+        assert len(labels.shape) == 2, 'Labels need to be a 2D array.'
+
+        num_pairs = num_samples * num_samples
+
+        assert num_pairs >= self._num_of_pairs, 'Not enough possible pairs.'
+
+        self._data_shape = data.shape
+        self._labels_shape = labels.shape
 
         return self
 
@@ -58,6 +72,22 @@ class PairwiseTransformer(object):
                 transformed data and the second element contains the
                 transformed labels.
         """
+        assert self._data_shape is not None, 'Transformer not fitted.'
+
+        data_shape_fits = (len(self._data_shape) == len(data.shape) and
+                           self._data_shape[1] == data.shape[1])
+        assert data_shape_fits, 'Data shape does not fit.'
+
+        labels_shape_fits = (len(self._labels_shape) == len(labels.shape) and
+                             self._labels_shape[1] == labels.shape[1])
+        assert labels_shape_fits, 'Labels shape does not fit.'
+
+        num_samples = len(data)
+        num_labels = len(labels)
+        assert num_samples == num_labels, 'Data and labels need same length.'
+
+        labels = np.argmax(labels, axis=1)
+
         random1, random2, pair_labels = self._strategies[self._strategy](
             data,
             labels,
@@ -77,7 +107,7 @@ class PairwiseTransformer(object):
             labels (List[int]): the labels to fit an transform.
 
         Returns:
-            Tuple[ArrayLike, ArrayLike]: the first element contains the
+            Tuple[ArrayLike, ArrayLike]: the first element contains the[1:]
                 transformed data and the second element contains the
                 transformed labels.
         """
