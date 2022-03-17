@@ -2,6 +2,7 @@
 import os.path
 
 from dbispipeline.evaluators import CvEpochEvaluator
+from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import MinMaxScaler
 
@@ -9,7 +10,6 @@ import hit_prediction_code.common as common
 from hit_prediction_code.dataloaders import ClassLoaderWrapper
 from hit_prediction_code.dataloaders import EssentiaLoader
 import hit_prediction_code.evaluations as evaluations
-from hit_prediction_code.models.linear import LogisticRegressionClassifier
 from hit_prediction_code.models.pairwise import PairwiseOrdinalModel
 from hit_prediction_code.result_handlers import print_results_as_json
 
@@ -32,7 +32,7 @@ dataloader = ClassLoaderWrapper(
 
 pipeline = Pipeline([
     ('scale', MinMaxScaler()),
-    ('model', PairwiseOrdinalModel(LogisticRegressionClassifier())),
+    ('model', PairwiseOrdinalModel(LogisticRegression())),
 ])
 
 evaluator = CvEpochEvaluator(
