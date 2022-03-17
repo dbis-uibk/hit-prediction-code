@@ -50,7 +50,7 @@ def test_strategy_random():
     )
 
     assert transformed_data.shape == (number_of_pairs, data.shape[1] * 2)
-    assert transformed_labels.shape == (number_of_pairs, 1)
+    assert transformed_labels.shape == (number_of_pairs,)
 
     _assert_label_computation(transformed_data, transformed_labels)
 
@@ -77,7 +77,7 @@ def test_strategy_balanced():
     )
 
     assert transformed_data.shape == (number_of_pairs, data.shape[1] * 2)
-    assert transformed_labels.shape == (number_of_pairs, 1)
+    assert transformed_labels.shape == (number_of_pairs,)
 
     _assert_label_computation(transformed_data, transformed_labels)
 

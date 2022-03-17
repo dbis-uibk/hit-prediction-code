@@ -24,7 +24,7 @@ class PairwiseOrdinalModel(ClassifierMixin, BaseEstimator):
 
         assert epochs > 0, 'epochs needs to be > 0'
 
-        self._wrapped_model = wrapped_model
+        self.wrapped_model = wrapped_model
         self.epochs = epochs
 
     def fit(self, data, target, epochs=None):
@@ -42,11 +42,12 @@ class PairwiseOrdinalModel(ClassifierMixin, BaseEstimator):
         if epochs is None:
             epochs = self.epochs
 
-        self._threshold_sample = self._fit_threshold_sample(data, target)
+        self._fit_threshold_sample(data, target)
 
-        data, target = PairwiseTransformer().fit_transform_data(data, target)
+        transformer = PairwiseTransformer(num_of_pairs=len(data))
+        data, target = transformer.fit_transform_data(data, target)
 
-        self._wrapped_model.fit(data, target, epochs=epochs)
+        self.wrapped_model.fit(data, target, epochs=epochs)
 
     def predict(self, data):
         """Wraps the prediction and converts the task.
@@ -54,19 +55,22 @@ class PairwiseOrdinalModel(ClassifierMixin, BaseEstimator):
         Args:
             data (array-like): the features to predict labels for.
         """
-        references = np.repeat(self._threshold_sample, len(data))
+        assert self._threshold_sample is None, 'Fit the model first'
+
+        references = np.tile(self._threshold_sample, (len(data), 1))
         data = np.column_stack((references, data))
 
-        prediction = self._wrapped_model.predict(data)
-
-        return convert_array_to_class_vector(
+        prediction = self.wrapped_model.predict(data)
+        prediction = convert_array_to_class_vector(
             prediction,
             [-1, 0, 1],
             strategy='one_hot',
         )
 
+        return prediction
+
     def _fit_threshold_sample(self, data, target):
-        indices = np.argmax(target[..., 1] == 1, axis=0)
+        indices = np.nonzero(target[:, 1] == 1)[0]
 
         assert len(indices) > 0, 'no threshold sample found'
 

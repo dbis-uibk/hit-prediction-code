@@ -94,7 +94,7 @@ class PairwiseTransformer(object):
         )
 
         pair_labels = list(_compute_labels(labels, random1, random2))
-        pair_labels = np.array(pair_labels).reshape(self._num_of_pairs, 1)
+        pair_labels = np.array(pair_labels)
 
         return np.column_stack((data[random1], data[random2])), pair_labels
 
