@@ -27,7 +27,7 @@ dataloader = ClassLoaderWrapper(
         label='peakPos',
         nan_value=common.peak_pos_non_hit_value(),
     ),
-    labels=[99, 100, 101],
+    labels=[100, 101],
 )
 
 pipeline = Pipeline([
@@ -37,7 +37,7 @@ pipeline = Pipeline([
 
 evaluator = CvEpochEvaluator(
     cv=evaluations.cv(),
-    scoring=evaluations.metrics.classifier_scoring(),
+    scoring=evaluations.metrics.ordinal_classifier_scoring(),
     scoring_step_size=1,
 )
 

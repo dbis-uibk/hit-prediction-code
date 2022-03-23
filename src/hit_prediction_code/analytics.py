@@ -441,22 +441,34 @@ def scores_from_confusion_matrices(
     scores = []
     for epoch, cm in zip(epochs, cms):
         mcm = confusion_matrix_to_multilabel_confusion_matrix(cm)
-        macro_p, macro_r, macro_f1 = precision_recall_fscore(
-            mcm,
-            average='macro',
-        )
-        micro_p, micro_r, micro_f1 = precision_recall_fscore(
-            mcm,
-            average='micro',
-        )
-        scores.append({
-            'epochs': epoch,
-            'macro_precision': macro_p,
-            'micro_precision': micro_p,
-            'macro_recall': macro_r,
-            'micro_recall': micro_r,
-            'macro_f1': macro_f1,
-            'micro_f1': micro_f1,
-        })
+        score = scores_from_multilabel_confusion_matrix(mcm)
+        scores.append({'epochs': epoch, **score})
 
     return pd.DataFrame(scores)
+
+
+def scores_from_multilabel_confusion_matrix(mcm: np.array) -> pd.DataFrame:
+    """Calculates known score on each multilabel confusion matrix.
+
+    Args:
+        mcm (np.array): multilabel confusion matrix.
+
+    Returns:
+        pd.DataFrame: containing the scores.
+    """
+    macro_p, macro_r, macro_f1 = precision_recall_fscore(
+        mcm,
+        average='macro',
+    )
+    micro_p, micro_r, micro_f1 = precision_recall_fscore(
+        mcm,
+        average='micro',
+    )
+    return {
+        'macro_precision': macro_p,
+        'micro_precision': micro_p,
+        'macro_recall': macro_r,
+        'micro_recall': micro_r,
+        'macro_f1': macro_f1,
+        'micro_f1': micro_f1,
+    }

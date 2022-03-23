@@ -13,19 +13,36 @@ from hit_prediction_code.transformers.pairwise import PairwiseTransformer
 class PairwiseOrdinalModel(ClassifierMixin, BaseEstimator):
     """This class wraps a model to predict classes on pairs of samples."""
 
-    def __init__(self, wrapped_model: BaseEstimator, epochs: int = 1) -> None:
+    def __init__(self,
+                 wrapped_model: BaseEstimator,
+                 epochs: int = 1,
+                 pairs_factor: float = 1,
+                 threshold_type: str = 'random') -> None:
         """Creates the wrapper.
 
         Args:
             wrapped_model (BaseEstimator): the model used for the actual
                 prediction.
+            epochs (int): number of epochs to train.
+            pairs_factor (float): factor multiplied with the length of data.
+            threshold_type (str): how to compute the thresholds; random or
+                average.
         """
         super().__init__()
 
+        self._thresholds = {
+            'random': self._random_threshold,
+            'average': self._average_threshold,
+        }
+
         assert epochs > 0, 'epochs needs to be > 0'
+        assert pairs_factor > 0, 'choose a pairs factor > 0'
+        assert threshold_type in self._thresholds.keys()
 
         self.wrapped_model = wrapped_model
         self.epochs = epochs
+        self.pairs_factor = pairs_factor
+        self.threshold_type = threshold_type
 
     def fit(self, data, target, epochs=None):
         """Wraps the fit of the wrapped model.
@@ -37,17 +54,16 @@ class PairwiseOrdinalModel(ClassifierMixin, BaseEstimator):
                 evaluation. The value passed to the wrapped model. Default is
                 None; this means the number of set epochs is used.
         """
-        assert target.shape[1] == 3, 'Only three classes are supported.'
-
         if epochs is None:
             epochs = self.epochs
 
-        self._fit_threshold_sample(data, target)
+        self._fit_threshold_samples(data, target)
 
-        transformer = PairwiseTransformer(num_of_pairs=len(data))
+        num_of_pairs = int(len(data) * self.pairs_factor)
+        transformer = PairwiseTransformer(num_of_pairs=num_of_pairs)
         data, target = transformer.fit_transform_data(data, target)
 
-        self.wrapped_model.fit(data, target, epochs=epochs)
+        self.wrapped_model.fit(data, target)
 
     def predict(self, data):
         """Wraps the prediction and converts the task.
@@ -55,23 +71,38 @@ class PairwiseOrdinalModel(ClassifierMixin, BaseEstimator):
         Args:
             data (array-like): the features to predict labels for.
         """
-        assert self._threshold_sample is None, 'Fit the model first'
+        assert self._threshold_samples is not None, 'Fit the model first'
 
-        references = np.tile(self._threshold_sample, (len(data), 1))
-        data = np.column_stack((references, data))
+        predictions = []
+        for sample in self._threshold_samples:
+            references = np.tile(sample, (len(data), 1))
+            col_data = np.column_stack((references, data))
+            prediction = self.wrapped_model.predict(col_data)
+            predictions.append(prediction >= 0)
 
-        prediction = self.wrapped_model.predict(data)
-        prediction = convert_array_to_class_vector(
-            prediction,
-            [-1, 0, 1],
+        predictions.append(np.full_like(prediction, True))
+
+        predictions = np.column_stack(predictions)
+        predictions = np.argmax(predictions, axis=1)
+        predictions = convert_array_to_class_vector(
+            predictions,
+            list(range(len(self._threshold_samples + 1))),
             strategy='one_hot',
         )
 
-        return prediction
+        return predictions
 
-    def _fit_threshold_sample(self, data, target):
-        indices = np.nonzero(target[:, 1] == 1)[0]
+    def _fit_threshold_samples(self, data, target):
+        self._threshold_samples = []
+        for c in range(target.shape[1] - 1):
+            indices = np.nonzero(target[:, c] == 1)[0]
+            assert len(indices) > 0, f'no threshold sample found for class {c}'
 
-        assert len(indices) > 0, 'no threshold sample found'
+            threshold = self._thresholds[self.threshold_type](data, indices)
+            self._threshold_samples.append(threshold)
 
-        self._threshold_sample = data[random.choice(indices)]
+    def _random_threshold(self, data, indices):
+        return data[random.choice(indices)]
+
+    def _average_threshold(self, data, indices):
+        return np.average(data[indices], axis=0)

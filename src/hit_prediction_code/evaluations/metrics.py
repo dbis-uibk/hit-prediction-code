@@ -1,4 +1,5 @@
 """Module containing evaluation metrics."""
+import numpy as np
 import scipy.stats
 from sklearn import metrics
 
@@ -260,4 +261,35 @@ def classifier_scoring():
             metrics.make_scorer(metrics.precision_score, average='macro'),
         'multilabel_confusion_matrix':
             metrics.make_scorer(metrics.multilabel_confusion_matrix),
+    }
+
+
+def _class_confusion_matrix(y_true, y_pred):
+    num_classes = y_true.shape[1]
+
+    y_true = np.argmax(y_true, axis=1)
+    y_pred = np.argmax(y_pred, axis=1)
+
+    return metrics.confusion_matrix(y_true, y_pred, labels=range(num_classes))
+
+
+def ordinal_classifier_scoring():
+    """Return a set of scoring functions for classification setup."""
+    return {
+        'f1_micro':
+            metrics.make_scorer(metrics.f1_score, average='micro'),
+        'f1_macro':
+            metrics.make_scorer(metrics.f1_score, average='macro'),
+        'recall_micro':
+            metrics.make_scorer(metrics.recall_score, average='micro'),
+        'recall_macro':
+            metrics.make_scorer(metrics.recall_score, average='macro'),
+        'precision_micro':
+            metrics.make_scorer(metrics.precision_score, average='micro'),
+        'precision_macro':
+            metrics.make_scorer(metrics.precision_score, average='macro'),
+        'multilabel_confusion_matrix':
+            metrics.make_scorer(metrics.multilabel_confusion_matrix),
+        'confusion_matrix':
+            metrics.make_scorer(_class_confusion_matrix),
     }
