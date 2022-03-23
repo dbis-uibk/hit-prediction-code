@@ -32,7 +32,13 @@ dataloader = ClassLoaderWrapper(
 
 pipeline = Pipeline([
     ('scale', MinMaxScaler()),
-    ('model', PairwiseOrdinalModel(LogisticRegression())),
+    ('model',
+     PairwiseOrdinalModel(
+         wrapped_model=LogisticRegression(),
+         pairs_factor=10.,
+         threshold_type='random',
+         pair_encoding='concat',
+     )),
 ])
 
 evaluator = CvEpochEvaluator(

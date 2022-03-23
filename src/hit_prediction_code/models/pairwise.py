@@ -16,7 +16,7 @@ class PairwiseOrdinalModel(ClassifierMixin, BaseEstimator):
     def __init__(self,
                  wrapped_model: BaseEstimator,
                  epochs: int = 1,
-                 pairs_factor: float = 1,
+                 pairs_factor: float = 1.,
                  threshold_type: str = 'random',
                  pair_encoding: str = 'concat') -> None:
         """Creates the wrapper.
