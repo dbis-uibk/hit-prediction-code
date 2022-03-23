@@ -86,7 +86,7 @@ class PairwiseOrdinalModel(ClassifierMixin, BaseEstimator):
         predictions = np.argmax(predictions, axis=1)
         predictions = convert_array_to_class_vector(
             predictions,
-            list(range(len(self._threshold_samples + 1))),
+            list(range(len(self._threshold_samples) + 1)),
             strategy='one_hot',
         )
 
