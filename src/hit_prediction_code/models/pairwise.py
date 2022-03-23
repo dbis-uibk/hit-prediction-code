@@ -17,7 +17,8 @@ class PairwiseOrdinalModel(ClassifierMixin, BaseEstimator):
                  wrapped_model: BaseEstimator,
                  epochs: int = 1,
                  pairs_factor: float = 1,
-                 threshold_type: str = 'random') -> None:
+                 threshold_type: str = 'random',
+                 pair_encoding: str = 'concat') -> None:
         """Creates the wrapper.
 
         Args:
@@ -43,6 +44,7 @@ class PairwiseOrdinalModel(ClassifierMixin, BaseEstimator):
         self.epochs = epochs
         self.pairs_factor = pairs_factor
         self.threshold_type = threshold_type
+        self.pair_encoding = pair_encoding
 
     def fit(self, data, target, epochs=None):
         """Wraps the fit of the wrapped model.
@@ -60,7 +62,8 @@ class PairwiseOrdinalModel(ClassifierMixin, BaseEstimator):
         self._fit_threshold_samples(data, target)
 
         num_of_pairs = int(len(data) * self.pairs_factor)
-        transformer = PairwiseTransformer(num_of_pairs=num_of_pairs)
+        transformer = PairwiseTransformer(num_of_pairs=num_of_pairs,
+                                          pair_encoding=self.pair_encoding)
         data, target = transformer.fit_transform_data(data, target)
 
         self.wrapped_model.fit(data, target)
@@ -76,7 +79,15 @@ class PairwiseOrdinalModel(ClassifierMixin, BaseEstimator):
         predictions = []
         for sample in self._threshold_samples:
             references = np.tile(sample, (len(data), 1))
-            col_data = np.column_stack((references, data))
+
+            if self.pair_encoding == 'concat':
+                col_data = np.column_stack((references, data))
+            elif self.pair_encoding == 'delta':
+                col_data = references - data
+            else:
+                raise AssertionError(
+                    f'pair_encoding {self.pair_encoding} unknown.')
+
             prediction = self.wrapped_model.predict(col_data)
             predictions.append(prediction >= 0)
 
