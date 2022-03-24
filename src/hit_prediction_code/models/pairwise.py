@@ -128,14 +128,25 @@ class PairwiseOrdinalModel(ClassifierMixin, BaseEstimator):
 
     def _train_with_threshold_samples(self):
         len_factor = 10
-        t1 = self._threshold_samples * len_factor
-        t2 = self._threshold_samples * len_factor
-        target = [0] * len(t1) * len_factor
-        labels = convert_array_to_class_vector(
-            np.array(target),
-            list(range(len(self._threshold_samples) + 1)),
-            strategy='one_hot',
-        )
+        t1 = []
+        t2 = []
+        labels = []
+
+        t1 += self._threshold_samples[:-1]
+        t2 += self._threshold_samples[1:]
+        labels += ([-1] * len(self._threshold_samples))
+
+        t1 += self._threshold_samples
+        t2 += self._threshold_samples
+        labels += ([0] * len(self._threshold_samples))
+
+        t1 += self._threshold_samples[1:]
+        t2 += self._threshold_samples[:-1]
+        labels = labels + ([1] * len(self._threshold_samples))
+
+        t1 *= len_factor
+        t2 *= len_factor
+        labels *= len_factor
 
         data = np.column_stack((t1, t2))
-        self.wrapped_model.fit(data, labels)
+        self.wrapped_model.fit(data, np.array(labels))
