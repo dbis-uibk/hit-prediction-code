@@ -37,7 +37,9 @@ pipeline = Pipeline([
          wrapped_model=LogisticRegression(),
          pairs_factor=10.,
          threshold_type='random',
+         pair_strategy='random',
          pair_encoding='concat',
+         threshold_sample_training=False,
      )),
 ])
 

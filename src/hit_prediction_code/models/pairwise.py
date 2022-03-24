@@ -88,13 +88,7 @@ class PairwiseOrdinalModel(ClassifierMixin, BaseEstimator):
         for sample in self._threshold_samples:
             references = np.tile(sample, (len(data), 1))
 
-            if self.pair_encoding == 'concat':
-                col_data = np.column_stack((references, data))
-            elif self.pair_encoding == 'delta':
-                col_data = references - data
-            else:
-                raise AssertionError(
-                    f'pair_encoding {self.pair_encoding} unknown.')
+            col_data = self._create_pairs(references, data)
 
             prediction = self.wrapped_model.predict(col_data)
             predictions.append(prediction >= 0)
@@ -148,5 +142,14 @@ class PairwiseOrdinalModel(ClassifierMixin, BaseEstimator):
         t2 *= len_factor
         labels *= len_factor
 
-        data = np.column_stack((t1, t2))
+        data = self._create_pairs(t1, t2)
         self.wrapped_model.fit(data, np.array(labels))
+
+    def _create_pairs(self, choice1, choice2):
+        if self.pair_encoding == 'concat':
+            return np.column_stack((choice1, choice2))
+        elif self.pair_encoding == 'delta':
+            return choice1 - choice2
+        else:
+            raise AssertionError(
+                f'pair_encoding {self.pair_encoding} unknown.')
