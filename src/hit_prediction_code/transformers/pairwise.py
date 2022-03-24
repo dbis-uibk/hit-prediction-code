@@ -178,6 +178,8 @@ class PairwiseTransformer(object):
             random2.append(item1)
             pair_labels.append(label * -1)
 
+        return random1, random2, pair_labels
+
 
 def _compute_labels(labels, choice1, choice2):
     assert len(choice1) == len(choice2)
