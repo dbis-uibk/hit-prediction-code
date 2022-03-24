@@ -127,10 +127,12 @@ class PairwiseOrdinalModel(ClassifierMixin, BaseEstimator):
         return np.average(data[indices], axis=0)
 
     def _train_with_threshold_samples(self):
-        t1 = self._threshold_samples * 1000
-        t2 = self._threshold_samples * 1000
+        len_factor = 10
+        t1 = self._threshold_samples * len_factor
+        t2 = self._threshold_samples * len_factor
+        target = [0] * len(t1) * len_factor
         labels = convert_array_to_class_vector(
-            len(t1) * [0] * 1000,
+            np.array(target),
             list(range(len(self._threshold_samples) + 1)),
             strategy='one_hot',
         )
