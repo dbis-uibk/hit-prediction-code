@@ -19,7 +19,8 @@ class PairwiseOrdinalModel(ClassifierMixin, BaseEstimator):
                  pairs_factor: float = 1.,
                  threshold_type: str = 'random',
                  pair_strategy: str = 'random',
-                 pair_encoding: str = 'concat') -> None:
+                 pair_encoding: str = 'concat',
+                 threshold_sample_training=False) -> None:
         """Creates the wrapper.
 
         Args:
@@ -47,6 +48,7 @@ class PairwiseOrdinalModel(ClassifierMixin, BaseEstimator):
         self.threshold_type = threshold_type
         self.pair_strategy = pair_strategy
         self.pair_encoding = pair_encoding
+        self.threshold_sample_training = threshold_sample_training
 
     def fit(self, data, target, epochs=None):
         """Wraps the fit of the wrapped model.
@@ -61,15 +63,18 @@ class PairwiseOrdinalModel(ClassifierMixin, BaseEstimator):
         if epochs is None:
             epochs = self.epochs
 
-        self._fit_threshold_samples(data, target)
-
         num_of_pairs = int(len(data) * self.pairs_factor)
         transformer = PairwiseTransformer(num_of_pairs=num_of_pairs,
                                           strategy=self.pair_strategy,
                                           pair_encoding=self.pair_encoding)
-        data, target = transformer.fit_transform_data(data, target)
+        data_trans, target_trans = transformer.fit_transform_data(data, target)
 
-        self.wrapped_model.fit(data, target)
+        self.wrapped_model.fit(data_trans, target_trans)
+
+        self._fit_threshold_samples(data, target)
+
+        if self.threshold_sample_training:
+            self._train_with_threshold_samples()
 
     def predict(self, data):
         """Wraps the prediction and converts the task.
@@ -120,3 +125,15 @@ class PairwiseOrdinalModel(ClassifierMixin, BaseEstimator):
 
     def _average_threshold(self, data, indices):
         return np.average(data[indices], axis=0)
+
+    def _train_with_threshold_samples(self):
+        t1 = self._threshold_samples * 1000
+        t2 = self._threshold_samples * 1000
+        labels = convert_array_to_class_vector(
+            len(t1) * [0] * 1000,
+            list(range(len(self._threshold_samples) + 1)),
+            strategy='one_hot',
+        )
+
+        data = np.column_stack((t1, t2))
+        self.wrapped_model.fit(data, labels)
