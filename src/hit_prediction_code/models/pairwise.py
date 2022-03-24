@@ -18,6 +18,7 @@ class PairwiseOrdinalModel(ClassifierMixin, BaseEstimator):
                  epochs: int = 1,
                  pairs_factor: float = 1.,
                  threshold_type: str = 'random',
+                 pair_strategy: str = 'random',
                  pair_encoding: str = 'concat') -> None:
         """Creates the wrapper.
 
@@ -44,6 +45,7 @@ class PairwiseOrdinalModel(ClassifierMixin, BaseEstimator):
         self.epochs = epochs
         self.pairs_factor = pairs_factor
         self.threshold_type = threshold_type
+        self.pair_strategy = pair_strategy
         self.pair_encoding = pair_encoding
 
     def fit(self, data, target, epochs=None):
@@ -63,6 +65,7 @@ class PairwiseOrdinalModel(ClassifierMixin, BaseEstimator):
 
         num_of_pairs = int(len(data) * self.pairs_factor)
         transformer = PairwiseTransformer(num_of_pairs=num_of_pairs,
+                                          strategy=self.pair_strategy,
                                           pair_encoding=self.pair_encoding)
         data, target = transformer.fit_transform_data(data, target)
 

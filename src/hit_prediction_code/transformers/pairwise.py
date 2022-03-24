@@ -25,6 +25,7 @@ class PairwiseTransformer(object):
         self._strategies = {
             'random': self._create_random_pairs,
             'balanced': self._create_balanced_pairs,
+            'symmetric': self._create_symmetric_pairs,
         }
 
         strategies = self._strategies.keys()
@@ -155,6 +156,27 @@ class PairwiseTransformer(object):
                     break
 
         return random1, random2, pair_labels
+
+    def _create_symmetric_pairs(self, data, labels):
+        random1 = []
+        random2 = []
+        pair_labels = []
+
+        while len(random1) < self._num_of_pairs:
+            item1 = random.randrange(len(data))
+            item2 = random.randrange(len(data))
+            label = _compare_labels_by_index(labels, item1, item2)
+
+            if label == 0:
+                continue
+
+            random1.append(item1)
+            random2.append(item2)
+            pair_labels.append(label)
+
+            random1.append(item2)
+            random2.append(item1)
+            pair_labels.append(label * -1)
 
 
 def _compute_labels(labels, choice1, choice2):
