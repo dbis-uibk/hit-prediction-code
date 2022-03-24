@@ -134,7 +134,7 @@ class PairwiseOrdinalModel(ClassifierMixin, BaseEstimator):
 
         t1 += self._threshold_samples[:-1]
         t2 += self._threshold_samples[1:]
-        labels += ([-1] * len(self._threshold_samples))
+        labels += ([-1] * (len(self._threshold_samples) - 1))
 
         t1 += self._threshold_samples
         t2 += self._threshold_samples
@@ -142,7 +142,7 @@ class PairwiseOrdinalModel(ClassifierMixin, BaseEstimator):
 
         t1 += self._threshold_samples[1:]
         t2 += self._threshold_samples[:-1]
-        labels = labels + ([1] * len(self._threshold_samples))
+        labels = labels + ([1] * (len(self._threshold_samples) - 1))
 
         t1 *= len_factor
         t2 *= len_factor
