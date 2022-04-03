@@ -405,6 +405,11 @@ class QcutLoaderWrapper(Loader):
         except AttributeError:
             return self.wrapped_loader.data, labels
 
+    @property
+    def configuration(self):
+        """Returns the configuration in json serializable format."""
+        return self._config
+
 
 class ClassLoaderWrapper(Loader):
     """Wraps a loader for regression targets and converts them to classes."""
