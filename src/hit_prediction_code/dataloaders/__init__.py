@@ -394,16 +394,24 @@ class QcutLoaderWrapper(Loader):
 
     def load(self):
         """Returns the data loaded by the dataloader."""
-        labels = pd.qcut(
+        return self.data, self.lables
+
+    @property
+    def data(self):
+        """Returns the data."""
+        try:
+            return self.wrapped_loader.data.values
+        except AttributeError:
+            return self.wrapped_loader.data
+
+    @property
+    def labels(self):
+        """Returns the converted labels."""
+        return pd.qcut(
             self.wrapped_loader.labels,
             self._number_of_bins,
             labels=False,
         )
-
-        try:
-            return self.wrapped_loader.data.values, labels
-        except AttributeError:
-            return self.wrapped_loader.data, labels
 
     @property
     def configuration(self):
