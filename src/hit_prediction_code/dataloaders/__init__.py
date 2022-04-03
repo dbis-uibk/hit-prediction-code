@@ -379,6 +379,33 @@ class EssentiaLoader(Loader):
         return self._config
 
 
+class QcutLoaderWrapper(Loader):
+    """Wraps a loader to convert labels to quantile-based bins."""
+
+    def __init__(self, wrapped_loader, number_of_bins) -> None:
+        """Creates the loader."""
+        self.wrapped_loader = wrapped_loader
+        self._number_of_bins = number_of_bins
+
+        self._config = {
+            'warpped_loader': wrapped_loader.configuration,
+            'number_of_bins': number_of_bins,
+        }
+
+    def load(self):
+        """Returns the data loaded by the dataloader."""
+        labels = pd.qcut(
+            self.wrapped_loader.labels,
+            self._number_of_bins,
+            labels=False,
+        )
+
+        try:
+            return self.wrapped_loader.data.values, labels
+        except AttributeError:
+            return self.wrapped_loader.data, labels
+
+
 class ClassLoaderWrapper(Loader):
     """Wraps a loader for regression targets and converts them to classes."""
 
