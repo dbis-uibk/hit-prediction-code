@@ -1,42 +1,55 @@
-"""LogisticRegressionClassifier plan using all features."""
+"""Plan using all features."""
 import os.path
 
 from dbispipeline.evaluators import CvEpochEvaluator
-from sklearn.linear_model import LogisticRegression
+from sklearn.neural_network import MLPClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import MinMaxScaler
 
 import hit_prediction_code.common as common
 from hit_prediction_code.dataloaders import ClassLoaderWrapper
 from hit_prediction_code.dataloaders import EssentiaLoader
+from hit_prediction_code.dataloaders import QcutLoaderWrapper
 import hit_prediction_code.evaluations as evaluations
 from hit_prediction_code.models.pairwise import PairwiseOrdinalModel
 from hit_prediction_code.result_handlers import print_results_as_json
+from hit_prediction_code.transformers.label import compute_hit_score_on_df
 
 PATH_PREFIX = 'data/hit_song_prediction_msd_bb_lfm_ab/processed'
 
+number_of_classes = 2
+
 dataloader = ClassLoaderWrapper(
-    wrapped_loader=EssentiaLoader(
-        dataset_path=os.path.join(
-            PATH_PREFIX,
-            'hsp-s_acousticbrainz.parquet',
+    wrapped_loader=QcutLoaderWrapper(
+        wrapped_loader=EssentiaLoader(
+            dataset_path=os.path.join(
+                PATH_PREFIX,
+                'hsp-s_acousticbrainz.parquet',
+            ),
+            features=[
+                *common.all_no_year_list(),
+            ],
+            label='yang_hit_score',
+            nan_value=0,
+            data_modifier=lambda df: compute_hit_score_on_df(
+                df,
+                pc_column='lastfm_playcount',
+                lc_column='lastfm_listener_count',
+                hit_score_column='yang_hit_score',
+            ),
         ),
-        features=[
-            *common.all_no_year_list(),
-        ],
-        label='peakPos',
-        nan_value=common.peak_pos_non_hit_value(),
+        number_of_bins=number_of_classes,
     ),
-    labels=[100, 101],
+    labels=list(range(number_of_classes)),
 )
 
 pipeline = Pipeline([
     ('scale', MinMaxScaler()),
     ('model',
      PairwiseOrdinalModel(
-         wrapped_model=LogisticRegression(),
-         pairs_factor=10.,
-         threshold_type='random',
+         wrapped_model=MLPClassifier(),
+         pairs_factor=3.,
+         threshold_type='average',
          pair_strategy='random',
          pair_encoding='concat',
          threshold_sample_training=False,
