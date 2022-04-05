@@ -47,7 +47,6 @@ pipeline = Pipeline([
     ('model',
      MLPClassifier(
          hidden_layer_sizes=(256, 128, 128, 128, 64),
-         max_iter=100,
          verbose=True,
      )),
 ])

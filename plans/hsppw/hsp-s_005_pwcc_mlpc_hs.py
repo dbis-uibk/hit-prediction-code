@@ -49,7 +49,6 @@ pipeline = Pipeline([
      PairwiseOrdinalModel(
          wrapped_model=MLPClassifier(
              hidden_layer_sizes=(256, 128, 128, 128, 64),
-             max_iter=100,
              verbose=True,
          ),
          pairs_factor=3.,
