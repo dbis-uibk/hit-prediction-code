@@ -370,8 +370,48 @@ class EssentiaLoader(Loader):
 
     @property
     def feature_indices(self):
-        """Returns the mapping between features and indeces."""
+        """Returns the mapping between features and indices."""
         return self._features_index_list
+
+    @property
+    def configuration(self):
+        """Returns the configuration in json serializable format."""
+        return self._config
+
+
+class CutLoaderWrapper(Loader):
+    """Wraps a loader to convert labels to equally sized bins."""
+
+    def __init__(self, wrapped_loader, number_of_bins) -> None:
+        """Creates the loader."""
+        self.wrapped_loader = wrapped_loader
+        self._number_of_bins = number_of_bins
+
+        self._config = {
+            'warpped_loader': wrapped_loader.configuration,
+            'number_of_bins': number_of_bins,
+        }
+
+    def load(self):
+        """Returns the data loaded by the dataloader."""
+        return self.data, self.labels
+
+    @property
+    def data(self):
+        """Returns the data."""
+        try:
+            return self.wrapped_loader.data.values
+        except AttributeError:
+            return self.wrapped_loader.data
+
+    @property
+    def labels(self):
+        """Returns the converted labels."""
+        return pd.cut(
+            self.wrapped_loader.labels,
+            self._number_of_bins,
+            labels=False,
+        )
 
     @property
     def configuration(self):
@@ -394,7 +434,7 @@ class QcutLoaderWrapper(Loader):
 
     def load(self):
         """Returns the data loaded by the dataloader."""
-        return self.data, self.lables
+        return self.data, self.labels
 
     @property
     def data(self):
