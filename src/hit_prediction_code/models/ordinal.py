@@ -1,6 +1,10 @@
 """Module containing implementations for ordinal classification."""
 import numpy as np
+from sklearn.base import BaseEstimator
+from sklearn.base import ClassifierMixin
 from sklearn.base import clone
+
+from ..transformers.label import convert_array_to_class_vector
 
 
 class OrdinalClassifier():
@@ -53,3 +57,56 @@ class OrdinalClassifier():
     def predict(self, data):
         """Predicts the target label."""
         return np.argmax(self.predict_proba(data), axis=1)
+
+
+class RegressorOrdinalModel(ClassifierMixin, BaseEstimator):
+    """This class wraps a regression model to predict ordinal classes."""
+
+    def __init__(self, wrapped_model: BaseEstimator, epochs: int = 1) -> None:
+        """Creates the wrapper.
+
+        Args:
+            wrapped_model (BaseEstimator): the model used for the actual
+                prediction.
+            epochs (int): number of epochs to train.
+        """
+        super().__init__()
+
+        assert epochs > 0, 'epochs needs to be > 0'
+
+        self.wrapped_model = wrapped_model
+        self.epochs = epochs
+
+    def fit(self, data, target, epochs=None):
+        """Wraps the fit of the wrapped model.
+
+        Args:
+            data (array-like): the features.
+            target (array-like): the targets.
+            epochs (int, optional): required to fit the api used for
+                evaluation. The value passed to the wrapped model. Default is
+                None; this means the number of set epochs is used.
+        """
+        if epochs is None:
+            epochs = self.epochs
+
+        self._num_classes = target.shape[1]
+        target_trans = np.argmax(target, axis=1)
+
+        self.wrapped_model.fit(data, target_trans)
+
+    def predict(self, data):
+        """Wraps the prediction and converts the task.
+
+        Args:
+            data (array-like): the features to predict labels for.
+        """
+        predictions = self.wrapped_model.predict(data)
+
+        predictions = convert_array_to_class_vector(
+            predictions,
+            list(range(self._num_classes)),
+            strategy='one_hot',
+        )
+
+        return predictions
