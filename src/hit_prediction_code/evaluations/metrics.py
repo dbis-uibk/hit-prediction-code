@@ -273,6 +273,20 @@ def _class_confusion_matrix(y_true, y_pred):
     return metrics.confusion_matrix(y_true, y_pred, labels=range(num_classes))
 
 
+def _class_mae(y_true, y_pred):
+    y_true = np.argmax(y_true, axis=1)
+    y_pred = np.argmax(y_pred, axis=1)
+
+    return metrics.mean_absolute_error(y_true, y_pred)
+
+
+def _class_kappa(y_true, y_pred):
+    y_true = np.argmax(y_true, axis=1)
+    y_pred = np.argmax(y_pred, axis=1)
+
+    return metrics.cohen_kappa_score(y_true, y_pred, weights='linear')
+
+
 def ordinal_classifier_scoring():
     """Return a set of scoring functions for classification setup."""
     return {
@@ -292,4 +306,8 @@ def ordinal_classifier_scoring():
             metrics.make_scorer(metrics.multilabel_confusion_matrix),
         'confusion_matrix':
             metrics.make_scorer(_class_confusion_matrix),
+        'mae_mu':
+            metrics.make_scorer(_class_mae),
+        'linear_kappa':
+            metrics.make_scorer(_class_kappa),
     }
