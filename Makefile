@@ -1,4 +1,4 @@
-.PHONY: clean clean-test clean-pyc clean-build docs help format bandit requirements #docker-image
+.PHONY: clean clean-test clean-pyc clean-build help format bandit requirements #docker-image
 .DEFAULT_GOAL := help
 
 define BROWSER_PYSCRIPT
@@ -65,19 +65,6 @@ coverage: ## check code coverage quickly with the default Python
 	coverage html
 	$(BROWSER) htmlcov/index.html
 
-docs: ## generate Sphinx HTML documentation, including API docs
-	rm -f docs/source/hit_prediction_code.rst
-	rm -f docs/source/modules.rst
-	sphinx-apidoc -o docs/source/ src/hit_prediction_code
-	$(MAKE) -C docs clean
-	$(MAKE) -C docs html
-	$(BROWSER) docs/build/html/index.html
-
-servedocs: docs ## compile the docs watching for changes
-	watchmedo shell-command -p '*.rst;*.md' -c '$(MAKE) -C docs html' -R -D .
-
-#release: dist ## package and upload a release
-#	twine upload dist/*
 
 executable:
 	pyinstaller --name hit_prediction_code hit_prediction_code/cli.py
